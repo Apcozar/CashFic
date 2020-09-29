@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+	
+	<changeSet author="Bernardo" id="initial_tables">
+		<createTable tableName="example_entities">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" />
+			</column>
+			<column name="name" type="VARCHAR(30)">
+				<constraints nullable="false" unique="true" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="Bernardo" id="initial_data">
+		<sqlFile encoding="utf8" path="populate/initial.sql"
+			relativeToChangelogFile="true" stripComments="true" />
+	</changeSet>
+	
+	
+	
+	<changeSet author="Santiago" id="sale_advertisements" >
+		<createTable tableName="sale_advertisements">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="PK_sale_advertisements"/>
+			</column>
+			<column name="product_title" type="VARCHAR(30)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+			<column name="product_description" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	
+	<changeSet author="Santiago" id="images" >
+		<createTable tableName="images">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="PK_images" />
+			</column>
+			<column name="title" type="VARCHAR(30)">
+				<constraints nullable="false" unique="false"/>
+			</column>		
+			<column name="image_path" type="VARCHAR(50)">
+				<constraints nullable="false" unique="true"/>			
+			</column>	
+			<column name="sale_advertisementId" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>	
+		</createTable>
+	</changeSet>
+	
+	<changeSet author="Santiago" id="sale_advertisementsImageRelation">
+		<addForeignKeyConstraint
+			baseColumnNames="sale_advertisementId"
+			baseTableName="images"
+			constraintName="FK_sale_advertisement_image"
+			referencedColumnNames="id"
+			referencedTableName="sale_advertisements"/>
+	</changeSet>
+	
+	
+	<changeSet author="Santiago" id="userProfile">
+		<createTable tableName="users">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" primaryKeyName="PK_users"/>
+			</column>
+			<column name="login" type="VARCHAR(40)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+			<column name="name" type="VARCHAR(20)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="city" type="VARCHAR(20)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	
+	<changeSet author="Santiago" id="userProfileSale_advertisementRelation">
+		<addColumn tableName="sale_advertisements">
+			<column name="userId" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		<addForeignKeyConstraint
+			baseTableName="sale_advertisements"
+			baseColumnNames="userId"
+			constraintName="FK_sale_advertisement_user"
+			referencedTableName="users"
+			referencedColumnNames="id"/>
+	</changeSet>
+	
+	<changeSet author="Santiago" id="initial_user_data">
+		<sqlFile encoding="utf8" path="populate/initial_users.sql"
+			relativeToChangelogFile="true" stripComments="true" />
+	</changeSet>
+	
+	
+	
+</databaseChangeLog>
