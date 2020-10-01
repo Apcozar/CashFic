@@ -103,7 +103,7 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
      * tests.
      */
     @ManyToOne
-    @JoinColumn(name="userId", nullable=false)
+    @JoinColumn(name="user_id", nullable=false)
     private DefaultUserEntity user;
     
     
@@ -161,6 +161,11 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
     	return images;
     }
     
+    @Override
+    public DefaultUserEntity getUser(){
+    	return user;
+    }
+    
     
     @Override
     public final int hashCode() {
@@ -182,6 +187,11 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
     	product_description = checkNotNull(value, "Received a null pointer as product_description");
     }
 
+    @Override
+    public void setUser(DefaultUserEntity value) {
+    	user = checkNotNull(value,"Received a null pointer as value");
+    } 
+    
     @Override
     public void setImages(final Set<DefaultImageEntity> value) {
     	images = checkNotNull(value,"Received a null pointer as images");

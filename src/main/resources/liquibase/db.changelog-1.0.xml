@@ -17,11 +17,6 @@
 		</createTable>
 	</changeSet>
 
-	<changeSet author="Bernardo" id="initial_data">
-		<sqlFile encoding="utf8" path="populate/initial.sql"
-			relativeToChangelogFile="true" stripComments="true" />
-	</changeSet>
-	
 	
 	
 	<changeSet author="Santiago" id="sale_advertisements" >
@@ -49,7 +44,7 @@
 			<column name="image_path" type="VARCHAR(50)">
 				<constraints nullable="false" unique="true"/>			
 			</column>	
-			<column name="sale_advertisementId" type="BIGINT">
+			<column name="sale_advertisement_id" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>	
 		</createTable>
@@ -57,7 +52,7 @@
 	
 	<changeSet author="Santiago" id="sale_advertisementsImageRelation">
 		<addForeignKeyConstraint
-			baseColumnNames="sale_advertisementId"
+			baseColumnNames="sale_advertisement_id"
 			baseTableName="images"
 			constraintName="FK_sale_advertisement_image"
 			referencedColumnNames="id"
@@ -84,22 +79,18 @@
 	
 	<changeSet author="Santiago" id="userProfileSale_advertisementRelation">
 		<addColumn tableName="sale_advertisements">
-			<column name="userId" type="BIGINT">
+			<column name="user_id" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 		</addColumn>
 		<addForeignKeyConstraint
 			baseTableName="sale_advertisements"
-			baseColumnNames="userId"
+			baseColumnNames="user_id"
 			constraintName="FK_sale_advertisement_user"
 			referencedTableName="users"
 			referencedColumnNames="id"/>
 	</changeSet>
-	
-	<changeSet author="Santiago" id="initial_user_data">
-		<sqlFile encoding="utf8" path="populate/initial_users.sql"
-			relativeToChangelogFile="true" stripComments="true" />
-	</changeSet>
+
 	
 	
 	

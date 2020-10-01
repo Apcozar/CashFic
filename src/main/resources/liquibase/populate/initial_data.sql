@@ -35,4 +35,8 @@ INSERT INTO users (login, name, city) VALUES
    ('santiago.paz.perez','santiago','naron'),
    ('adrian.ulla.rubinos','adrian','rabade');
 
+INSERT INTO sale_advertisements  (product_title, product_description, user_id) VALUES  
+	('FirstProduct','FirstProductDescription',1),
+	('SecondProduct', 'SecondProductDescription',1),
+	('ThirdProduct','ThirdProductDescription',1);
 

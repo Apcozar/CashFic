@@ -86,7 +86,7 @@ public class DefaultImageEntity implements ImageEntity {
     private String            image_path             = "";
 
     @ManyToOne
-    @JoinColumn(name="sale_advertisementId", nullable=false)
+    @JoinColumn(name="sale_advertisement_id", nullable=false)
     private DefaultImageEntity image;
     
     
@@ -160,7 +160,7 @@ public class DefaultImageEntity implements ImageEntity {
 
     @Override
     public final String toString() {
-        return MoreObjects.toStringHelper(this).add("imageId", id).toString();
+        return MoreObjects.toStringHelper(this).add("image_id", id).toString();
     }
 
 }

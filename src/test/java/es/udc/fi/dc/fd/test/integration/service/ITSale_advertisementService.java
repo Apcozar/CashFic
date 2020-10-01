@@ -37,8 +37,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.udc.fi.dc.fd.model.UserEntity;
+import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSale_advertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.service.Sale_advertisementService;
 import es.udc.fi.dc.fd.service.UserService;
 
 /**
@@ -54,18 +56,21 @@ import es.udc.fi.dc.fd.service.UserService;
 @Rollback
 @ContextConfiguration(locations = { "classpath:context/application-context.xml" })
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
-public class ITUserService {
+public class ITSale_advertisementService {
 
     /**
      * Service being tested.
      */
     @Autowired
-    private UserService service;
+    private Sale_advertisementService service;
 
+    @Autowired
+    private UserService userService;
+    
     /**
      * Default constructor.
      */
-    public ITUserService() {
+    public ITSale_advertisementService() {
         super();
     }
 
@@ -74,84 +79,51 @@ public class ITUserService {
      */
     @Test
     public void testAdd_NotExisting_Added() {
-        final DefaultUserEntity entity; // Entity to add
+        final DefaultSale_advertisementEntity entity; // Entity to add
         final Integer entitiesCount;       // Original number of entities
         final Integer finalEntitiesCount;  // Final number of entities
+        final DefaultUserEntity user;
+        entitiesCount = ((Collection<DefaultSale_advertisementEntity>) service
+                .getAllSale_advertisements()).size();
 
-        entitiesCount = ((Collection<DefaultUserEntity>) service
-                .getAllUsers()).size();
-
-        entity = new DefaultUserEntity();
-        entity.setLogin("testExampleLogin");
-        entity.setName("testExampleName");
-        entity.setCity("testExamplecity");   
-
+        entity = new DefaultSale_advertisementEntity();
+        entity.setProduct_title("ExampleProductTittle");
+        entity.setProduct_description("ExampleProductDescription");  
+        user = (DefaultUserEntity) userService.findById(1); 
+        entity.setUser(user);
         service.add(entity);
 
-        finalEntitiesCount = ((Collection<DefaultUserEntity>) service
-                .getAllUsers()).size();
+        finalEntitiesCount = ((Collection<DefaultSale_advertisementEntity>) service
+                .getAllSale_advertisements()).size();
 
         Assert.assertEquals(finalEntitiesCount,Integer.valueOf(entitiesCount + 1));
     }
 
     /** 
-     * Verifies that searching an existing user by id returns the expected
-     * user.
+     * Verifies that searching an existing sale_advertisement by id returns the expected
+     * sale_advertisement.
      */
     @Test
     public void testFindById_Existing_Valid() {
-        final UserEntity user; // Found entity
+        final Sale_advertisementEntity sale_advertisement; // Found entity
 
-        user = service.findById(1);
+        sale_advertisement = service.findById(1);
 
-        Assert.assertEquals(user.getId(), Integer.valueOf(1));
+        Assert.assertEquals(sale_advertisement.getId(), Integer.valueOf(1));
     }
 
     /**
-     * Verifies that searching for a not existing user by id returns an empty
-     * user.
+     * Verifies that searching for a not existing sale_advertisement by id returns an empty
+     * sale_advertisement.
      */
     @Test
     public void testFindById_NotExisting_Invalid() {
-        final UserEntity user; // Found entity
+        final Sale_advertisementEntity sale_advertisement; // Found entity
 
-        user = service.findById(100);
+        sale_advertisement = service.findById(100);
 
-        Assert.assertEquals(user.getId(), Integer.valueOf(-1));
+        Assert.assertEquals(sale_advertisement.getId(), Integer.valueOf(-1));
     }
 
-    
-    /** 
-     * Verifies that searching an existing user by login returns the expected
-     * user.
-     */
-    @Test
-    public void testFindByLogin_Existing_Valid() {
-        final UserEntity user; // Found entity
-        final UserEntity user2; // Second found entity
-        
-        user = service.findByLogin("santiago.paz");
-        user2 = service.findByLogin("adrian.ulla.rubinos");
-        Assert.assertEquals(user.getLogin(), String.valueOf("santiago.paz"));
-        Assert.assertEquals(user2.getLogin(), String.valueOf("adrian.ulla.rubinos"));
-    }
-    
-    /**
-     * Verifies that searching for a not existing user by login returns an empty
-     * user.
-     */
-    @Test
-    public void testFindByLogin_NotExisting_Invalid() {
-        final UserEntity user; // Found entity
-
-        user = service.findByLogin("NotExistingUserLogin");
-
-        Assert.assertEquals(user.getId(), Integer.valueOf(-1));
-    }
-
-    
-    
-    
-    
     
 }

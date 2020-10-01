@@ -92,6 +92,33 @@ public class DefaultUserService implements UserService {
 
         return user;
     }
+    
+    /**
+     * Returns an user with the given login.
+     * <p>
+     * If no instance exists with that login then a user with a negative id is
+     * returned.
+     *
+     * @param login
+     *            login of the user to find
+     * @return the user for the given login
+     */
+    @Override
+    public final UserEntity findByLogin(final String login) {
+        final UserEntity user;
+
+        checkNotNull(login, "Received a null pointer as identifier");
+
+        if (userRepository.existsByLogin(login)) {
+        	user = userRepository.findByLogin(login);
+        } else {
+        	user = new DefaultUserEntity();
+        }
+
+        return user;
+    }
+    
+    
 
     @Override
     public final Iterable<DefaultUserEntity> getAllUsers() {

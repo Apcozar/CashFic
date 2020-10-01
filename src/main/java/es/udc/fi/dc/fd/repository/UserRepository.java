@@ -25,7 +25,9 @@
 package es.udc.fi.dc.fd.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
+import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 
 /**
@@ -39,4 +41,10 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 public interface UserRepository
         extends JpaRepository<DefaultUserEntity, Integer> {
 
+	
+	@Query("select count(u)>0 from UserEntity u where u.login = ?1")
+	boolean existsByLogin(String login);
+	
+	@Query("select u from UserEntity u where u.login = ?1")
+	UserEntity findByLogin(String login); 
 }

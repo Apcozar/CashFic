@@ -61,6 +61,18 @@ public interface UserService {
      * @return the user for the given id
      */
     public UserEntity findById(final Integer identifier);
+    
+    /**
+     * Returns an user with the given login.
+     * <p>
+     * If no user exists with that login then an user with a negative id is
+     * expected to be returned. Avoid returning nulls.
+     *
+     * @param login
+     *            login of the user to find
+     * @return the user for the given login
+     */
+    public UserEntity findByLogin(final String login);
 
     /**
      * Returns all the users from the DB.

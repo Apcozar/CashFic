@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 
 /**
  * A sale_advertisement entity.
@@ -68,6 +69,13 @@ public interface Sale_advertisementEntity extends Serializable {
     public Set<DefaultImageEntity> getImages();
     
     /**
+     * Returns the user of the sale_advertisement.
+     *
+     * @return the sale_advertisement's user
+     */
+    public DefaultUserEntity getUser();
+    
+    /**
      * Sets the identifier assigned to this sale_advertisement.
      *
      * @param identifier
@@ -94,9 +102,16 @@ public interface Sale_advertisementEntity extends Serializable {
     /**
      * Changes the images of the sale_advertisement.
      *
-     * @param images
+     * @param value
      *            the images to set on the sale_advertisement
      */
-    public void setImages(final Set<DefaultImageEntity> images);
+    public void setImages(final Set<DefaultImageEntity> value);
     
+    /**
+     * Changes the user of the sale_advertisement.
+     *
+     * @param value
+     *            the user to set on the sale_advertisement
+     */
+    public void setUser(final DefaultUserEntity value);
 }
