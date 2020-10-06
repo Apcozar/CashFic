@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -100,7 +101,11 @@ public class DefaultUserEntity implements UserEntity {
      * This is to have additional data apart from the id, to be used on the
      * tests.
      */
-    @OneToMany(mappedBy="user")
+    @OneToMany(
+    		mappedBy="user",
+    		cascade = CascadeType.ALL,
+    		orphanRemoval = true
+    		)
     private Set<DefaultSale_advertisementEntity> sale_advertisements;
     
     

@@ -39,4 +39,9 @@ INSERT INTO sale_advertisements  (product_title, product_description, user_id) V
 	('FirstProduct','FirstProductDescription',1),
 	('SecondProduct', 'SecondProductDescription',1),
 	('ThirdProduct','ThirdProductDescription',1);
-
+	
+	
+INSERT INTO images (title, image_path, sale_advertisement_id) VALUES
+	('iamgeTitle1','imagePath1',1),
+	('iamgeTitle2','imagePath2',1),
+	('iamgeTitle3','imagePath3',1);

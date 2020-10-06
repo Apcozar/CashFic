@@ -29,8 +29,6 @@ import org.springframework.data.domain.Pageable;
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 
-
-
 /**
  * Service for the image domain.
  * <p>
@@ -41,49 +39,45 @@ import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
  */
 public interface ImageService {
 
-    /**
-     * Persists an image.
-     * 
-     * @param image
-     *            image to persist
-     * @return the persisted image
-     */
-    public ImageEntity add(final DefaultImageEntity image);
+	/**
+	 * Persists an image.
+	 * 
+	 * @param image image to persist
+	 * @return the persisted image
+	 */
+	public ImageEntity add(final DefaultImageEntity image);
 
-    /**
-     * Returns an image with the given id.
-     * <p>
-     * If no image exists with that id then an image with a negative id is
-     * expected to be returned. Avoid returning nulls.
-     *
-     * @param identifier
-     *            identifier of the image to find
-     * @return the image for the given id
-     */
-    public ImageEntity findById(final Integer identifier);
+	/**
+	 * Returns an image with the given id.
+	 * <p>
+	 * If no image exists with that id then an image with a negative id is expected
+	 * to be returned. Avoid returning nulls.
+	 *
+	 * @param identifier identifier of the image to find
+	 * @return the image for the given id
+	 */
+	public ImageEntity findById(final Integer identifier);
 
-    /**
-     * Returns all the images from the DB.
-     * 
-     * @return the persisted images
-     */
-    public Iterable<DefaultImageEntity> getAllImages();
+	/**
+	 * Returns all the images from the DB.
+	 * 
+	 * @return the persisted images
+	 */
+	public Iterable<DefaultImageEntity> getAllImages();
 
-    /**
-     * Returns a paginated collection of images.
-     * 
-     * @param page
-     *            pagination data
-     * @return a paginated collection of images
-     */
-    public Iterable<DefaultImageEntity> getImages(final Pageable page);
+	/**
+	 * Returns a paginated collection of images.
+	 * 
+	 * @param page pagination data
+	 * @return a paginated collection of images
+	 */
+	public Iterable<DefaultImageEntity> getImages(final Pageable page);
 
-    /**
-     * Removes an image from persistence.
-     * 
-     * @param image
-     *            image to remove
-     */
-    public void remove(final DefaultImageEntity image);
+	/**
+	 * Removes an image from persistence.
+	 * 
+	 * @param image image to remove
+	 */
+	public void remove(final DefaultImageEntity image);
 
 }

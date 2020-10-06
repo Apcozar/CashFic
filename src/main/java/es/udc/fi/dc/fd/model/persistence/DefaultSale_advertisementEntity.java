@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -55,151 +56,144 @@ import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
 @Table(name = "sale_advertisements")
 public class DefaultSale_advertisementEntity implements Sale_advertisementEntity {
 
-    /**
-     * Serialization ID.
-     */
-    @Transient
-    private static final long serialVersionUID = 1328776989450853491L;
+	/**
+	 * Serialization ID.
+	 */
+	@Transient
+	private static final long serialVersionUID = 1328776989450853491L;
 
-    /**
-     * Sale_advertisement's ID.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
-    private Integer           id               = -1;
+	/**
+	 * Sale_advertisement's ID.
+	 */
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false, unique = true)
+	private Integer id = -1;
 
-    /**
-     * Product_title of the sale_advertisement.
-     * <p>
-     * This is to have additional data apart from the id, to be used on the
-     * tests.
-     */
-    @Column(name = "product_title", nullable = false, unique = true)
-    private String            product_title             = "";
-    
-    /**
-     * Product_description of the sale_advertisement.
-     * <p>
-     * This is to have additional data apart from the id, to be used on the
-     * tests.
-     */
-    @Column(name = "product_description", nullable = true, unique = false)
-    private String            product_description             = "";
+	/**
+	 * Product_title of the sale_advertisement.
+	 * <p>
+	 * This is to have additional data apart from the id, to be used on the tests.
+	 */
+	@Column(name = "product_title", nullable = false, unique = true)
+	private String product_title = "";
 
-    /**
-     * Images of the sale_advertisement.
-     * <p>
-     * This is to have additional data apart from the id, to be used on the
-     * tests.
-     */
-    @OneToMany(mappedBy="image")
-    private Set<DefaultImageEntity> images;
-    
-    /**
-     * user of the sale_advertisement.
-     * <p>
-     * This is to have additional data apart from the id, to be used on the
-     * tests.
-     */
-    @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
-    private DefaultUserEntity user;
-    
-    
-    
-    /**
-     * Constructs an sale_advertisement entity.
-     */
-    public DefaultSale_advertisementEntity() {
-        super();
-    }
+	/**
+	 * Product_description of the sale_advertisement.
+	 * <p>
+	 * This is to have additional data apart from the id, to be used on the tests.
+	 */
+	@Column(name = "product_description", nullable = true, unique = false)
+	private String product_description = "";
 
-    @Override
-    public final boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
+	/**
+	 * Images of the sale_advertisement.
+	 * <p>
+	 * This is to have additional data apart from the id, to be used on the tests.
+	 */
+	@OneToMany(mappedBy = "sale_advertisement", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<DefaultImageEntity> images;
 
-        if (obj == null) {
-            return false;
-        }
+	/**
+	 * user of the sale_advertisement.
+	 * <p>
+	 * This is to have additional data apart from the id, to be used on the tests.
+	 */
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = false)
+	private DefaultUserEntity user;
 
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+	/**
+	 * Constructs an sale_advertisement entity.
+	 */
+	public DefaultSale_advertisementEntity() {
+		super();
+	}
 
-        final DefaultSale_advertisementEntity other = (DefaultSale_advertisementEntity) obj;
-        return Objects.equals(id, other.id);
-    }
+	@Override
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
 
-    /**
-     * Returns the identifier assigned to this sale_advertisement.
-     * <p>
-     * If no identifier has been assigned yet, then the value will be lower than
-     * zero.
-     *
-     * @return the sale_advertisement's identifier
-     */
-    @Override
-    public Integer getId() {
-        return id;
-    }
+		if (obj == null) {
+			return false;
+		}
 
-    @Override
-    public String getProduct_title() {
-        return product_title;
-    }
-    
-    @Override 
-    public String getProduct_description() {
-    	return product_description;
-    }
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
 
-    @Override
-    public Set<DefaultImageEntity> getImages(){
-    	return images;
-    }
-    
-    @Override
-    public DefaultUserEntity getUser(){
-    	return user;
-    }
-    
-    
-    @Override
-    public final int hashCode() {
-        return Objects.hash(id);
-    }
+		final DefaultSale_advertisementEntity other = (DefaultSale_advertisementEntity) obj;
+		return Objects.equals(id, other.id);
+	}
 
-    @Override
-    public void setId(final Integer value) {
-        id = checkNotNull(value, "Received a null pointer as identifier");
-    }
+	/**
+	 * Returns the identifier assigned to this sale_advertisement.
+	 * <p>
+	 * If no identifier has been assigned yet, then the value will be lower than
+	 * zero.
+	 *
+	 * @return the sale_advertisement's identifier
+	 */
+	@Override
+	public Integer getId() {
+		return id;
+	}
 
-    @Override
-    public void setProduct_title(final String value) {
-    	product_title = checkNotNull(value, "Received a null pointer as product_title");
-    }
-    
-    @Override
-    public void setProduct_description(final String value) {
-    	product_description = checkNotNull(value, "Received a null pointer as product_description");
-    }
+	@Override
+	public String getProduct_title() {
+		return product_title;
+	}
 
-    @Override
-    public void setUser(DefaultUserEntity value) {
-    	user = checkNotNull(value,"Received a null pointer as value");
-    } 
-    
-    @Override
-    public void setImages(final Set<DefaultImageEntity> value) {
-    	images = checkNotNull(value,"Received a null pointer as images");
-    }
-    
-    @Override
-    public final String toString() {
-        return MoreObjects.toStringHelper(this).add("imageId", id).toString();
-    }
+	@Override
+	public String getProduct_description() {
+		return product_description;
+	}
+
+	@Override
+	public Set<DefaultImageEntity> getImages() {
+		return images;
+	}
+
+	@Override
+	public DefaultUserEntity getUser() {
+		return user;
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public void setId(final Integer value) {
+		id = checkNotNull(value, "Received a null pointer as identifier");
+	}
+
+	@Override
+	public void setProduct_title(final String value) {
+		product_title = checkNotNull(value, "Received a null pointer as product_title");
+	}
+
+	@Override
+	public void setProduct_description(final String value) {
+		product_description = checkNotNull(value, "Received a null pointer as product_description");
+	}
+
+	@Override
+	public void setUser(DefaultUserEntity value) {
+		user = checkNotNull(value, "Received a null pointer as value");
+	}
+
+	@Override
+	public void setImages(final Set<DefaultImageEntity> value) {
+		images = checkNotNull(value, "Received a null pointer as images");
+	}
+
+	@Override
+	public final String toString() {
+		return MoreObjects.toStringHelper(this).add("imageId", id).toString();
+	}
 
 }

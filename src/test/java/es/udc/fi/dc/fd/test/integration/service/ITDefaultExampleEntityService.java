@@ -26,6 +26,8 @@ package es.udc.fi.dc.fd.test.integration.service;
 
 import java.util.Collection;
 
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +37,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.junit.jupiter.api.Test;
-
-import org.junit.Assert;
-
 import es.udc.fi.dc.fd.model.ExampleEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultExampleEntity;
-import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.ExampleEntityService;
 
 /**

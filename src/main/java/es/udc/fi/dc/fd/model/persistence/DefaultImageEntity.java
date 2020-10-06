@@ -41,6 +41,7 @@ import javax.persistence.Transient;
 import com.google.common.base.MoreObjects;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
+import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
 
 /**
  * Persistent entity for the images.
@@ -87,7 +88,7 @@ public class DefaultImageEntity implements ImageEntity {
 
     @ManyToOne
     @JoinColumn(name="sale_advertisement_id", nullable=false)
-    private DefaultImageEntity image;
+    private DefaultSale_advertisementEntity sale_advertisement;
     
     
     /**
@@ -139,6 +140,11 @@ public class DefaultImageEntity implements ImageEntity {
     }
 
     @Override
+    public Sale_advertisementEntity getSale_advertisement() {
+    	return sale_advertisement;
+    }
+    
+    @Override
     public final int hashCode() {
         return Objects.hash(id);
     }
@@ -156,6 +162,11 @@ public class DefaultImageEntity implements ImageEntity {
     @Override
     public void setImagePath(final String value) {
     	image_path = checkNotNull(value, "Received a null pointer as image_path");
+    }
+    
+    @Override
+    public void setSale_advertisement(final DefaultSale_advertisementEntity value) {
+    	sale_advertisement = checkNotNull(value, "Received a null pointer as image_path");
     }
 
     @Override

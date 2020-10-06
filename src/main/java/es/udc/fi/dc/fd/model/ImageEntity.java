@@ -26,6 +26,8 @@ package es.udc.fi.dc.fd.model;
 
 import java.io.Serializable;
 
+import es.udc.fi.dc.fd.model.persistence.DefaultSale_advertisementEntity;
+
 /**
  * A image entity.
  *
@@ -56,6 +58,13 @@ public interface ImageEntity extends Serializable {
      * @return the image's path
      */
     public String getImagePath();
+    
+    /**
+     * Returns the sale_advertisement of the image.
+     *
+     * @return the image's sale_advertisement
+     */
+    public Sale_advertisementEntity getSale_advertisement();
 
     /**
      * Sets the identifier assigned to this image.
@@ -81,4 +90,12 @@ public interface ImageEntity extends Serializable {
      */
     public void setImagePath(final String image_path);
 
+    /**
+     * Changes the sale_advertisement of the image.
+     *
+     * @param sale_advertisement
+     *            the sale_advertisement to set on the image
+     */
+    public void setSale_advertisement(final DefaultSale_advertisementEntity sale_advertisement);
+    
 }

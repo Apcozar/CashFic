@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
+import es.udc.fi.dc.service.exceptions.DataException;
 
 /**
  * Default implementation of the image service.
@@ -43,70 +44,78 @@ import es.udc.fi.dc.fd.repository.ImageRepository;
 @Service
 public class DefaultImageService implements ImageService {
 
-    /**
-     * Repository for the domain entities handled by the service.
-     */
-    private final ImageRepository imageRepository;
+	/**
+	 * Repository for the domain entities handled by the service.
+	 */
+	private final ImageRepository imageRepository;
 
-    /**
-     * Constructs an image service with the specified repository.
-     *
-     * @param repository
-     *            the repository for the image instances
-     */
-    @Autowired
-    public DefaultImageService(
-            final ImageRepository repository) {
-        super();
+	/**
+	 * Constructs an image service with the specified repository.
+	 *
+	 * @param repository the repository for the image instances
+	 */
+	@Autowired
+	public DefaultImageService(final ImageRepository repository) {
+		super();
 
-        imageRepository = checkNotNull(repository,
-                "Received a null pointer as repository");
-    }
+		imageRepository = checkNotNull(repository, "Received a null pointer as repository");
+	}
 
-    @Override
-    public final ImageEntity add(final DefaultImageEntity image) {
-        return imageRepository.save(image);
-    }
+	private void ValidateImage(ImageEntity image) {
+		if ((image.getId() != null) || (image.getImagePath() == null) || (image.getTitle() == null)
+				|| (image.getSale_advertisement() == null)) {
+			throw new DataException("");
+		} else {
+			if (image.getImagePath() == null) {
+				// Throw validation exception
+			}
+		}
 
-    /**
-     * Returns an image with the given id.
-     * <p>
-     * If no instance exists with that id then a image with a negative id is
-     * returned.
-     *
-     * @param identifier
-     *            identifier of the image to find
-     * @return the image for the given id
-     */
-    @Override
-    public final ImageEntity findById(final Integer identifier) {
-        final ImageEntity image;
+	}
 
-        checkNotNull(identifier, "Received a null pointer as identifier");
+	@Override
+	public final ImageEntity add(final DefaultImageEntity image) {
 
-        if (imageRepository.existsById(identifier)) {
-            image = imageRepository.getOne(identifier);
-        } else {
-            image = new DefaultImageEntity();
-        }
+		return imageRepository.save(image);
+	}
 
-        return image;
-    }
+	/**
+	 * Returns an image with the given id.
+	 * <p>
+	 * If no instance exists with that id then a image with a negative id is
+	 * returned.
+	 *
+	 * @param identifier identifier of the image to find
+	 * @return the image for the given id
+	 */
+	@Override
+	public final ImageEntity findById(final Integer identifier) {
+		final ImageEntity image;
 
-    @Override
-    public final Iterable<DefaultImageEntity> getAllImages() {
-        return imageRepository.findAll();
-    }
+		checkNotNull(identifier, "Received a null pointer as identifier");
 
-    @Override
-    public final Iterable<DefaultImageEntity>
-            getImages(final Pageable page) {
-        return imageRepository.findAll(page);
-    }
+		if (imageRepository.existsById(identifier)) {
+			image = imageRepository.getOne(identifier);
+		} else {
+			image = new DefaultImageEntity();
+		}
 
-    @Override
-    public final void remove(final DefaultImageEntity image) {
-        imageRepository.delete(image);
-    }
+		return image;
+	}
+
+	@Override
+	public final Iterable<DefaultImageEntity> getAllImages() {
+		return imageRepository.findAll();
+	}
+
+	@Override
+	public final Iterable<DefaultImageEntity> getImages(final Pageable page) {
+		return imageRepository.findAll(page);
+	}
+
+	@Override
+	public final void remove(final DefaultImageEntity image) {
+		imageRepository.delete(image);
+	}
 
 }
