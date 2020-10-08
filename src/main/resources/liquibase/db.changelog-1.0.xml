@@ -68,11 +68,23 @@
 			<column name="login" type="VARCHAR(40)">
 				<constraints nullable="false" unique="true"/>
 			</column>
-			<column name="name" type="VARCHAR(20)">
+			<column name="password" type="VARCHAR(60)">
+				<constraints nullable="false" unique="false" />
+			</column>
+			<column name="name" type="VARCHAR(30)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="city" type="VARCHAR(20)">
+			<column name="lastName" type="VARCHAR(40)">
 				<constraints nullable="false"/>
+			</column>
+			<column name="email" type="VARCHAR(30)">
+				<constraints nullable="false" unique="true" />
+			</column>
+			<column name="city" type="VARCHAR(30)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="role" type="TINYINT">
+				<constraints nullable="true" unique="false" />
 			</column>
 		</createTable>
 	</changeSet>

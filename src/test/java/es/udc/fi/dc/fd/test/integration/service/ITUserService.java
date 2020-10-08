@@ -24,9 +24,8 @@
 
 package es.udc.fi.dc.fd.test.integration.service;
 
-import java.util.Collection;
-
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
@@ -37,16 +36,18 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.user.exceptions.EmailNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.IncorrectLoginException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 
 /**
  * Integration tests for the {@link UserService}.
- * <p>
- * As this service doesn't contain any actual business logic, and it just wraps
- * the example entities repository, these tests are for verifying everything is
- * set up correctly and working.
+ * 
  */
 @RunWith(JUnitPlatform.class)
 @SpringJUnitConfig
@@ -56,102 +57,277 @@ import es.udc.fi.dc.fd.service.UserService;
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
 public class ITUserService {
 
-    /**
-     * Service being tested.
-     */
-    @Autowired
-    private UserService service;
+	/** The non existent id. */
+	private final Integer NON_EXISTENT_ID = -1;
 
-    /**
-     * Default constructor.
-     */
-    public ITUserService() {
-        super();
-    }
+	/** The non existent email. */
+	private final String NON_EXISTENT_EMAIL = "-1";
 
-    /**
-     * Verifies that the service adds entities into persistence.
-     */
-    @Test
-    public void testAdd_NotExisting_Added() {
-        final DefaultUserEntity entity; // Entity to add
-        final Integer entitiesCount;       // Original number of entities
-        final Integer finalEntitiesCount;  // Final number of entities
+	/** The non existent user name. */
+	private final String NON_EXISTENT_LOGIN = "-1";
 
-        entitiesCount = ((Collection<DefaultUserEntity>) service
-                .getAllUsers()).size();
+	/** The login. */
+	private final String LOGIN = "login";
 
-        entity = new DefaultUserEntity();
-        entity.setLogin("testExampleLogin");
-        entity.setName("testExampleName");
-        entity.setCity("testExamplecity");   
+	/** The login2. */
+	private final String LOGIN2 = "login2";
 
-        service.add(entity);
+	/** The email. */
+	private final String EMAIL = "user@udc.es";
 
-        finalEntitiesCount = ((Collection<DefaultUserEntity>) service
-                .getAllUsers()).size();
+	/** The email2. */
+	private final String EMAIL2 = "user2@udc.es";
 
-        Assert.assertEquals(finalEntitiesCount,Integer.valueOf(entitiesCount + 1));
-    }
+	/** The password. */
+	private final String PASSWORD = "password";
 
-    /** 
-     * Verifies that searching an existing user by id returns the expected
-     * user.
-     */
-    @Test
-    public void testFindById_Existing_Valid() {
-        final UserEntity user; // Found entity
+	/** The incorrect password. */
+	private final String INCORRECT_PASSWORD = "password2";
 
-        user = service.findById(1);
+	/**
+	 * Service being tested.
+	 */
+	@Autowired
+	private UserService userService;
 
-        Assert.assertEquals(user.getId(), Integer.valueOf(1));
-    }
+	/**
+	 * Default constructor.
+	 */
+	public ITUserService() {
+		super();
+	}
 
-    /**
-     * Verifies that searching for a not existing user by id returns an empty
-     * user.
-     */
-    @Test
-    public void testFindById_NotExisting_Invalid() {
-        final UserEntity user; // Found entity
+	/**
+	 * Creates the user.
+	 *
+	 * @param userName the user name
+	 * @param email    the email
+	 * @return the default user entity
+	 */
+	private DefaultUserEntity createUser(String login, String email) {
+		return new DefaultUserEntity(login, PASSWORD, "userName", "userLastName", email, "city");
+	}
 
-        user = service.findById(100);
+	/**
+	 * Sign up and find by login name test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserNotFoundException            the user not found exception
+	 */
+	@Test
+	public void signUpAndFindByLoginNameTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
-        Assert.assertEquals(user.getId(), Integer.valueOf(-1));
-    }
+		userService.signUp(expected);
 
-    
-    /** 
-     * Verifies that searching an existing user by login returns the expected
-     * user.
-     */
-    @Test
-    public void testFindByLogin_Existing_Valid() {
-        final UserEntity user; // Found entity
-        final UserEntity user2; // Second found entity
-        
-        user = service.findByLogin("santiago.paz");
-        user2 = service.findByLogin("adrian.ulla.rubinos");
-        Assert.assertEquals(user.getLogin(), String.valueOf("santiago.paz"));
-        Assert.assertEquals(user2.getLogin(), String.valueOf("adrian.ulla.rubinos"));
-    }
-    
-    /**
-     * Verifies that searching for a not existing user by login returns an empty
-     * user.
-     */
-    @Test
-    public void testFindByLogin_NotExisting_Invalid() {
-        final UserEntity user; // Found entity
+		DefaultUserEntity actual = userService.findByLogin(LOGIN);
 
-        user = service.findByLogin("NotExistingUserLogin");
+		Assert.assertEquals(expected, actual);
+	}
 
-        Assert.assertEquals(user.getId(), Integer.valueOf(-1));
-    }
+	/**
+	 * Sign up and find by id test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserNotFoundException            the user not found exception
+	 */
+	@Test
+	public void signUpAndFindByIdTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
-    
-    
-    
-    
-    
+		userService.signUp(expected);
+
+		DefaultUserEntity actual = userService.findById(expected.getId());
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	/**
+	 * Sign up and find by email test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws EmailNotFoundException           the email not found exception
+	 */
+	@Test
+	public void signUpAndFindByEmailTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, EmailNotFoundException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
+
+		userService.signUp(expected);
+
+		DefaultUserEntity actual = userService.findByEmail(EMAIL);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	/**
+	 * Sign up and login test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws EmailNotFoundException           the email not found exception
+	 * @throws IncorrectLoginException          the incorrect login exception
+	 */
+	@Test
+	public void signUpAndLoginTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, EmailNotFoundException, IncorrectLoginException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
+
+		userService.signUp(expected);
+
+		DefaultUserEntity actual = userService.login(LOGIN, PASSWORD);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	/**
+	 * Sign up existent login test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void signUpExistentLoginTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
+
+		userService.signUp(expected);
+
+		Assertions.assertThrows(UserLoginExistsException.class, () -> {
+			userService.signUp(createUser(LOGIN, EMAIL2));
+		});
+	}
+
+	/**
+	 * Sign up existent email test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void signUpExistentEmailTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
+
+		userService.signUp(expected);
+
+		Assertions.assertThrows(UserEmailExistsException.class, () -> {
+			userService.signUp(createUser(LOGIN2, EMAIL));
+		});
+	}
+
+	/**
+	 * Sign up existent login and email test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void signUpExistentLoginAndEmailTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
+
+		userService.signUp(expected);
+
+		Assertions.assertThrows(UserLoginAndEmailExistsException.class, () -> {
+			userService.signUp(createUser(LOGIN, EMAIL));
+		});
+	}
+
+	/**
+	 * Find by non existent id test.
+	 *
+	 * @throws UserNotFoundException the user not found exception
+	 */
+	@Test
+	public void FindByNonExistentIdTest() throws UserNotFoundException {
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.findById(NON_EXISTENT_ID);
+		});
+	}
+
+	/**
+	 * Find by non existent login test.
+	 *
+	 * @throws UserNotFoundException the user not found exception
+	 */
+	@Test
+	public void FindByNonExistentLoginTest() throws UserNotFoundException {
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.findByLogin(NON_EXISTENT_LOGIN);
+		});
+	}
+
+	/**
+	 * Find by non existent EMAIL test.
+	 *
+	 * @throws EmailNotFoundException the email not found exception
+	 */
+	@Test
+	public void FindByNonExistentEMAILTest() throws EmailNotFoundException {
+		Assertions.assertThrows(EmailNotFoundException.class, () -> {
+			userService.findByEmail(NON_EXISTENT_EMAIL);
+		});
+	}
+
+	/**
+	 * Sign up and login non existent login test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws IncorrectLoginException          the incorrect login exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void signUpAndLoginNonExistentLoginTest() throws UserNotFoundException, IncorrectLoginException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.login(NON_EXISTENT_LOGIN, PASSWORD);
+		});
+	}
+
+	/**
+	 * Sign up and login incorrect password test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws IncorrectLoginException          the incorrect login exception
+	 */
+	@Test
+	public void signUpAndLoginIncorrectPasswordTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, IncorrectLoginException {
+		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
+
+		userService.signUp(expected);
+
+		Assertions.assertThrows(IncorrectLoginException.class, () -> {
+			userService.login(LOGIN, INCORRECT_PASSWORD);
+		});
+	}
 }

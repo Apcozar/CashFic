@@ -24,12 +24,13 @@
 
 package es.udc.fi.dc.fd.service;
 
-import org.springframework.data.domain.Pageable;
-
-import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
-
-
+import es.udc.fi.dc.fd.service.user.exceptions.EmailNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.IncorrectLoginException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 
 /**
  * Service for the user domain.
@@ -41,61 +42,53 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
  */
 public interface UserService {
 
-    /**
-     * Persists an user.
-     * 
-     * @param user
-     *            user to persist
-     * @return the persisted user
-     */
-    public UserEntity add(final DefaultUserEntity user);
+	/**
+	 * Sign up a new user.
+	 *
+	 * @param user the new user
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	void signUp(DefaultUserEntity user)
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException;
 
-    /**
-     * Returns an user with the given id.
-     * <p>
-     * If no user exists with that id then an user with a negative id is
-     * expected to be returned. Avoid returning nulls.
-     *
-     * @param identifier
-     *            identifier of the user to find
-     * @return the user for the given id
-     */
-    public UserEntity findById(final Integer identifier);
-    
-    /**
-     * Returns an user with the given login.
-     * <p>
-     * If no user exists with that login then an user with a negative id is
-     * expected to be returned. Avoid returning nulls.
-     *
-     * @param login
-     *            login of the user to find
-     * @return the user for the given login
-     */
-    public UserEntity findByLogin(final String login);
+	/**
+	 * Login.
+	 *
+	 * @param userName the user name
+	 * @param password the password
+	 * @return the default user entity
+	 * @throws UserNotFoundException   the user not found exception
+	 * @throws IncorrectLoginException the incorrect login exception
+	 */
+	DefaultUserEntity login(String userName, String password) throws UserNotFoundException, IncorrectLoginException;
 
-    /**
-     * Returns all the users from the DB.
-     * 
-     * @return the persisted users
-     */
-    public Iterable<DefaultUserEntity> getAllUsers();
+	/**
+	 * Find by id.
+	 *
+	 * @param identifier the identifier
+	 * @return the default user entity
+	 * @throws UserNotFoundException the user not found exception
+	 */
+	DefaultUserEntity findById(final Integer identifier) throws UserNotFoundException;
 
-    /**
-     * Returns a paginated collection of users.
-     * 
-     * @param page
-     *            pagination data
-     * @return a paginated collection of users
-     */
-    public Iterable<DefaultUserEntity> getUsers(final Pageable page);
+	/**
+	 * Find by login.
+	 *
+	 * @param login the login
+	 * @return the default user entity
+	 * @throws UserNotFoundException the user not found exception
+	 */
+	DefaultUserEntity findByLogin(String login) throws UserNotFoundException;
 
-    /**
-     * Removes an user from persistence.
-     * 
-     * @param user
-     *            user to remove
-     */
-    public void remove(final DefaultUserEntity user);
-
+	/**
+	 * Find by email.
+	 *
+	 * @param email the email
+	 * @return the default user entity
+	 * @throws EmailNotFoundException the email not found exception
+	 */
+	DefaultUserEntity findByEmail(String email) throws EmailNotFoundException;
 }

@@ -28,12 +28,11 @@
 -- ********
 
 
-INSERT INTO users (login, name, city) VALUES
-   ('santiago.paz','santiago','naron'),
-   ('adrian.ulla','adrian','rabade'),
-   ('user.example','exampleName','exampleCity'),
-   ('santiago.paz.perez','santiago','naron'),
-   ('adrian.ulla.rubinos','adrian','rabade');
+INSERT INTO users (login, password, name, lastName, email , city, role) VALUES
+   ('santiago.paz', '123', 'santiago', 'paz perez', 'santi@udc.es', 'naron', 0),
+   ('adrian.ulla','123','adrian', 'Ulla Rubinos', 'adrian.rubinos@udc.es', 'rabade', 0),
+   ('user.example','123','exaplme', 'last name', 'example@udc.es', 'rabade', 0);
+
 
 INSERT INTO sale_advertisements  (product_title, product_description, user_id) VALUES  
 	('FirstProduct','FirstProductDescription',1),

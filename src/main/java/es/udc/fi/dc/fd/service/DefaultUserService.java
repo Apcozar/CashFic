@@ -26,13 +26,22 @@ package es.udc.fi.dc.fd.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 
-import es.udc.fi.dc.fd.model.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import es.udc.fi.dc.fd.model.Role;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.repository.UserRepository;
+import es.udc.fi.dc.fd.service.user.exceptions.EmailNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.IncorrectLoginException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 
 /**
  * Default implementation of the user service.
@@ -43,97 +52,89 @@ import es.udc.fi.dc.fd.repository.UserRepository;
 @Service
 public class DefaultUserService implements UserService {
 
-    /**
-     * Repository for the domain entities handled by the service.
-     */
-    private final UserRepository userRepository;
+	/**
+	 * Repository for the domain entities handled by the service.
+	 */
+	private final UserRepository userDao;
 
-    /**
-     * Constructs an user service with the specified repository.
-     *
-     * @param repository
-     *            the repository for the user instances
-     */
-    @Autowired
-    public DefaultUserService(
-            final UserRepository repository) {
-        super();
+	/**
+	 * Constructs an user service with the specified repository.
+	 *
+	 * @param repository the repository for the user instances
+	 */
+	@Autowired
+	public DefaultUserService(final UserRepository repository) {
+		super();
 
-        userRepository = checkNotNull(repository,
-                "Received a null pointer as repository");
-    }
+		userDao = checkNotNull(repository, "Received a null pointer as repository");
+	}
 
-    @Override
-    public final UserEntity add(final DefaultUserEntity user) {
-        return userRepository.save(user);
-    }
+	@Override
+	public void signUp(DefaultUserEntity user)
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 
-    /**
-     * Returns an user with the given id.
-     * <p>
-     * If no instance exists with that id then a user with a negative id is
-     * returned.
-     *
-     * @param identifier
-     *            identifier of the user to find
-     * @return the user for the given id
-     */
-    @Override
-    public final UserEntity findById(final Integer identifier) {
-        final UserEntity user;
+		if ((userDao.existsByLogin(user.getLogin())) && (userDao.existsByEmail(user.getEmail()))) {
+			throw new UserLoginAndEmailExistsException(user.getLogin(), user.getEmail());
+		}
+		if (userDao.existsByLogin(user.getLogin())) {
+			throw new UserLoginExistsException(user.getLogin());
+		}
+		if (userDao.findByEmail(user.getEmail()) != null) {
+			throw new UserEmailExistsException(user.getEmail());
+		}
 
-        checkNotNull(identifier, "Received a null pointer as identifier");
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		user.setRole(Role.ROLE_USER);
 
-        if (userRepository.existsById(identifier)) {
-        	user = userRepository.getOne(identifier);
-        } else {
-        	user = new DefaultUserEntity();
-        }
+		userDao.save(user);
+	}
 
-        return user;
-    }
-    
-    /**
-     * Returns an user with the given login.
-     * <p>
-     * If no instance exists with that login then a user with a negative id is
-     * returned.
-     *
-     * @param login
-     *            login of the user to find
-     * @return the user for the given login
-     */
-    @Override
-    public final UserEntity findByLogin(final String login) {
-        final UserEntity user;
+	@Override
+	@Transactional(readOnly = true)
+	public DefaultUserEntity login(String login, String password)
+			throws UserNotFoundException, IncorrectLoginException {
 
-        checkNotNull(login, "Received a null pointer as identifier");
+		if (!userDao.existsByLogin(login)) {
+			throw new UserNotFoundException(login);
+		}
 
-        if (userRepository.existsByLogin(login)) {
-        	user = userRepository.findByLogin(login);
-        } else {
-        	user = new DefaultUserEntity();
-        }
+		DefaultUserEntity user = userDao.findByLogin(login);
 
-        return user;
-    }
-    
-    
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @Override
-    public final Iterable<DefaultUserEntity> getAllUsers() {
-        return userRepository.findAll();
-    }
+		if (!passwordEncoder.matches(password, user.getPassword())) {
+			throw new IncorrectLoginException(login, password);
+		}
 
-    @Override
-    public final Iterable<DefaultUserEntity>
-            getUsers(final Pageable page) {
-        return userRepository.findAll(page);
-    }
+		return user;
+	}
 
-    @Override
-    public final void remove(final DefaultUserEntity user) {
-    	userRepository.delete(user);
-    }
+	@Override
+	public DefaultUserEntity findById(Integer identifier) throws UserNotFoundException {
+		Optional<DefaultUserEntity> user = userDao.findById(identifier);
 
+		if (!user.isPresent()) {
+			throw new UserNotFoundException(identifier.toString());
+		}
+		return user.get();
+	}
+
+	@Override
+	public DefaultUserEntity findByLogin(String login) throws UserNotFoundException {
+		if (!userDao.existsByLogin(login)) {
+			throw new UserNotFoundException(login);
+		}
+
+		return userDao.findByLogin(login);
+	}
+
+	@Override
+	public DefaultUserEntity findByEmail(String email) throws EmailNotFoundException {
+		if (!userDao.existsByEmail(email)) {
+			throw new EmailNotFoundException(email);
+		}
+
+		return userDao.findByEmail(email);
+	}
 }

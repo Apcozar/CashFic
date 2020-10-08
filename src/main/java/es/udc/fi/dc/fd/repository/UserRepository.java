@@ -27,7 +27,6 @@ package es.udc.fi.dc.fd.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 
 /**
@@ -38,13 +37,41 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
  *
  * @author Santiago
  */
-public interface UserRepository
-        extends JpaRepository<DefaultUserEntity, Integer> {
+public interface UserRepository extends JpaRepository<DefaultUserEntity, Integer> {
 
-	
+	/**
+	 * Exists by login.
+	 *
+	 * @param login the login
+	 * @return true, if successful
+	 */
 	@Query("select count(u)>0 from UserEntity u where u.login = ?1")
 	boolean existsByLogin(String login);
-	
+
+	/**
+	 * Find by login.
+	 *
+	 * @param login the login
+	 * @return the user entity
+	 */
 	@Query("select u from UserEntity u where u.login = ?1")
-	UserEntity findByLogin(String login); 
+	DefaultUserEntity findByLogin(String login);
+
+	/**
+	 * Exists by email.
+	 *
+	 * @param email the email
+	 * @return true, if successful
+	 */
+	@Query("select count(u)>0 from UserEntity u where u.email = ?1")
+	boolean existsByEmail(String email);
+
+	/**
+	 * Find by email
+	 * 
+	 * @param email the user email
+	 * @return user entity or null if not found
+	 */
+	@Query("SELECT u FROM UserEntity u WHERE u.email = ?1")
+	DefaultUserEntity findByEmail(String email);
 }
