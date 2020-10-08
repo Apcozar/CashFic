@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
-import es.udc.fi.dc.service.exceptions.DataException;
+import es.udc.fi.dc.service.exceptions.ImageServiceException;
 
 /**
  * Default implementation of the image service.
@@ -59,23 +59,45 @@ public class DefaultImageService implements ImageService {
 		super();
 
 		imageRepository = checkNotNull(repository, "Received a null pointer as repository");
-	}
-
-	private void ValidateImage(ImageEntity image) {
-		if ((image.getId() != null) || (image.getImagePath() == null) || (image.getTitle() == null)
-				|| (image.getSale_advertisement() == null)) {
-			throw new DataException("");
-		} else {
-			if (image.getImagePath() == null) {
-				// Throw validation exception
-			}
-		}
 
 	}
 
+	/**
+	 * Returns an image with the given id.
+	 * <p>
+	 * Create an image with the entity parameters received. Returns the entity
+	 * persisted with id assigned
+	 * 
+	 * @param image image with the parameters
+	 * @return the image with the id associated
+	 * @throws ImageServiceException The ImageServiceException
+	 */
 	@Override
-	public final ImageEntity add(final DefaultImageEntity image) {
+	public final ImageEntity add(final DefaultImageEntity image) throws ImageServiceException {
+		if (!(image.getId() == null || image.getId() == -1)) {
+			throw new ImageServiceException("The image id should be null or -1");
+		}
+		if (imageRepository.existsById(image.getId())) {
+			throw new ImageServiceException("Image already exists");
+		}
+		return imageRepository.save(image);
+	}
 
+	/**
+	 * Updates an image from persistence.
+	 * 
+	 * @param image image to update
+	 * @return updated image
+	 * @throws ImageServiceException The ImageServiceException
+	 */
+	@Override
+	public final ImageEntity update(final DefaultImageEntity image) throws ImageServiceException {
+		if ((image.getId() == null || image.getId() == -1)) {
+			throw new ImageServiceException("The image id cannot be null or -1");
+		}
+		if (!imageRepository.existsById(image.getId())) {
+			throw new ImageServiceException("Image not exists");
+		}
 		return imageRepository.save(image);
 	}
 
@@ -114,7 +136,11 @@ public class DefaultImageService implements ImageService {
 	}
 
 	@Override
-	public final void remove(final DefaultImageEntity image) {
+	public final void remove(final DefaultImageEntity image) throws ImageServiceException {
+		checkNotNull(image, "Received a null pointer as identifier");
+		if (!imageRepository.existsById(image.getId())) {
+			throw new ImageServiceException("Image doesnt exists");
+		}
 		imageRepository.delete(image);
 	}
 

@@ -40,10 +40,12 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
+import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSale_advertisementEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.Sale_advertisementService;
+import es.udc.fi.dc.service.exceptions.ImageServiceException;
 
 /**
  * Integration tests for the {@link ImageService}.
@@ -77,47 +79,6 @@ public class ITImageService {
 	}
 
 	/**
-	 * Verifies that the service adds entities into persistence.
-	 */
-	@Test
-	public void testAdd_NotExisting_Added() {
-		final DefaultImageEntity entity; // Entity to add
-		final Integer entitiesCount; // Original number of entities
-		final Integer finalEntitiesCount; // Final number of entities
-
-		entitiesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
-
-		entity = new DefaultImageEntity();
-		entity.setImagePath("newTestImagePath");
-		entity.setTitle("newTestImageTitle");
-		DefaultSale_advertisementEntity var = (DefaultSale_advertisementEntity) saleService.findById(1);
-		entity.setSale_advertisement(var);
-
-		service.add(entity);
-
-		finalEntitiesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
-
-		Assert.assertEquals(finalEntitiesCount, Integer.valueOf(entitiesCount + 1));
-	}
-
-	/**
-	 * Verifies that the service update entities into persistence.
-	 */
-	@Test
-	public void testAdd_Existing_Updated() {
-
-		ImageEntity entity = service.findById(3);
-		entity.setTitle("new test title");
-		entity.setImagePath("new Image path");
-
-		service.add((DefaultImageEntity) entity);
-		ImageEntity persistedEntity = service.findById(3);
-
-		Assert.assertEquals(persistedEntity.getTitle(), "new test title");
-		Assert.assertEquals(persistedEntity.getImagePath(), "new Image path");
-	}
-
-	/**
 	 * Verifies that searching an existing image by id returns the expected image.
 	 */
 	@Test
@@ -142,39 +103,237 @@ public class ITImageService {
 	}
 
 	/**
-	 * Verifies that remove existing image by id returns an empty image.
+	 * Verifies that the service adds entities into persistence.
+	 * 
+	 * @throws ImageServiceException
+	 * 
 	 */
 	@Test
-	public void testRemove_Existing_Removed() {
-		int finalEntitiesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
+	public void testAdd_NotExisting_Added() throws ImageServiceException {
+		final ImageEntity image; // image to add
+		final Integer imagesCount; // Original number of images
+		final Integer finalImagesCount; // Final number of images
+		final ImageEntity savedImage; // Image stored as result of use service
+		DefaultSale_advertisementEntity saleAdvertisement; // Image's sale advertisement
 
-		ImageEntity image = service.findById(1);
-		service.remove((DefaultImageEntity) image);
+		// Get sale advertisement for the image
+		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
 
-		Assert.assertEquals(((Collection<DefaultImageEntity>) service.getAllImages()).size(), (finalEntitiesCount - 1));
+		// Get number of stored images
+		imagesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
 
-		Assert.assertEquals((service.findById(image.getId()).getId()), Integer.valueOf(-1));
+		// Create a image
+		image = new DefaultImageEntity();
+		image.setImagePath("newTestImagePath");
+		image.setTitle("newTestImageTitle");
+		image.setSale_advertisement(saleAdvertisement);
+
+		// Save the image
+		savedImage = service.add((DefaultImageEntity) image);
+
+		// Get stored images count
+		finalImagesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
+
+		// Check if image has been added by count of all images
+		Assert.assertEquals(finalImagesCount, Integer.valueOf(imagesCount + 1));
+
+		// Check savedImage data
+		Assert.assertEquals(savedImage.getTitle(), "newTestImageTitle");
+		Assert.assertEquals(savedImage.getImagePath(), "newTestImagePath");
+		// Check image's sale advertisement is the same as stored
+		Assert.assertEquals(savedImage.getSale_advertisement(), saleService.findById(1));
+		// Sale advertisement has been updated and now owns the image
+		Assert.assertTrue(saleService.findById(1).getImages().contains(savedImage));
 	}
 
-	/**
-	 * Verifies that remove not existing image returns an exception.
-	 */
 	@Test
-	public void testRemove_Not_Existing_Invalid() {
-		DefaultImageEntity image = new DefaultImageEntity();
+	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException {
+		DefaultImageEntity image; // first image to add
+		DefaultImageEntity secondImage; // Second image to add with the same path
+		DefaultSale_advertisementEntity saleAdvertisement;
+
+		// Get sale advertisement for the image
+		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+
+		// Create a image
+		image = new DefaultImageEntity();
+		image.setImagePath("firstTestImagePath");
+		image.setTitle("firstTestImageTitle");
+		image.setSale_advertisement(saleAdvertisement);
+
+		secondImage = new DefaultImageEntity();
+		secondImage.setTitle("second image title");
+		secondImage.setImagePath(image.getImagePath());
+		secondImage.setSale_advertisement(saleAdvertisement);
+
+		// Save the first image
+		service.add((DefaultImageEntity) image);
+
+		// Expected exception, path must be unique
 		assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
-			service.remove(image);
+			service.add(secondImage);
 		});
 	}
+
+	@Test
+	public void testAdd_Image_Already_Exist_Fail() throws ImageServiceException {
+		ImageEntity image; // image to add
+		DefaultSale_advertisementEntity saleAdvertisement;
+
+		// Get sale advertisement for the image
+		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+
+		// Create a image
+		image = new DefaultImageEntity();
+		image.setImagePath("firstTestImagePath");
+		image.setTitle("firstTestImageTitle");
+		image.setSale_advertisement(saleAdvertisement);
+
+		// Save the image
+		ImageEntity savedImage = service.add((DefaultImageEntity) image);
+
+		// Change path must be unique
+		savedImage.setImagePath("Changed image path");
+
+		// Expected exception, cannot add an existing image (image with assigned id)
+		assertThrows(ImageServiceException.class, () -> {
+			service.add((DefaultImageEntity) savedImage);
+		});
+	}
+
+	@Test
+	public void testRemove_Image_Exist_Removed() throws ImageServiceException {
+		final Integer imagesCount; // Original number of images
+		final Integer finalImagesCount; // Final number of images
+		ImageEntity image; // image to add
+		DefaultSale_advertisementEntity saleAdvertisement;
+
+		// Get sale advertisement for the image
+		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+
+		// Create a image
+		image = new DefaultImageEntity();
+		image.setImagePath("firstTestImagePath");
+		image.setTitle("firstTestImageTitle");
+		image.setSale_advertisement(saleAdvertisement);
+
+		// Save the image
+		ImageEntity savedImage = service.add((DefaultImageEntity) image);
+		// Get images count
+		imagesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
+		// Remove image and get images count
+		service.remove((DefaultImageEntity) savedImage);
+		finalImagesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
+
+		// Size decrease 1
+		Assert.assertEquals(Integer.valueOf(finalImagesCount + 1), imagesCount);
+
+		// Not found image by id
+		ImageEntity foundImage = service.findById(savedImage.getId());
+		Assert.assertEquals(foundImage.getId(), Integer.valueOf(-1));
+
+	}
+
+	@Test
+	public void testRemove_Image_Not_Exist_Fails() throws ImageServiceException {
+		DefaultSale_advertisementEntity saleAdvertisement;
+		ImageEntity image; // image to remove
+
+		// Get sale advertisement for the image
+		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+
+		// Set image
+		image = new DefaultImageEntity();
+		image.setImagePath("firstTestImagePath");
+		image.setTitle("firstTestImageTitle");
+		image.setSale_advertisement(saleAdvertisement);
+		image.setId(100);
+
+		// Remove image which not have been saved
+		assertThrows(ImageServiceException.class, () -> {
+			service.remove((DefaultImageEntity) image);
+		});
+	}
+
 	/**
 	 * Verifies that remove existing image two times return an exception.
+	 * 
+	 * @throws ImageServiceException
 	 */
 	@Test
-	public void testRemove_Same_Tow_Times_Invalid() {
-		 ImageEntity image = service.findById(1);
-		 service.remove((DefaultImageEntity) image);
-		assertThrows(org.springframework.dao.InvalidDataAccessApiUsageException.class, () -> {
+	public void testRemove_Same_Tow_Times_Invalid() throws ImageServiceException {
+		ImageEntity image = service.findById(1);
+		service.remove((DefaultImageEntity) image);
+		assertThrows(ImageServiceException.class, () -> {
 			service.remove((DefaultImageEntity) image);
+		});
+	}
+
+	/**
+	 * Verifies that updating an image returns the image with changed attributes
+	 * 
+	 * @throws ImageServiceException
+	 * 
+	 */
+	@Test
+	public void testUpdate_Existing_Image_Updated() throws ImageServiceException {
+		DefaultSale_advertisementEntity saleAdvertisement; // Initial image's sale advertisement
+		DefaultSale_advertisementEntity changeSaleAdvertisement; // sale advertisement for update image
+		DefaultImageEntity image; // image to add and update attributes
+
+		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+		changeSaleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(2);
+
+		// Create image with attributes
+		image = new DefaultImageEntity();
+
+		image.setTitle("Initial image title");
+		image.setImagePath("initial image path");
+		image.setSale_advertisement(saleAdvertisement);
+		// Save image
+		ImageEntity storedImage = service.add(image);
+		// Change saved image attributes and update image
+		storedImage.setTitle("change image title");
+		storedImage.setImagePath("change image path");
+		storedImage.setSale_advertisement(changeSaleAdvertisement);
+
+		DefaultImageEntity changeStoredImage = (DefaultImageEntity) service.update((DefaultImageEntity) storedImage);
+
+		Assert.assertEquals(changeStoredImage.getTitle(), "change image title");
+		Assert.assertEquals(changeStoredImage.getImagePath(), "change image path");
+		Assert.assertEquals(changeStoredImage.getSale_advertisement().getId(), changeSaleAdvertisement.getId());
+
+		// Recover initial sale_advertisement and check that not have the first image
+		// stored
+		Sale_advertisementEntity initialSaleAdvertisement = saleService.findById(saleAdvertisement.getId());
+		Assert.assertFalse(initialSaleAdvertisement.getImages().contains(storedImage));
+		// Check that change SaleAdvertisement have the updated image
+		Sale_advertisementEntity updateChangeSaleAdvertisement = saleService.findById(changeSaleAdvertisement.getId());
+		Assert.assertTrue(updateChangeSaleAdvertisement.getImages().contains(changeStoredImage));
+	}
+
+	/**
+	 * Verifies that updating an image that not exists returns exception
+	 * 
+	 * @throws ImageServiceException
+	 * 
+	 */
+	@Test
+	public void testUpdate_NotExisting_Image_Fails() throws ImageServiceException {
+		DefaultSale_advertisementEntity saleAdvertisement; // Initial image's sale advertisement
+		DefaultImageEntity image; // image to update attributes
+
+		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+
+		// Create image with attributes
+		image = new DefaultImageEntity();
+		image.setId(100); // Image's id that not exist
+		image.setTitle("Initial image title");
+		image.setImagePath("initial image path");
+		image.setSale_advertisement(saleAdvertisement);
+		// Update image returns exception
+		assertThrows(ImageServiceException.class, () -> {
+			service.update(image);
 		});
 	}
 

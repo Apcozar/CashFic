@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
+import es.udc.fi.dc.service.exceptions.ImageServiceException;
 
 /**
  * Service for the image domain.
@@ -40,12 +41,13 @@ import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 public interface ImageService {
 
 	/**
-	 * Persists an image.
+	 * Store an image wich no exist.
 	 * 
-	 * @param image image to persist
+	 * @param image image to persist imageId = -1 or null
 	 * @return the persisted image
+	 * @throws ImageServiceException the ImageService exception
 	 */
-	public ImageEntity add(final DefaultImageEntity image);
+	public ImageEntity add(final DefaultImageEntity image) throws ImageServiceException;
 
 	/**
 	 * Returns an image with the given id.
@@ -77,7 +79,17 @@ public interface ImageService {
 	 * Removes an image from persistence.
 	 * 
 	 * @param image image to remove
+	 * @throws ImageServiceException the ImageService exception
 	 */
-	public void remove(final DefaultImageEntity image);
+	public void remove(final DefaultImageEntity image) throws ImageServiceException;
+
+	/**
+	 * Updates an image from persistence.
+	 * 
+	 * @param image image to update
+	 * @return updated image
+	 * @throws ImageServiceException the ImageService exception
+	 */
+	ImageEntity update(DefaultImageEntity image) throws ImageServiceException;
 
 }
