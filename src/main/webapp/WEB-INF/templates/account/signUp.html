@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.signUp}"></title>
+</head>
+<body>
+	<header class="header" th:include="fragments/menu :: menu"> </header>
+
+	<div class="container">
+		<div class="card">
+			<div class="card-body">
+				<h1 class="card-title" th:text="#{title.signUp}"></h1>
+
+				<form th:action="@{/signUp}" method="POST"
+					class="form-signup form-horizontal" th:object="${signUpForm}">
+
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('login')} ? 'error'">
+						<input type="text" id="login" name="login"
+							th:placeholder="Login" class="form-control"
+							th:field="*{login}" autofocus /> <span class="text-danger"
+							th:if="${#fields.hasErrors('login')}" th:errors="*{login}"></span>
+						<span class="text-danger" th:if="${user_exist != null}"
+							th:text="#{loginExists}"></span>
+					</div>
+
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('password')} ? 'error'">
+						<input type="password" th:placeholder="Password" id="password"
+							name="password" class="form-control" th:field="*{password}" /> <span
+							class="text-danger" th:if="${#fields.hasErrors('password')}"
+							th:errors="*{password}"></span>
+					</div>
+					
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('name')} ? 'error'">
+						<input type="text" id="name" name="name"
+							th:placeholder="Name" class="form-control"
+							th:field="*{name}" autofocus /> <span class="text-danger"
+							th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+					</div>
+					
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('lastName')} ? 'error'">
+						<input type="text" id="lastName" name="lastName"
+							th:placeholder="LastName" class="form-control"
+							th:field="*{lastName}" autofocus /> <span class="text-danger"
+							th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+					</div>
+
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('email')} ? 'error'">
+						<input type="text" id="email" name="email" th:placeholder="Email"
+							class="form-control" th:field="*{email}" autofocus /> <span
+							class="text-danger" th:if="${#fields.hasErrors('email')}"
+							th:errors="*{email}"></span> <span class="text-danger"
+							th:if="${email_exist != null}" th:text="#{emailExist}"></span>
+					</div>
+
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('city')} ? 'error'">
+						<input type="text" id="city" name="city" th:placeholder="City"
+							class="form-control" th:field="*{city}" autofocus /> <span
+							class="text-danger" th:if="${#fields.hasErrors('city')}"
+							th:errors="*{city}"></span>
+					</div>
+					<div class="form-group">
+						<button class="btn btn-primary btn-block" name="Submit"
+							value="SignUp" type="Submit" th:text="SignUp"></button>
+					</div>
+
+
+				</form>
+				<p class="mb-0">
+					<small><a th:href="@{/signIn}" th:text="#{title.signIn}"></a></small>
+				</p>
+
+
+			</div>
+
+		</div>
+	</div>
+
+
+
+</body>
+<footer>
+	<div th:include="fragments/scripts :: general"></div>
+</footer>
+</html>

@@ -1,0 +1,30 @@
+package es.udc.fi.dc.fd.controller;
+
+/**
+ * Constants for the account view controllers.
+ */
+public class ViewConstants {
+
+	/** Name for user name. */
+	public static final String USER_NAME = "username";
+
+	/**
+	 * Name for the welcome view
+	 */
+	public static final String WELCOME = "welcome";
+
+	/**
+	 * Name for the signUp form
+	 */
+	public static final String VIEW_SIGNUP = "account/signUp";
+
+	/** Name for the null pointer. */
+	public static final String NULL_POINTER = "received a null pointer as service";
+
+	/**
+	 * Private constructor to avoid initialization.
+	 */
+	private ViewConstants() {
+		super();
+	}
+}

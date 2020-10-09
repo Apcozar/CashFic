@@ -22,5 +22,7 @@
 	<import resource="classpath:context/persistence-versioning.xml" />
 	<import resource="classpath:context/service.xml" />
 	<import resource="classpath:context/aspect.xml" />
+	<import resource="classpath:context/security.xml" />
+	
 
 </beans>

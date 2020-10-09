@@ -13,32 +13,43 @@
 					th:text="#{application.title}">Webapp title</a>
 
 			</div>
-
+			
 			<div id="navbar-main-body"
 				class="navbar-body navbar-collapse collapse">
-				<small class="navbar-text">v@project.version@</small>
+
 				<ul class="nav navbar-nav navbar-right">
-					<li>
-						<ul class="list-unstyled icons-list">
-							<li><a href="@project.scm.url@" title="Gitlab"
-								aria-label="Gitlab"><span class="fa fa-github"
-									aria-hidden="true"></span></a></li>
-						</ul>
-					</li>
+			
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
 						data-toggle="dropdown" role="button" aria-haspopup="true"
 						aria-expanded="false"><span th:remove="tag"
-							th:text="#{title.data}">Data</span> <span aria-hidden="true"></span>
-					</a>
+							th:text="#{title.account}"></span> <span
+							aria-hidden="true"></span> </a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a th:href="@{/entity/list}" th:text="#{label.list}">List</a></li>
-							<li><a th:href="@{/entity/edit}" th:text="#{label.add}">Addition</a></li>
-							<li><a th:href="@{/entity/pdf}" th:text="#{label.pdf}">PDF</a></li>
-							<li><a th:href="@{/exception/runtime}"
-								th:text="#{label.exception}">Exception</a></li>
+						<th:block th:if="${username == null}">
+							<li><a th:href="@{/signIn}"> <span
+									class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign
+									In
+							</a></li>
+
+							<li><a th:href="@{/signUp}"> <span
+									class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign
+									Up
+							</a></li>
+						</th:block>
+					<th:block th:if="${username}">
+							<li><a th:href="@{/profile}"> <span
+									class="glyphicon glyphicon-user" aria-hidden="true" th:text="#{label.profile}"></span>
+							</a></li>
+					
+							<li><a href="@{/logout}"
+								onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+								th:text="#{label.logout}"><span
+									class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Logout </a></li>
+							<form id="logout-form" th:action="@{/logout}" method="GET" hidden></form>
+					</th:block>
 						</ul></li>
 				</ul>
-			</div>
+			</div>	
 		</div>
 	</nav>
 </header>
