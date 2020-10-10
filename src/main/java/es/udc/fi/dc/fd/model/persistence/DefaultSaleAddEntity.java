@@ -27,6 +27,7 @@ package es.udc.fi.dc.fd.model.persistence;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false, unique = true)
-	private Integer id = -1;
+	private Integer id;
 
 	/**
 	 * Product_title of the sale_advertisement.
@@ -117,6 +118,15 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 	 */
 	public DefaultSaleAddEntity() {
 		super();
+	}
+	public DefaultSaleAddEntity(Integer id, String productTitle, String productDescription, DefaultUserEntity user, LocalDateTime date) {
+		super();
+		this.id = id;
+		this.product_title=productTitle;
+		this.product_description=productDescription;
+		this.user=user;
+		this.date=date;
+		this.images= new HashSet<>();
 	}
 
 	@Override
