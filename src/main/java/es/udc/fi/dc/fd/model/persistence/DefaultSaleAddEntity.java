@@ -26,6 +26,7 @@ package es.udc.fi.dc.fd.model.persistence;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,7 +44,7 @@ import javax.persistence.Transient;
 
 import com.google.common.base.MoreObjects;
 
-import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
+import es.udc.fi.dc.fd.model.SaleAddEntity;
 
 /**
  * Persistent entity for the sale_advertisements.
@@ -52,9 +53,9 @@ import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
  *
  * @author Santiago
  */
-@Entity(name = "Sale_advertisementEntity")
+@Entity(name = "SaleAddEntity")
 @Table(name = "sale_advertisements")
-public class DefaultSale_advertisementEntity implements Sale_advertisementEntity {
+public class DefaultSaleAddEntity implements SaleAddEntity {
 
 	/**
 	 * Serialization ID.
@@ -76,7 +77,7 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
 	@Column(name = "product_title", nullable = false, unique = true)
-	private String product_title = "";
+	private String product_title;
 
 	/**
 	 * Product_description of the sale_advertisement.
@@ -84,7 +85,7 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
 	@Column(name = "product_description", nullable = true, unique = false)
-	private String product_description = "";
+	private String product_description;
 
 	/**
 	 * Images of the sale_advertisement.
@@ -104,9 +105,17 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 	private DefaultUserEntity user;
 
 	/**
+	 * The date of the sale_advertisement.
+	 * <p>
+	 * To know when the ad was created.
+	 */
+	@Column(name = "add_date", nullable = true, unique = false)
+	private LocalDateTime date;
+
+	/**
 	 * Constructs an sale_advertisement entity.
 	 */
-	public DefaultSale_advertisementEntity() {
+	public DefaultSaleAddEntity() {
 		super();
 	}
 
@@ -124,8 +133,11 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 			return false;
 		}
 
-		final DefaultSale_advertisementEntity other = (DefaultSale_advertisementEntity) obj;
-		return Objects.equals(id, other.id);
+		final DefaultSaleAddEntity other = (DefaultSaleAddEntity) obj;
+		return Objects.equals(id, other.id) && Objects.equals(date, other.date)
+				&& Objects.equals(product_description, other.product_description)
+				&& Objects.equals(product_title, other.product_title);
+
 	}
 
 	/**
@@ -142,12 +154,12 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 	}
 
 	@Override
-	public String getProduct_title() {
+	public String getProductTitle() {
 		return product_title;
 	}
 
 	@Override
-	public String getProduct_description() {
+	public String getProductDescription() {
 		return product_description;
 	}
 
@@ -162,6 +174,11 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 	}
 
 	@Override
+	public LocalDateTime getDate() {
+		return date;
+	}
+
+	@Override
 	public final int hashCode() {
 		return Objects.hash(id);
 	}
@@ -172,12 +189,12 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 	}
 
 	@Override
-	public void setProduct_title(final String value) {
+	public void setProductTitle(final String value) {
 		product_title = checkNotNull(value, "Received a null pointer as product_title");
 	}
 
 	@Override
-	public void setProduct_description(final String value) {
+	public void setProductDescription(final String value) {
 		product_description = checkNotNull(value, "Received a null pointer as product_description");
 	}
 
@@ -189,6 +206,11 @@ public class DefaultSale_advertisementEntity implements Sale_advertisementEntity
 	@Override
 	public void setImages(final Set<DefaultImageEntity> value) {
 		images = checkNotNull(value, "Received a null pointer as images");
+	}
+
+	@Override
+	public void setDate(final LocalDateTime value) {
+		date = checkNotNull(value, "Received a null pointer as date");
 	}
 
 	@Override

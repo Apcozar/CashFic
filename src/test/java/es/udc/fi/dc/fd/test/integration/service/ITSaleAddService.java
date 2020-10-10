@@ -24,9 +24,11 @@
 
 package es.udc.fi.dc.fd.test.integration.service;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
@@ -37,11 +39,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
-import es.udc.fi.dc.fd.model.persistence.DefaultSale_advertisementEntity;
+import es.udc.fi.dc.fd.model.SaleAddEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAddEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
-import es.udc.fi.dc.fd.service.Sale_advertisementService;
+import es.udc.fi.dc.fd.service.SaleAddService;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
+import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
 
 /**
  * Integration tests for the {@link UserService}.
@@ -56,13 +60,13 @@ import es.udc.fi.dc.fd.service.UserService;
 @Rollback
 @ContextConfiguration(locations = { "classpath:context/application-context.xml" })
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
-public class ITSale_advertisementService {
+public class ITSaleAddService {
 
 	/**
 	 * Service being tested.
 	 */
 	@Autowired
-	private Sale_advertisementService service;
+	private SaleAddService service;
 
 	@Autowired
 	private UserService userService;
@@ -70,7 +74,7 @@ public class ITSale_advertisementService {
 	/**
 	 * Default constructor.
 	 */
-	public ITSale_advertisementService() {
+	public ITSaleAddService() {
 		super();
 	}
 
@@ -78,49 +82,64 @@ public class ITSale_advertisementService {
 	 * Verifies that the service adds entities into persistence.
 	 */
 	@Test
-	public void testAdd_NotExisting_Added() {
-		final DefaultSale_advertisementEntity entity; // Entity to add
+	public void testAdd_NotExisting_Added() throws SaleAddServiceException, UserNotFoundException {
+		final DefaultSaleAddEntity entity; // Entity to add
 		final Integer entitiesCount; // Original number of entities
 		final Integer finalEntitiesCount; // Final number of entities
 		final DefaultUserEntity user;
-		entitiesCount = ((Collection<DefaultSale_advertisementEntity>) service.getAllSale_advertisements()).size();
+		final LocalDateTime date = LocalDateTime.of(2020, 3, 2, 20, 50);
+		entitiesCount = ((Collection<DefaultSaleAddEntity>) service.getAllSaleAdds()).size();
 
-		entity = new DefaultSale_advertisementEntity();
-		entity.setProduct_title("ExampleProductTittle");
-		entity.setProduct_description("ExampleProductDescription");
+		entity = new DefaultSaleAddEntity();
+		entity.setProductTitle("ExampleProductTittle");
+		entity.setProductDescription("ExampleProductDescription");
+		entity.setDate(date);
 		user = (DefaultUserEntity) userService.findById(1);
 		entity.setUser(user);
 		service.add(entity);
 
-		finalEntitiesCount = ((Collection<DefaultSale_advertisementEntity>) service.getAllSale_advertisements()).size();
+		finalEntitiesCount = ((Collection<DefaultSaleAddEntity>) service.getAllSaleAdds()).size();
 
 		Assert.assertEquals(finalEntitiesCount, Integer.valueOf(entitiesCount + 1));
+		Assert.assertEquals(entity.getProductTitle(), "ExampleProductTittle");
 	}
 
 	/**
 	 * Verifies that the service update entities into persistence.
+	 * 
+	 * @throws UserNotFoundException
 	 */
 	@Test
-	public void testAdd_Existing_Updated() {
+	public void testAdd_Existing_Updated() throws SaleAddServiceException, UserNotFoundException {
+		final DefaultSaleAddEntity entity;
+		final LocalDateTime date = LocalDateTime.of(2020, 4, 4, 21, 50);
+		final DefaultUserEntity user;
+		final SaleAddEntity persistedEntity;
 
-		Sale_advertisementEntity entity = service.findById(3);
-		entity.setProduct_description("new test Sale_advertisement description");
-		entity.setProduct_title("new test product title");
+		entity = new DefaultSaleAddEntity();
+		entity.setProductDescription("new test Sale_advertisement description");
+		entity.setProductTitle("new test product title");
+		entity.setDate(date);
+		user = (DefaultUserEntity) userService.findById(1);
+		entity.setUser(user);
 
-		service.add((DefaultSale_advertisementEntity) entity);
-		Sale_advertisementEntity persistedEntity = service.findById(3);
+		service.add(entity);
 
-		Assert.assertEquals(persistedEntity.getProduct_description(), "new test Sale_advertisement description");
-		Assert.assertEquals(persistedEntity.getProduct_title(), "new test product title");
+		persistedEntity = service.findById(entity.getId());
+
+		Assert.assertEquals(persistedEntity.getProductDescription(), "new test Sale_advertisement description");
+		Assert.assertEquals(persistedEntity.getProductTitle(), "new test product title");
 	}
 
 	/**
 	 * Verifies that searching an existing sale_advertisement by id returns the
 	 * expected sale_advertisement.
+	 * 
+	 * @throws SaleAddServiceException
 	 */
 	@Test
-	public void testFindById_Existing_Valid() {
-		final Sale_advertisementEntity sale_advertisement; // Found entity
+	public void testFindById_Existing_Valid() throws SaleAddServiceException {
+		final SaleAddEntity sale_advertisement; // Found entity
 
 		sale_advertisement = service.findById(1);
 
@@ -130,14 +149,13 @@ public class ITSale_advertisementService {
 	/**
 	 * Verifies that searching for a not existing sale_advertisement by id returns
 	 * an empty sale_advertisement.
+	 * 
+	 * @throws SaleAddServiceException
 	 */
 	@Test
-	public void testFindById_NotExisting_Invalid() {
-		final Sale_advertisementEntity sale_advertisement; // Found entity
+	public void testFindById_NotExisting_Invalid() throws SaleAddServiceException {
 
-		sale_advertisement = service.findById(100);
-
-		Assert.assertEquals(sale_advertisement.getId(), Integer.valueOf(-1));
+		Assertions.assertThrows(SaleAddServiceException.class, () -> service.findById(-1));
 	}
 
 	/**

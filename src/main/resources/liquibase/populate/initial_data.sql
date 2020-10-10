@@ -34,10 +34,10 @@ INSERT INTO users (login, password, name, lastName, email , city, role) VALUES
    ('user.example','123','exaplme', 'last name', 'example@udc.es', 'rabade', 0);
 
 
-INSERT INTO sale_advertisements  (product_title, product_description, user_id) VALUES  
-	('FirstProduct','FirstProductDescription',1),
-	('SecondProduct', 'SecondProductDescription',1),
-	('ThirdProduct','ThirdProductDescription',1);
+INSERT INTO sale_advertisements  (product_title, product_description, user_id, add_date) VALUES  
+	('FirstProduct','FirstProductDescription',1,DATE_ADD(DATE(NOW()), INTERVAL '0 00:05' DAY_MINUTE)),
+	('SecondProduct', 'SecondProductDescription',1,DATE_ADD(DATE(NOW()), INTERVAL '0 00:15' DAY_MINUTE)),
+	('ThirdProduct','ThirdProductDescription',1,DATE_ADD(DATE(NOW()), INTERVAL '0 00:25' DAY_MINUTE));
 	
 	
 INSERT INTO images (title, image_path, sale_advertisement_id) VALUES

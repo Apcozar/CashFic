@@ -116,7 +116,7 @@ public class DefaultUserEntity implements UserEntity {
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<DefaultSale_advertisementEntity> sale_advertisements;
+	private Set<DefaultSaleAddEntity> sale_advertisements;
 
 	/**
 	 * Constructs an sale_advertisement entity.
@@ -218,7 +218,7 @@ public class DefaultUserEntity implements UserEntity {
 	}
 
 	@Override
-	public Set<DefaultSale_advertisementEntity> getSaleAdvertisements() {
+	public Set<DefaultSaleAddEntity> getSaleAdvertisements() {
 		return sale_advertisements;
 	}
 
@@ -303,7 +303,7 @@ public class DefaultUserEntity implements UserEntity {
 	}
 
 	@Override
-	public void setSale_advertisements(final Set<DefaultSale_advertisementEntity> value) {
+	public void setSale_advertisements(final Set<DefaultSaleAddEntity> value) {
 		sale_advertisements = checkNotNull(value, "Received a null pointer as images");
 	}
 

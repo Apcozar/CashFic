@@ -40,12 +40,13 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
-import es.udc.fi.dc.fd.model.Sale_advertisementEntity;
+import es.udc.fi.dc.fd.model.SaleAddEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
-import es.udc.fi.dc.fd.model.persistence.DefaultSale_advertisementEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAddEntity;
 import es.udc.fi.dc.fd.service.ImageService;
-import es.udc.fi.dc.fd.service.Sale_advertisementService;
+import es.udc.fi.dc.fd.service.SaleAddService;
 import es.udc.fi.dc.service.exceptions.ImageServiceException;
+import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
 
 /**
  * Integration tests for the {@link ImageService}.
@@ -69,7 +70,7 @@ public class ITImageService {
 	private ImageService service;
 
 	@Autowired
-	private Sale_advertisementService saleService;
+	private SaleAddService saleService;
 
 	/**
 	 * Default constructor.
@@ -106,18 +107,19 @@ public class ITImageService {
 	 * Verifies that the service adds entities into persistence.
 	 * 
 	 * @throws ImageServiceException
+	 * @throws SaleAddServiceException
 	 * 
 	 */
 	@Test
-	public void testAdd_NotExisting_Added() throws ImageServiceException {
+	public void testAdd_NotExisting_Added() throws ImageServiceException, SaleAddServiceException {
 		final ImageEntity image; // image to add
 		final Integer imagesCount; // Original number of images
 		final Integer finalImagesCount; // Final number of images
 		final ImageEntity savedImage; // Image stored as result of use service
-		DefaultSale_advertisementEntity saleAdvertisement; // Image's sale advertisement
+		DefaultSaleAddEntity saleAdvertisement; // Image's sale advertisement
 
 		// Get sale advertisement for the image
-		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+		saleAdvertisement = (DefaultSaleAddEntity) saleService.findById(1);
 
 		// Get number of stored images
 		imagesCount = ((Collection<DefaultImageEntity>) service.getAllImages()).size();
@@ -147,13 +149,13 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException {
+	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException, SaleAddServiceException {
 		DefaultImageEntity image; // first image to add
 		DefaultImageEntity secondImage; // Second image to add with the same path
-		DefaultSale_advertisementEntity saleAdvertisement;
+		DefaultSaleAddEntity saleAdvertisement;
 
 		// Get sale advertisement for the image
-		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+		saleAdvertisement = (DefaultSaleAddEntity) saleService.findById(1);
 
 		// Create a image
 		image = new DefaultImageEntity();
@@ -176,12 +178,12 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testAdd_Image_Already_Exist_Fail() throws ImageServiceException {
+	public void testAdd_Image_Already_Exist_Fail() throws ImageServiceException, SaleAddServiceException {
 		ImageEntity image; // image to add
-		DefaultSale_advertisementEntity saleAdvertisement;
+		DefaultSaleAddEntity saleAdvertisement;
 
 		// Get sale advertisement for the image
-		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+		saleAdvertisement = (DefaultSaleAddEntity) saleService.findById(1);
 
 		// Create a image
 		image = new DefaultImageEntity();
@@ -202,14 +204,14 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testRemove_Image_Exist_Removed() throws ImageServiceException {
+	public void testRemove_Image_Exist_Removed() throws ImageServiceException, SaleAddServiceException {
 		final Integer imagesCount; // Original number of images
 		final Integer finalImagesCount; // Final number of images
 		ImageEntity image; // image to add
-		DefaultSale_advertisementEntity saleAdvertisement;
+		DefaultSaleAddEntity saleAdvertisement;
 
 		// Get sale advertisement for the image
-		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+		saleAdvertisement = (DefaultSaleAddEntity) saleService.findById(1);
 
 		// Create a image
 		image = new DefaultImageEntity();
@@ -235,12 +237,12 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testRemove_Image_Not_Exist_Fails() throws ImageServiceException {
-		DefaultSale_advertisementEntity saleAdvertisement;
+	public void testRemove_Image_Not_Exist_Fails() throws ImageServiceException, SaleAddServiceException {
+		DefaultSaleAddEntity saleAdvertisement;
 		ImageEntity image; // image to remove
 
 		// Get sale advertisement for the image
-		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+		saleAdvertisement = (DefaultSaleAddEntity) saleService.findById(1);
 
 		// Set image
 		image = new DefaultImageEntity();
@@ -273,16 +275,17 @@ public class ITImageService {
 	 * Verifies that updating an image returns the image with changed attributes
 	 * 
 	 * @throws ImageServiceException
+	 * @throws SaleAddServiceException
 	 * 
 	 */
 	@Test
-	public void testUpdate_Existing_Image_Updated() throws ImageServiceException {
-		DefaultSale_advertisementEntity saleAdvertisement; // Initial image's sale advertisement
-		DefaultSale_advertisementEntity changeSaleAdvertisement; // sale advertisement for update image
+	public void testUpdate_Existing_Image_Updated() throws ImageServiceException, SaleAddServiceException {
+		DefaultSaleAddEntity saleAdvertisement; // Initial image's sale advertisement
+		DefaultSaleAddEntity changeSaleAdvertisement; // sale advertisement for update image
 		DefaultImageEntity image; // image to add and update attributes
 
-		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
-		changeSaleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(2);
+		saleAdvertisement = (DefaultSaleAddEntity) saleService.findById(1);
+		changeSaleAdvertisement = (DefaultSaleAddEntity) saleService.findById(2);
 
 		// Create image with attributes
 		image = new DefaultImageEntity();
@@ -305,10 +308,10 @@ public class ITImageService {
 
 		// Recover initial sale_advertisement and check that not have the first image
 		// stored
-		Sale_advertisementEntity initialSaleAdvertisement = saleService.findById(saleAdvertisement.getId());
+		SaleAddEntity initialSaleAdvertisement = saleService.findById(saleAdvertisement.getId());
 		Assert.assertFalse(initialSaleAdvertisement.getImages().contains(storedImage));
 		// Check that change SaleAdvertisement have the updated image
-		Sale_advertisementEntity updateChangeSaleAdvertisement = saleService.findById(changeSaleAdvertisement.getId());
+		SaleAddEntity updateChangeSaleAdvertisement = saleService.findById(changeSaleAdvertisement.getId());
 		Assert.assertTrue(updateChangeSaleAdvertisement.getImages().contains(changeStoredImage));
 	}
 
@@ -316,14 +319,15 @@ public class ITImageService {
 	 * Verifies that updating an image that not exists returns exception
 	 * 
 	 * @throws ImageServiceException
+	 * @throws SaleAddServiceException
 	 * 
 	 */
 	@Test
-	public void testUpdate_NotExisting_Image_Fails() throws ImageServiceException {
-		DefaultSale_advertisementEntity saleAdvertisement; // Initial image's sale advertisement
+	public void testUpdate_NotExisting_Image_Fails() throws ImageServiceException, SaleAddServiceException {
+		DefaultSaleAddEntity saleAdvertisement; // Initial image's sale advertisement
 		DefaultImageEntity image; // image to update attributes
 
-		saleAdvertisement = (DefaultSale_advertisementEntity) saleService.findById(1);
+		saleAdvertisement = (DefaultSaleAddEntity) saleService.findById(1);
 
 		// Create image with attributes
 		image = new DefaultImageEntity();
