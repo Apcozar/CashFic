@@ -82,9 +82,6 @@ public class HomeController {
 	 */
 	@GetMapping(produces = MediaType.TEXT_HTML_VALUE)
 	public String showWelcome(Model model) {
-		String username = this.securityService.findLoggedInUsername();
-		model.addAttribute(ViewConstants.USER_NAME, username);
-
 		return ViewConstants.WELCOME;
 	}
 

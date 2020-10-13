@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 		DefaultUserEntity user = this.userRepository.findByLogin(username);
 
-		if (user.equals(null)) {
+		if (user == null) {
 			throw new UsernameNotFoundException(username);
 		}
 
