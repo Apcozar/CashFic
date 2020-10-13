@@ -27,7 +27,7 @@ package es.udc.fi.dc.fd.model;
 import java.io.Serializable;
 import java.util.Set;
 
-import es.udc.fi.dc.fd.model.persistence.DefaultSaleAddEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 
 /**
  * A user entity.
@@ -100,7 +100,7 @@ public interface UserEntity extends Serializable {
 	 *
 	 * @return the user's sale_advertisements
 	 */
-	public Set<DefaultSaleAddEntity> getSaleAdvertisements();
+	public Set<DefaultSaleAdvertisementEntity> getSaleAdvertisements();
 
 	/**
 	 * Sets the identifier assigned to this user.
@@ -163,6 +163,6 @@ public interface UserEntity extends Serializable {
 	 *
 	 * @param sale_advertisements the sale_advertisements to set on the user
 	 */
-	public void setSale_advertisements(final Set<DefaultSaleAddEntity> sale_advertisements);
+	public void setSale_advertisements(final Set<DefaultSaleAdvertisementEntity> sale_advertisements);
 
 }

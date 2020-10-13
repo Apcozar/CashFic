@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -89,7 +88,7 @@ public class DefaultUserEntity implements UserEntity {
 	/**
 	 * Last name of the user.
 	 */
-	@Column(name = "lastName", nullable = false, unique = false)
+	@Column(name = "last_name", nullable = false, unique = false)
 	private String lastName;
 
 	/**
@@ -115,8 +114,8 @@ public class DefaultUserEntity implements UserEntity {
 	 * <p>
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<DefaultSaleAddEntity> sale_advertisements;
+	@OneToMany(mappedBy = "user")
+	private Set<DefaultSaleAdvertisementEntity> sale_advertisements;
 
 	/**
 	 * Constructs an sale_advertisement entity.
@@ -218,7 +217,7 @@ public class DefaultUserEntity implements UserEntity {
 	}
 
 	@Override
-	public Set<DefaultSaleAddEntity> getSaleAdvertisements() {
+	public Set<DefaultSaleAdvertisementEntity> getSaleAdvertisements() {
 		return sale_advertisements;
 	}
 
@@ -303,7 +302,7 @@ public class DefaultUserEntity implements UserEntity {
 	}
 
 	@Override
-	public void setSale_advertisements(final Set<DefaultSaleAddEntity> value) {
+	public void setSale_advertisements(final Set<DefaultSaleAdvertisementEntity> value) {
 		sale_advertisements = checkNotNull(value, "Received a null pointer as images");
 	}
 

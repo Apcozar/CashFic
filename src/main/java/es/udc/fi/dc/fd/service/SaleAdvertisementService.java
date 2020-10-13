@@ -26,8 +26,8 @@ package es.udc.fi.dc.fd.service;
 
 import org.springframework.data.domain.Pageable;
 
-import es.udc.fi.dc.fd.model.SaleAddEntity;
-import es.udc.fi.dc.fd.model.persistence.DefaultSaleAddEntity;
+import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
 
 /**
@@ -38,16 +38,7 @@ import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
  *
  * @author Santiago
  */
-public interface SaleAddService {
-
-	/**
-	 * Adds the.
-	 *
-	 * @param saleAdd the sale add
-	 * @return the sale add entity
-	 * @throws SaleAddServiceException the sale add service exception
-	 */
-	public SaleAddEntity add(final DefaultSaleAddEntity saleAdd) throws SaleAddServiceException;
+public interface SaleAdvertisementService {
 
 	/**
 	 * Returns a saleAdd with the given id.
@@ -57,16 +48,25 @@ public interface SaleAddService {
 	 *
 	 * @param identifier identifier of the saleAdd to find
 	 * @return the saleAdd for the given id
-	 * @throws SaleAddServiceException
+	 * @throws SaleAddServiceException the sale exception
 	 */
-	public SaleAddEntity findById(final Integer identifier) throws SaleAddServiceException;
+	public SaleAdvertisementEntity findById(final Integer identifier) throws SaleAddServiceException;
+
+	/**
+	 * Adds the.
+	 *
+	 * @param saleAdd the sale add
+	 * @return the sale add entity
+	 * @throws SaleAddServiceException the sale add service exception
+	 */
+	public SaleAdvertisementEntity add(final DefaultSaleAdvertisementEntity saleAdd) throws SaleAddServiceException;
 
 	/**
 	 * Returns all the saleAdds from the DB.
 	 * 
 	 * @return the persisted saleAdds
 	 */
-	public Iterable<DefaultSaleAddEntity> getAllSaleAdds();
+	public Iterable<DefaultSaleAdvertisementEntity> getAllSaleAdvertisements();
 
 	/**
 	 * Returns a paginated collection of saleAdd.
@@ -74,7 +74,7 @@ public interface SaleAddService {
 	 * @param page pagination data
 	 * @return a paginated collection of saleAdds
 	 */
-	public Iterable<DefaultSaleAddEntity> getsaleAdds(final Pageable page);
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisements(final Pageable page);
 
 	/**
 	 * Removes the.
@@ -82,7 +82,7 @@ public interface SaleAddService {
 	 * @param saleAdd the sale add
 	 * @throws SaleAddServiceException the sale add service exception
 	 */
-	public void remove(final DefaultSaleAddEntity saleAdd) throws SaleAddServiceException;
+	public void remove(final DefaultSaleAdvertisementEntity saleAdd) throws SaleAddServiceException;
 
 	/**
 	 * Update.
@@ -91,6 +91,6 @@ public interface SaleAddService {
 	 * @return the sale add entity
 	 * @throws SaleAddServiceException the sale add service exception
 	 */
-	SaleAddEntity update(DefaultSaleAddEntity saleAdd) throws SaleAddServiceException;
+	SaleAdvertisementEntity update(DefaultSaleAdvertisementEntity saleAdd) throws SaleAddServiceException;
 
 }

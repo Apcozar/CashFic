@@ -36,7 +36,7 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
  *
  * @author Santiago
  */
-public interface SaleAddEntity extends Serializable {
+public interface SaleAdvertisementEntity extends Serializable {
 
 	/**
 	 * Returns the identifier assigned to this sale_advertisement.
@@ -107,13 +107,6 @@ public interface SaleAddEntity extends Serializable {
 	public void setProductDescription(final String product_description);
 
 	/**
-	 * Changes the images of the sale_advertisement.
-	 *
-	 * @param value the images to set on the sale_advertisement
-	 */
-	public void setImages(final Set<DefaultImageEntity> value);
-
-	/**
 	 * Changes the user of the sale_advertisement.
 	 *
 	 * @param value the user to set on the sale_advertisement
@@ -126,4 +119,8 @@ public interface SaleAddEntity extends Serializable {
 	 * @param date the new date
 	 */
 	public void setDate(final LocalDateTime date);
+
+	public void addImage(DefaultImageEntity value);
+
+	void removeImage(DefaultImageEntity image);
 }

@@ -26,7 +26,7 @@ package es.udc.fi.dc.fd.model;
 
 import java.io.Serializable;
 
-import es.udc.fi.dc.fd.model.persistence.DefaultSaleAddEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 
 /**
  * A image entity.
@@ -35,67 +35,63 @@ import es.udc.fi.dc.fd.model.persistence.DefaultSaleAddEntity;
  */
 public interface ImageEntity extends Serializable {
 
-    /**
-     * Returns the identifier assigned to this image.
-     * <p>
-     * If no identifier has been assigned yet, then the value is expected to be
-     * {@code null} or lower than zero.
-     *
-     * @return the image's identifier
-     */
-    public Integer getId();
+	/**
+	 * Returns the identifier assigned to this image.
+	 * <p>
+	 * If no identifier has been assigned yet, then the value is expected to be
+	 * {@code null} or lower than zero.
+	 *
+	 * @return the image's identifier
+	 */
+	public Integer getId();
 
-    /**
-     * Returns the title of the image.
-     *
-     * @return the image's title
-     */
-    public String getTitle();
-    
-    /**
-     * Returns the path of the image.
-     *
-     * @return the image's path
-     */
-    public String getImagePath();
-    
-    /**
-     * Returns the sale_advertisement of the image.
-     *
-     * @return the image's sale_advertisement
-     */
-    public SaleAddEntity getSale_advertisement();
+	/**
+	 * Returns the title of the image.
+	 *
+	 * @return the image's title
+	 */
+	public String getTitle();
 
-    /**
-     * Sets the identifier assigned to this image.
-     *
-     * @param identifier
-     *            the identifier for the image
-     */
-    public void setId(final Integer identifier);
+	/**
+	 * Returns the path of the image.
+	 *
+	 * @return the image's path
+	 */
+	public String getImagePath();
 
-    /**
-     * Changes the title of the image.
-     *
-     * @param title
-     *            the title to set on the image
-     */
-    public void setTitle(final String title);
-    
-    /**
-     * Changes the path of the image.
-     *
-     * @param image_path
-     *            the path to set on the image
-     */
-    public void setImagePath(final String image_path);
+	/**
+	 * Returns the sale_advertisement of the image.
+	 *
+	 * @return the image's sale_advertisement
+	 */
+	public SaleAdvertisementEntity getSale_advertisement();
 
-    /**
-     * Changes the sale_advertisement of the image.
-     *
-     * @param sale_advertisement
-     *            the sale_advertisement to set on the image
-     */
-    public void setSale_advertisement(final DefaultSaleAddEntity sale_advertisement);
-    
+	/**
+	 * Sets the identifier assigned to this image.
+	 *
+	 * @param identifier the identifier for the image
+	 */
+	public void setId(final Integer identifier);
+
+	/**
+	 * Changes the title of the image.
+	 *
+	 * @param title the title to set on the image
+	 */
+	public void setTitle(final String title);
+
+	/**
+	 * Changes the path of the image.
+	 *
+	 * @param image_path the path to set on the image
+	 */
+	public void setImagePath(final String image_path);
+
+	/**
+	 * Changes the sale_advertisement of the image.
+	 *
+	 * @param sale_advertisement the sale_advertisement to set on the image
+	 */
+	public void setSale_advertisement(final DefaultSaleAdvertisementEntity sale_advertisement);
+
 }

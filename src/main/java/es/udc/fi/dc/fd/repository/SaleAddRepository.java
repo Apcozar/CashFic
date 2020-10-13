@@ -26,16 +26,16 @@ package es.udc.fi.dc.fd.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.udc.fi.dc.fd.model.persistence.DefaultSaleAddEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 
 /**
- * Spring-JPA repository for {@link DefaultSaleAddEntity}.
+ * Spring-JPA repository for {@link DefaultSaleAdvertisementEntity}.
  * <p>
  * This is a simple repository just to allow the endpoints querying the
  * Sale_advertisements they are asked for.
  *
  * @author Santiago
  */
-public interface SaleAddRepository extends JpaRepository<DefaultSaleAddEntity, Integer> {
+public interface SaleAddRepository extends JpaRepository<DefaultSaleAdvertisementEntity, Integer> {
 
 }

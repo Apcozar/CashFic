@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -45,7 +44,7 @@ import javax.persistence.Transient;
 
 import com.google.common.base.MoreObjects;
 
-import es.udc.fi.dc.fd.model.SaleAddEntity;
+import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 
 /**
  * Persistent entity for the sale_advertisements.
@@ -54,9 +53,9 @@ import es.udc.fi.dc.fd.model.SaleAddEntity;
  *
  * @author Santiago
  */
-@Entity(name = "SaleAddEntity")
+@Entity(name = "SaleAdvertisementEntity")
 @Table(name = "sale_advertisements")
-public class DefaultSaleAddEntity implements SaleAddEntity {
+public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 
 	/**
 	 * Serialization ID.
@@ -70,7 +69,7 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false, unique = true)
-	private Integer id;
+	private Integer id = -1;
 
 	/**
 	 * Product_title of the sale_advertisement.
@@ -78,7 +77,7 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
 	@Column(name = "product_title", nullable = false, unique = true)
-	private String product_title;
+	private String product_title = "";
 
 	/**
 	 * Product_description of the sale_advertisement.
@@ -86,15 +85,15 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
 	@Column(name = "product_description", nullable = true, unique = false)
-	private String product_description;
+	private String product_description = "";
 
 	/**
 	 * Images of the sale_advertisement.
 	 * <p>
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
-	@OneToMany(mappedBy = "sale_advertisement", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<DefaultImageEntity> images;
+	@OneToMany(mappedBy = "sale_advertisement")
+	private Set<DefaultImageEntity> images = new HashSet<DefaultImageEntity>();
 
 	/**
 	 * user of the sale_advertisement.
@@ -116,17 +115,19 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 	/**
 	 * Constructs an sale_advertisement entity.
 	 */
-	public DefaultSaleAddEntity() {
+	public DefaultSaleAdvertisementEntity() {
 		super();
 	}
-	public DefaultSaleAddEntity(Integer id, String productTitle, String productDescription, DefaultUserEntity user, LocalDateTime date) {
+
+	public DefaultSaleAdvertisementEntity(Integer id, String productTitle, String productDescription,
+			DefaultUserEntity user, LocalDateTime date) {
 		super();
 		this.id = id;
-		this.product_title=productTitle;
-		this.product_description=productDescription;
-		this.user=user;
-		this.date=date;
-		this.images= new HashSet<>();
+		this.product_title = productTitle;
+		this.product_description = productDescription;
+		this.user = user;
+		this.date = date;
+		this.images = new HashSet<>();
 	}
 
 	@Override
@@ -143,7 +144,7 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 			return false;
 		}
 
-		final DefaultSaleAddEntity other = (DefaultSaleAddEntity) obj;
+		final DefaultSaleAdvertisementEntity other = (DefaultSaleAdvertisementEntity) obj;
 		return Objects.equals(id, other.id) && Objects.equals(date, other.date)
 				&& Objects.equals(product_description, other.product_description)
 				&& Objects.equals(product_title, other.product_title);
@@ -214,8 +215,13 @@ public class DefaultSaleAddEntity implements SaleAddEntity {
 	}
 
 	@Override
-	public void setImages(final Set<DefaultImageEntity> value) {
-		images = checkNotNull(value, "Received a null pointer as images");
+	public void addImage(final DefaultImageEntity image) {
+		images.add(checkNotNull(image, "Received a null pointer as images"));
+	}
+
+	@Override
+	public void removeImage(final DefaultImageEntity image) {
+		images.remove(image);
 	}
 
 	@Override

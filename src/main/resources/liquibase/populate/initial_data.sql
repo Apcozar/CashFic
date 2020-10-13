@@ -28,19 +28,19 @@
 -- ********
 
 
-INSERT INTO users (login, password, name, lastName, email , city, role) VALUES
+INSERT INTO users (login, password, name, last_name, email , city, role) VALUES
    ('santiago.paz', '123', 'santiago', 'paz perez', 'santi@udc.es', 'naron', 0),
    ('adrian.ulla','123','adrian', 'Ulla Rubinos', 'adrian.rubinos@udc.es', 'rabade', 0),
    ('user.example','123','exaplme', 'last name', 'example@udc.es', 'rabade', 0);
 
 
 INSERT INTO sale_advertisements  (product_title, product_description, user_id, add_date) VALUES  
-	('FirstProduct','FirstProductDescription',1,DATE_ADD(DATE(NOW()), INTERVAL '0 00:05' DAY_MINUTE)),
-	('SecondProduct', 'SecondProductDescription',1,DATE_ADD(DATE(NOW()), INTERVAL '0 00:15' DAY_MINUTE)),
-	('ThirdProduct','ThirdProductDescription',1,DATE_ADD(DATE(NOW()), INTERVAL '0 00:25' DAY_MINUTE));
+	('FirstProduct','FirstProductDescription',1,'2011-03-12 10:34:09'),
+	('SecondProduct', 'SecondProductDescription',1,'2011-03-12 10:34:09'),
+	('ThirdProduct','ThirdProductDescription',1,'2011-03-12 10:34:09');
 	
 	
 INSERT INTO images (title, image_path, sale_advertisement_id) VALUES
-	('iamgeTitle1','imagePath1',1),
-	('iamgeTitle2','imagePath2',1),
-	('iamgeTitle3','imagePath3',1);
+	('imageTitle1','imagePath1',1),
+	('imageTitle2','imagePath2',1),
+	('imageTitle3','imagePath3',1);

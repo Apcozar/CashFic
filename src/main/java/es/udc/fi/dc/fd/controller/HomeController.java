@@ -77,6 +77,7 @@ public class HomeController {
 	/**
 	 * Shows the welcome view.
 	 * 
+	 * @param model the model
 	 * @return the welcome view
 	 */
 	@GetMapping(produces = MediaType.TEXT_HTML_VALUE)

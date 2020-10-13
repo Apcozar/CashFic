@@ -55,11 +55,11 @@
 	
 	<changeSet author="Santiago" id="sale_advertisementsImageRelation">
 		<addForeignKeyConstraint
-			baseColumnNames="sale_advertisement_id"
 			baseTableName="images"
+			baseColumnNames="sale_advertisement_id"
 			constraintName="FK_sale_advertisement_image"
 			referencedColumnNames="id"
-			referencedTableName="sale_advertisements"/>
+			referencedTableName="sale_advertisements"/>	
 	</changeSet>
 	
 	
@@ -77,7 +77,7 @@
 			<column name="name" type="VARCHAR(30)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="lastName" type="VARCHAR(40)">
+			<column name="last_name" type="VARCHAR(40)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="email" type="VARCHAR(30)">
