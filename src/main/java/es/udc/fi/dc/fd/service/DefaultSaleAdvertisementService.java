@@ -37,7 +37,7 @@ import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
 import es.udc.fi.dc.fd.repository.SaleAddRepository;
-import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Default implementation of the saleAdd service.
@@ -79,10 +79,10 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	 *
 	 * @param identifier identifier of the saleAdd to find
 	 * @return the saleAdd for the given id
-	 * @throws SaleAddServiceException the exception
+	 * @throws SaleAdvertisementServiceException the exception
 	 */
 	@Override
-	public final SaleAdvertisementEntity findById(final Integer identifier) throws SaleAddServiceException {
+	public final SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementServiceException {
 
 		checkNotNull(identifier, "Received a null pointer as identifier");
 
@@ -93,7 +93,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		if (saleAdd.isPresent()) {
 			return saleAdd.get();
 		} else {
-			throw new SaleAddServiceException("Sale add not exists");
+			throw new SaleAdvertisementServiceException("Sale add not exists");
 		}
 
 	}
@@ -106,16 +106,17 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	 * 
 	 * @param saleAdvertisement the sale advertisement entity
 	 * @return the saleAdvertisement entity with initialized id
-	 * @throws SaleAddServiceException The SaleAddServiceException
+	 * @throws SaleAdvertisementServiceException The
+	 *                                           SaleAdvertisementServiceException
 	 */
 	@Override
 	public final SaleAdvertisementEntity add(DefaultSaleAdvertisementEntity saleAdvertisement)
-			throws SaleAddServiceException {
+			throws SaleAdvertisementServiceException {
 		if (!((saleAdvertisement.getId() == null || saleAdvertisement.getId() == -1))) {
-			throw new SaleAddServiceException("The sale advertisement's id must be null or -1");
+			throw new SaleAdvertisementServiceException("The sale advertisement's id must be null or -1");
 		}
 		if (saleAddRepository.existsById(saleAdvertisement.getId())) {
-			throw new SaleAddServiceException("Sale advertisement already exists");
+			throw new SaleAdvertisementServiceException("Sale advertisement already exists");
 		}
 
 		return saleAddRepository.save(saleAdvertisement);
@@ -126,25 +127,26 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	 *
 	 * @param saleAdvertisement the sale advertisement entity with new parameters
 	 * @return the sale advertisement entity updated
-	 * @throws SaleAddServiceException the sale add service exception
+	 * @throws SaleAdvertisementServiceException the sale add service exception
 	 */
 	@Override
 	public final SaleAdvertisementEntity update(final DefaultSaleAdvertisementEntity saleAdvertisement)
-			throws SaleAddServiceException {
+			throws SaleAdvertisementServiceException {
 		if (saleAdvertisement.getId() == null || saleAdvertisement.getId() == -1) {
-			throw new SaleAddServiceException("The sale add id cannot be null or -1");
+			throw new SaleAdvertisementServiceException("The sale add id cannot be null or -1");
 		}
 		if (!saleAddRepository.existsById(saleAdvertisement.getId())) {
-			throw new SaleAddServiceException("Sale advertisement not exists");
+			throw new SaleAdvertisementServiceException("Sale advertisement not exists");
 		}
 		return saleAddRepository.save(saleAdvertisement);
 	}
 
 	@Override
-	public final void remove(final DefaultSaleAdvertisementEntity saleAdvertisement) throws SaleAddServiceException {
+	public final void remove(final DefaultSaleAdvertisementEntity saleAdvertisement)
+			throws SaleAdvertisementServiceException {
 		checkNotNull(saleAdvertisement, "Received a null pointer as identifier");
 		if (!saleAddRepository.existsById(saleAdvertisement.getId())) {
-			throw new SaleAddServiceException("Sale advertisement does not exists");
+			throw new SaleAdvertisementServiceException("Sale advertisement does not exists");
 		}
 
 		saleAdvertisement.getImages().forEach((final DefaultImageEntity image) -> imageRepository.delete(image));

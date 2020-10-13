@@ -151,6 +151,16 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 
 	}
 
+	public DefaultSaleAdvertisementEntity(String product_title, String product_description,
+			Set<DefaultImageEntity> images, DefaultUserEntity user, LocalDateTime date) {
+		super();
+		this.product_title = product_title;
+		this.product_description = product_description;
+		this.images = images;
+		this.user = user;
+		this.date = date;
+	}
+
 	/**
 	 * Returns the identifier assigned to this sale_advertisement.
 	 * <p>

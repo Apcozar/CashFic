@@ -28,7 +28,7 @@ import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
-import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Service for the saleAdd domain.
@@ -48,18 +48,19 @@ public interface SaleAdvertisementService {
 	 *
 	 * @param identifier identifier of the saleAdd to find
 	 * @return the saleAdd for the given id
-	 * @throws SaleAddServiceException the sale exception
+	 * @throws SaleAdvertisementServiceException the sale exception
 	 */
-	public SaleAdvertisementEntity findById(final Integer identifier) throws SaleAddServiceException;
+	public SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementServiceException;
 
 	/**
 	 * Adds the.
 	 *
 	 * @param saleAdd the sale add
 	 * @return the sale add entity
-	 * @throws SaleAddServiceException the sale add service exception
+	 * @throws SaleAdvertisementServiceException the sale add service exception
 	 */
-	public SaleAdvertisementEntity add(final DefaultSaleAdvertisementEntity saleAdd) throws SaleAddServiceException;
+	public SaleAdvertisementEntity add(final DefaultSaleAdvertisementEntity saleAdd)
+			throws SaleAdvertisementServiceException;
 
 	/**
 	 * Returns all the saleAdds from the DB.
@@ -80,17 +81,17 @@ public interface SaleAdvertisementService {
 	 * Removes the.
 	 *
 	 * @param saleAdd the sale add
-	 * @throws SaleAddServiceException the sale add service exception
+	 * @throws SaleAdvertisementServiceException the sale add service exception
 	 */
-	public void remove(final DefaultSaleAdvertisementEntity saleAdd) throws SaleAddServiceException;
+	public void remove(final DefaultSaleAdvertisementEntity saleAdd) throws SaleAdvertisementServiceException;
 
 	/**
 	 * Update.
 	 *
 	 * @param saleAdd the sale add
 	 * @return the sale add entity
-	 * @throws SaleAddServiceException the sale add service exception
+	 * @throws SaleAdvertisementServiceException the sale add service exception
 	 */
-	SaleAdvertisementEntity update(DefaultSaleAdvertisementEntity saleAdd) throws SaleAddServiceException;
+	SaleAdvertisementEntity update(DefaultSaleAdvertisementEntity saleAdd) throws SaleAdvertisementServiceException;
 
 }

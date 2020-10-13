@@ -45,7 +45,7 @@ import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.service.exceptions.ImageServiceException;
-import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Integration tests for the {@link ImageService}.
@@ -106,11 +106,11 @@ public class ITImageService {
 	 * Verifies that the service adds entities into persistence.
 	 * 
 	 * @throws ImageServiceException
-	 * @throws SaleAddServiceException
+	 * @throws SaleAdvertisementServiceException
 	 * 
 	 */
 	@Test
-	public void testAdd_NotExisting_Added() throws ImageServiceException, SaleAddServiceException {
+	public void testAdd_NotExisting_Added() throws ImageServiceException, SaleAdvertisementServiceException {
 		final ImageEntity image; // image to add
 		final Integer imagesCount; // Original number of images
 		final Integer finalImagesCount; // Final number of images
@@ -148,7 +148,7 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException, SaleAddServiceException {
+	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException, SaleAdvertisementServiceException {
 		DefaultImageEntity image; // first image to add
 		DefaultImageEntity secondImage; // Second image to add with the same path
 		DefaultSaleAdvertisementEntity saleAdvertisement;
@@ -177,7 +177,7 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testAdd_Image_Already_Exist_Fail() throws ImageServiceException, SaleAddServiceException {
+	public void testAdd_Image_Already_Exist_Fail() throws ImageServiceException, SaleAdvertisementServiceException {
 		ImageEntity image; // image to add
 		DefaultSaleAdvertisementEntity saleAdvertisement;
 
@@ -203,7 +203,7 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testRemove_Image_Exist_Removed() throws ImageServiceException, SaleAddServiceException {
+	public void testRemove_Image_Exist_Removed() throws ImageServiceException, SaleAdvertisementServiceException {
 		final Integer imagesCount; // Original number of images
 		final Integer finalImagesCount; // Final number of images
 		ImageEntity image; // image to add
@@ -232,7 +232,7 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testRemove_Image_Not_Exist_Fails() throws ImageServiceException, SaleAddServiceException {
+	public void testRemove_Image_Not_Exist_Fails() throws ImageServiceException, SaleAdvertisementServiceException {
 		DefaultSaleAdvertisementEntity saleAdvertisement;
 		ImageEntity image; // image to remove
 
@@ -270,7 +270,7 @@ public class ITImageService {
 	 * Verifies that updating an image returns the image with changed attributes
 	 * 
 	 * @throws ImageServiceException
-	 * @throws SaleAddServiceException
+	 * @throws SaleAdvertisementServiceException
 	 * 
 	 */
 //	 imageService UPDATE NOT WORK (CHANGE image's sale advertisement, no delete
@@ -278,7 +278,7 @@ public class ITImageService {
 //	 it add new sale advertisement to image and add image to new sale
 //	 advertisement list
 	@Test
-	public void testUpdate_Existing_Image_Updated() throws ImageServiceException, SaleAddServiceException {
+	public void testUpdate_Existing_Image_Updated() throws ImageServiceException, SaleAdvertisementServiceException {
 		DefaultSaleAdvertisementEntity saleAdvertisement; // Initial image's sale advertisement
 		DefaultSaleAdvertisementEntity changeSaleAdvertisement; // sale advertisement for update image
 		DefaultImageEntity image; // image to add and update attributes
@@ -319,11 +319,11 @@ public class ITImageService {
 	 * Verifies that updating an image that not exists returns exception
 	 * 
 	 * @throws ImageServiceException
-	 * @throws SaleAddServiceException
+	 * @throws SaleAdvertisementServiceException
 	 * 
 	 */
 	@Test
-	public void testUpdate_NotExisting_Image_Fails() throws ImageServiceException, SaleAddServiceException {
+	public void testUpdate_NotExisting_Image_Fails() throws ImageServiceException, SaleAdvertisementServiceException {
 		DefaultSaleAdvertisementEntity saleAdvertisement; // Initial image's sale advertisement
 		DefaultImageEntity image; // image to update attributes
 

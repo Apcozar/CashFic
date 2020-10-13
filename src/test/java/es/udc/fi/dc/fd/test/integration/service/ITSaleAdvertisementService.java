@@ -49,7 +49,7 @@ import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 import es.udc.fi.dc.service.exceptions.ImageServiceException;
-import es.udc.fi.dc.service.exceptions.SaleAddServiceException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Integration tests for the {@link UserService}.
@@ -89,10 +89,10 @@ public class ITSaleAdvertisementService {
 	 * Verifies that searching an existing sale_advertisement by id returns the
 	 * expected sale_advertisement.
 	 * 
-	 * @throws SaleAddServiceException
+	 * @throws SaleAdvertisementServiceException
 	 */
 	@Test
-	public void testFindById_Existing_Valid() throws SaleAddServiceException {
+	public void testFindById_Existing_Valid() throws SaleAdvertisementServiceException {
 		final SaleAdvertisementEntity sale_advertisement; // Found entity
 
 		sale_advertisement = service.findById(1);
@@ -104,19 +104,19 @@ public class ITSaleAdvertisementService {
 	 * Verifies that searching for a not existing sale_advertisement by id returns
 	 * an empty sale_advertisement.
 	 * 
-	 * @throws SaleAddServiceException
+	 * @throws SaleAdvertisementServiceException
 	 */
 	@Test
-	public void testFindById_NotExisting_Invalid() throws SaleAddServiceException {
+	public void testFindById_NotExisting_Invalid() throws SaleAdvertisementServiceException {
 
-		Assertions.assertThrows(SaleAddServiceException.class, () -> service.findById(-1));
+		Assertions.assertThrows(SaleAdvertisementServiceException.class, () -> service.findById(-1));
 	}
 
 	/**
 	 * Verifies that the service adds sale advertisement into persistence.
 	 */
 	@Test
-	public void testAdd_NotExisting_Added() throws SaleAddServiceException, UserNotFoundException {
+	public void testAdd_NotExisting_Added() throws SaleAdvertisementServiceException, UserNotFoundException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement to add
 		final Integer entitiesCount; // Original number of sale advertisements
 		final Integer finalEntitiesCount; // Final number of sale advertisements
@@ -151,12 +151,12 @@ public class ITSaleAdvertisementService {
 	 * Verifies that cannot add existing add advertisement
 	 */
 	@Test
-	public void testAdd_Existing_Fail() throws SaleAddServiceException, UserNotFoundException {
+	public void testAdd_Existing_Fail() throws SaleAdvertisementServiceException, UserNotFoundException {
 		final SaleAdvertisementEntity saleAdvertisement; // Sale advertisement to add
 
 		// Get an existing sale advertisement
 		saleAdvertisement = service.findById(1);
-		Assertions.assertThrows(SaleAddServiceException.class,
+		Assertions.assertThrows(SaleAdvertisementServiceException.class,
 				() -> service.add((DefaultSaleAdvertisementEntity) saleAdvertisement));
 	}
 
@@ -167,7 +167,7 @@ public class ITSaleAdvertisementService {
 	 */
 	// NOT CHECKED WHAT HAPPEN IF UPDATE SET OF IMAGES OR USER
 	@Test
-	public void testUpdate_Existing_Updated() throws SaleAddServiceException, UserNotFoundException {
+	public void testUpdate_Existing_Updated() throws SaleAdvertisementServiceException, UserNotFoundException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for update
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -211,7 +211,7 @@ public class ITSaleAdvertisementService {
 	 * @throws UserNotFoundException
 	 */
 	@Test
-	public void testUpdate_NotExisting_Fail() throws SaleAddServiceException, UserNotFoundException {
+	public void testUpdate_NotExisting_Fail() throws SaleAdvertisementServiceException, UserNotFoundException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for update
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -227,7 +227,7 @@ public class ITSaleAdvertisementService {
 
 		saleAdvertisement.setId(100);
 		// Update not existing sale advertisement throw exception
-		Assertions.assertThrows(SaleAddServiceException.class,
+		Assertions.assertThrows(SaleAdvertisementServiceException.class,
 				() -> service.update((DefaultSaleAdvertisementEntity) saleAdvertisement));
 	}
 
@@ -237,7 +237,7 @@ public class ITSaleAdvertisementService {
 	 * @throws UserNotFoundException
 	 */
 	@Test
-	public void testRemove_Existing_Removed() throws SaleAddServiceException, UserNotFoundException {
+	public void testRemove_Existing_Removed() throws SaleAdvertisementServiceException, UserNotFoundException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -262,7 +262,7 @@ public class ITSaleAdvertisementService {
 		Assert.assertEquals(Integer.valueOf(initialCount), Integer.valueOf(finalCount + 1));
 
 		// Check we cannot find a sale advertisement with id
-		Assertions.assertThrows(SaleAddServiceException.class, () -> service.findById(savedSaleAdvertisement.getId()));
+		Assertions.assertThrows(SaleAdvertisementServiceException.class, () -> service.findById(savedSaleAdvertisement.getId()));
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class ITSaleAdvertisementService {
 	 */
 	@Test
 	public void testRemove_ExistingWithImages_Removed()
-			throws SaleAddServiceException, UserNotFoundException, ImageServiceException {
+			throws SaleAdvertisementServiceException, UserNotFoundException, ImageServiceException {
 		final SaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
 
 		saleAdvertisement = service.findById(1);
@@ -311,12 +311,12 @@ public class ITSaleAdvertisementService {
 		Assert.assertEquals(secondFinalImage.getId(), Integer.valueOf(-1));
 
 		// Check we cannot find a sale advertisement with id
-		Assertions.assertThrows(SaleAddServiceException.class,
+		Assertions.assertThrows(SaleAdvertisementServiceException.class,
 				() -> service.findById(updatedSaleAdvertisement.getId()));
 	}
 
 	@Test
-	public void testRemove_NotExisting_Fails() throws UserNotFoundException, SaleAddServiceException {
+	public void testRemove_NotExisting_Fails() throws UserNotFoundException, SaleAdvertisementServiceException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement to remove
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -331,12 +331,12 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setUser(user);
 		saleAdvertisement.setId(100);
 		// Remove sale no exist
-		Assertions.assertThrows(SaleAddServiceException.class, () -> service.remove(saleAdvertisement));
+		Assertions.assertThrows(SaleAdvertisementServiceException.class, () -> service.remove(saleAdvertisement));
 	}
 
 	@Test
 	public void testCreate_Remove_Images()
-			throws UserNotFoundException, SaleAddServiceException, ImageServiceException {
+			throws UserNotFoundException, SaleAdvertisementServiceException, ImageServiceException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // add sale advertisement
 		final DefaultUserEntity user; // User for sale Advertisement
 
