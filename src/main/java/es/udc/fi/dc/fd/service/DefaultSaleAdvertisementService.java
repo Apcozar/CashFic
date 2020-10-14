@@ -26,8 +26,6 @@ package es.udc.fi.dc.fd.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,9 @@ import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
-import es.udc.fi.dc.fd.repository.SaleAddRepository;
+import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
@@ -51,7 +51,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	/**
 	 * Repository for the domain entities handled by the service.
 	 */
-	private final SaleAddRepository saleAddRepository;
+	private final SaleAdvertisementRepository saleAdvertisementRepository;
 
 	/**
 	 * Repository for the domain entities handled by the service.
@@ -61,65 +61,60 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	/**
 	 * Constructs an saleAdd service with the specified repository.
 	 *
-	 * @param repository the repository for the saleAdd instances
+	 * @param repository   the repository for the saleAdd instances
+	 * @param imRepository the repository for the images instances
 	 */
 	@Autowired
-	public DefaultSaleAdvertisementService(final SaleAddRepository repository, final ImageRepository imRepository) {
+	public DefaultSaleAdvertisementService(final SaleAdvertisementRepository repository,
+			final ImageRepository imRepository) {
 		super();
 
-		saleAddRepository = checkNotNull(repository, "Received a null pointer as repository");
-		imageRepository = checkNotNull(imRepository, "Received a null pointer as repository");
+		saleAdvertisementRepository = checkNotNull(repository,
+				"Received a null pointer as sale advertisement repository");
+		imageRepository = checkNotNull(imRepository, "Received a null pointer as image repository");
 	}
 
 	/**
-	 * Returns an saleAdd with the given id.
+	 * Returns a saleAdvertisement with the given id.
 	 * <p>
-	 * If no instance exists with that id then a saleAdd with a negative id is
-	 * returned.
+	 * If no instance exists with that id throw SaleAdvertisementNotFoundException
 	 *
-	 * @param identifier identifier of the saleAdd to find
-	 * @return the saleAdd for the given id
-	 * @throws SaleAdvertisementServiceException the exception
+	 * @param identifier identifier of the saleAdvertisement to find
+	 * @return the saleAdvertisement for the given id
+	 * @throws SaleAdvertisementNotFoundException when saleAdvertisement with given
+	 *                                            identifier not found
 	 */
 	@Override
-	public final SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementServiceException {
+	public final SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementNotFoundException {
 
 		checkNotNull(identifier, "Received a null pointer as identifier");
 
-		Optional<DefaultSaleAdvertisementEntity> saleAdd;
-
-		saleAdd = saleAddRepository.findById(identifier);
-
-		if (saleAdd.isPresent()) {
-			return saleAdd.get();
-		} else {
-			throw new SaleAdvertisementServiceException("Sale add not exists");
+		if (!saleAdvertisementRepository.existsById(identifier)) {
+			throw new SaleAdvertisementNotFoundException(identifier);
 		}
 
+		return saleAdvertisementRepository.getOne(identifier);
 	}
 
 	/**
 	 * Returns a saleAdvertisement created with a initialized id.
 	 * <p>
 	 * Creates a saleAdvertisement with the entity parameters received. Returns the
-	 * entity persisted with id assigned
+	 * entity persisted with id assigned or exception if image with id already exist
 	 * 
-	 * @param saleAdvertisement the sale advertisement entity
+	 * @param saleAdvertisement the sale advertisement entity that add
 	 * @return the saleAdvertisement entity with initialized id
-	 * @throws SaleAdvertisementServiceException The
-	 *                                           SaleAdvertisementServiceException
+	 * @throws SaleAdvertisementAlreadyExistsException when sale advertisement
+	 *                                                 already exist
 	 */
 	@Override
 	public final SaleAdvertisementEntity add(DefaultSaleAdvertisementEntity saleAdvertisement)
-			throws SaleAdvertisementServiceException {
-		if (!((saleAdvertisement.getId() == null || saleAdvertisement.getId() == -1))) {
-			throw new SaleAdvertisementServiceException("The sale advertisement's id must be null or -1");
+			throws SaleAdvertisementAlreadyExistsException {
+		checkNotNull(saleAdvertisement, "Received a null pointer as sale advertisement");
+		if (saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
+			throw new SaleAdvertisementAlreadyExistsException(saleAdvertisement.getId());
 		}
-		if (saleAddRepository.existsById(saleAdvertisement.getId())) {
-			throw new SaleAdvertisementServiceException("Sale advertisement already exists");
-		}
-
-		return saleAddRepository.save(saleAdvertisement);
+		return saleAdvertisementRepository.save(saleAdvertisement);
 	}
 
 	/**
@@ -135,32 +130,37 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		if (saleAdvertisement.getId() == null || saleAdvertisement.getId() == -1) {
 			throw new SaleAdvertisementServiceException("The sale add id cannot be null or -1");
 		}
-		if (!saleAddRepository.existsById(saleAdvertisement.getId())) {
+		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
 			throw new SaleAdvertisementServiceException("Sale advertisement not exists");
 		}
-		return saleAddRepository.save(saleAdvertisement);
+		return saleAdvertisementRepository.save(saleAdvertisement);
 	}
 
+	/**
+	 * Removes the sale advertisement from persistence
+	 *
+	 * @param saleAdvertisement the sale advertisement to remove
+	 * @throws SaleAdvertisementNotFoundException when sale advertisement not found
+	 */
 	@Override
 	public final void remove(final DefaultSaleAdvertisementEntity saleAdvertisement)
-			throws SaleAdvertisementServiceException {
+			throws SaleAdvertisementNotFoundException {
 		checkNotNull(saleAdvertisement, "Received a null pointer as identifier");
-		if (!saleAddRepository.existsById(saleAdvertisement.getId())) {
-			throw new SaleAdvertisementServiceException("Sale advertisement does not exists");
+		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
+			throw new SaleAdvertisementNotFoundException(saleAdvertisement.getId());
 		}
-
 		saleAdvertisement.getImages().forEach((final DefaultImageEntity image) -> imageRepository.delete(image));
-		saleAddRepository.delete(saleAdvertisement);
+		saleAdvertisementRepository.delete(saleAdvertisement);
 	}
 
 	@Override
 	public final Iterable<DefaultSaleAdvertisementEntity> getAllSaleAdvertisements() {
-		return saleAddRepository.findAll();
+		return saleAdvertisementRepository.findAll();
 	}
 
 	@Override
 	public final Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisements(final Pageable page) {
-		return saleAddRepository.findAll(page);
+		return saleAdvertisementRepository.findAll(page);
 	}
 
 }

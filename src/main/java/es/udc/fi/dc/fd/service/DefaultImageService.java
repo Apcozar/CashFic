@@ -26,8 +26,6 @@ package es.udc.fi.dc.fd.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,9 @@ import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
-import es.udc.fi.dc.fd.repository.SaleAddRepository;
+import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
+import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.service.exceptions.ImageNotFoundException;
 import es.udc.fi.dc.service.exceptions.ImageServiceException;
 
 /**
@@ -56,15 +56,16 @@ public class DefaultImageService implements ImageService {
 	/**
 	 * Repository for the domain entities handled by the service.
 	 */
-	private final SaleAddRepository saleAdvertisementRepository;
+	private final SaleAdvertisementRepository saleAdvertisementRepository;
 
 	/**
 	 * Constructs an image service with the specified repository.
 	 *
-	 * @param repository the repository for the image instances
+	 * @param repository     the repository for the image instances
+	 * @param saleRepository the repository for the sale advertisement instances
 	 */
 	@Autowired
-	public DefaultImageService(final ImageRepository repository, final SaleAddRepository saleRepository) {
+	public DefaultImageService(final ImageRepository repository, final SaleAdvertisementRepository saleRepository) {
 		super();
 
 		imageRepository = checkNotNull(repository, "Received a null pointer as repository");
@@ -74,24 +75,21 @@ public class DefaultImageService implements ImageService {
 	/**
 	 * Returns an image with the given id.
 	 * <p>
-	 * If no instance exists with that id then a image with a negative id is
-	 * returned.
+	 * If image no exists with that id then throw exception
 	 *
-	 * @param identifier identifier of the image to find
-	 * @return the image for the given id
+	 * @param identifier image's id
+	 * @return the image for the given identifier
+	 * @throws ImageNotFoundException exception when image not found
 	 */
 	@Override
-	public final ImageEntity findById(final Integer identifier) {
+	public final ImageEntity findById(final Integer identifier) throws ImageNotFoundException {
 		final ImageEntity image;
-
 		checkNotNull(identifier, "Received a null pointer as identifier");
 
-		if (imageRepository.existsById(identifier)) {
-			image = imageRepository.getOne(identifier);
-		} else {
-			image = new DefaultImageEntity();
+		if (!imageRepository.existsById(identifier)) {
+			throw new ImageNotFoundException(identifier);
 		}
-
+		image = imageRepository.getOne(identifier);
 		return image;
 	}
 
@@ -103,20 +101,16 @@ public class DefaultImageService implements ImageService {
 	 * 
 	 * @param image image with the parameters
 	 * @return the image with the id associated
-	 * @throws ImageServiceException The ImageServiceException
+	 * @throws ImageAlreadyExistsException when the image id already exists
 	 */
 	@Override
-	public final ImageEntity add(final DefaultImageEntity image) throws ImageServiceException {
-		if (!(image.getId() == -1)) {
-			throw new ImageServiceException("The image id should be null or -1");
-		}
+	public final ImageEntity add(final DefaultImageEntity image) throws ImageAlreadyExistsException {
+		checkNotNull(image, "Received a null pointer as image");
 		if (imageRepository.existsById(image.getId())) {
-			throw new ImageServiceException("Image already exists");
+			throw new ImageAlreadyExistsException(image.getId());
 		}
-		Optional<DefaultSaleAdvertisementEntity> imageSaleAdvertisement = saleAdvertisementRepository
-				.findById(image.getSale_advertisement().getId());
-		DefaultSaleAdvertisementEntity saleAdvertisementEntity = imageSaleAdvertisement.get();
-
+		DefaultSaleAdvertisementEntity saleAdvertisementEntity = saleAdvertisementRepository
+				.getOne(image.getSale_advertisement().getId());
 		DefaultImageEntity savedImage = imageRepository.save(image);
 		saleAdvertisementEntity.addImage(savedImage);
 		saleAdvertisementRepository.save(saleAdvertisementEntity);
@@ -166,6 +160,25 @@ public class DefaultImageService implements ImageService {
 		return updatedImage;
 	}
 
+	/**
+	 * Removes an image from persistence.
+	 * 
+	 * @param image image to remove
+	 * @throws ImageNotFoundException when image not found
+	 */
+	@Override
+	public final void remove(final DefaultImageEntity image) throws ImageNotFoundException {
+		checkNotNull(image, "Received a null pointer as identifier");
+		if (!imageRepository.existsById(image.getId())) {
+			throw new ImageNotFoundException(image.getId());
+		}
+		DefaultSaleAdvertisementEntity saleAdvertisement = (DefaultSaleAdvertisementEntity) image
+				.getSale_advertisement();
+		saleAdvertisement.removeImage(image);
+		saleAdvertisementRepository.save(saleAdvertisement);
+		imageRepository.delete(image);
+	}
+
 	@Override
 	public final Iterable<DefaultImageEntity> getAllImages() {
 		return imageRepository.findAll();
@@ -174,19 +187,6 @@ public class DefaultImageService implements ImageService {
 	@Override
 	public final Iterable<DefaultImageEntity> getImages(final Pageable page) {
 		return imageRepository.findAll(page);
-	}
-
-	@Override
-	public final void remove(final DefaultImageEntity image) throws ImageServiceException {
-		checkNotNull(image, "Received a null pointer as identifier");
-		if (!imageRepository.existsById(image.getId())) {
-			throw new ImageServiceException("Image doesnt exists");
-		}
-		DefaultSaleAdvertisementEntity saleAdvertisement = (DefaultSaleAdvertisementEntity) image
-				.getSale_advertisement();
-		saleAdvertisement.removeImage(image);
-		saleAdvertisementRepository.save(saleAdvertisement);
-		imageRepository.delete(image);
 	}
 
 }

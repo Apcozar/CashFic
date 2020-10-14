@@ -36,6 +36,6 @@ import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
  *
  * @author Santiago
  */
-public interface SaleAddRepository extends JpaRepository<DefaultSaleAdvertisementEntity, Integer> {
+public interface SaleAdvertisementRepository extends JpaRepository<DefaultSaleAdvertisementEntity, Integer> {
 
 }
