@@ -28,6 +28,8 @@ import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
+import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.service.exceptions.ImageNotFoundException;
 import es.udc.fi.dc.service.exceptions.ImageServiceException;
 
 /**
@@ -41,24 +43,25 @@ import es.udc.fi.dc.service.exceptions.ImageServiceException;
 public interface ImageService {
 
 	/**
-	 * Store an image wich no exist.
+	 * Store an image which no exist.
 	 * 
-	 * @param image image to persist imageId = -1 or null
+	 * @param image image to persist imageId should be -1
 	 * @return the persisted image
-	 * @throws ImageServiceException the ImageService exception
+	 * @throws ImageServiceException       the ImageService exception
+	 * @throws ImageAlreadyExistsException when the image already exists
 	 */
-	public ImageEntity add(final DefaultImageEntity image) throws ImageServiceException;
+	public ImageEntity add(final DefaultImageEntity image) throws ImageServiceException, ImageAlreadyExistsException;
 
 	/**
 	 * Returns an image with the given id.
 	 * <p>
-	 * If no image exists with that id then an image with a negative id is expected
-	 * to be returned. Avoid returning nulls.
+	 * If no image exists with that id then throw exception
 	 *
-	 * @param identifier identifier of the image to find
-	 * @return the image for the given id
+	 * @param identifier image's id to find
+	 * @return the image for the given identifier
+	 * @throws ImageNotFoundException exception when image not found
 	 */
-	public ImageEntity findById(final Integer identifier);
+	public ImageEntity findById(final Integer identifier) throws ImageNotFoundException;
 
 	/**
 	 * Returns all the images from the DB.
@@ -79,9 +82,9 @@ public interface ImageService {
 	 * Removes an image from persistence.
 	 * 
 	 * @param image image to remove
-	 * @throws ImageServiceException the ImageService exception
+	 * @throws ImageNotFoundException when image not found
 	 */
-	public void remove(final DefaultImageEntity image) throws ImageServiceException;
+	public void remove(final DefaultImageEntity image) throws ImageNotFoundException;
 
 	/**
 	 * Updates an image from persistence.

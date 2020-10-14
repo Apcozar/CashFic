@@ -28,6 +28,8 @@ import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
@@ -41,26 +43,30 @@ import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 public interface SaleAdvertisementService {
 
 	/**
-	 * Returns a saleAdd with the given id.
+	 * Returns a saleAdvertisement with the given id.
 	 * <p>
-	 * If no saleAdd exists with that id then an saleAdd with a negative id is
-	 * expected to be returned. Avoid returning nulls.
+	 * If no saleAdvertisement exists with that id then throws
+	 * SaleAdvertisementNotFoundException
 	 *
 	 * @param identifier identifier of the saleAdd to find
-	 * @return the saleAdd for the given id
-	 * @throws SaleAdvertisementServiceException the sale exception
+	 * @return the saleAdvertisement for the given id
+	 * @throws SaleAdvertisementNotFoundException when a saleAdvertisement with
+	 *                                            given identifier not found
 	 */
-	public SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementServiceException;
+	public SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementNotFoundException;
 
 	/**
-	 * Adds the.
+	 * Adds sale advertisement into persistence
+	 * <p>
+	 * If sale advertisement already exists throw an exception
 	 *
-	 * @param saleAdd the sale add
-	 * @return the sale add entity
-	 * @throws SaleAdvertisementServiceException the sale add service exception
+	 * @param saleAvertisement the sale advertisement to add, id should be -1
+	 * @return the sale advertisement added with initialized id
+	 * @throws SaleAdvertisementAlreadyExistsException when sale advertisement
+	 *                                                 already exists
 	 */
-	public SaleAdvertisementEntity add(final DefaultSaleAdvertisementEntity saleAdd)
-			throws SaleAdvertisementServiceException;
+	public SaleAdvertisementEntity add(final DefaultSaleAdvertisementEntity saleAvertisement)
+			throws SaleAdvertisementAlreadyExistsException;
 
 	/**
 	 * Returns all the saleAdds from the DB.
@@ -78,12 +84,13 @@ public interface SaleAdvertisementService {
 	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisements(final Pageable page);
 
 	/**
-	 * Removes the.
+	 * Removes the sale advertisement from persistence
 	 *
-	 * @param saleAdd the sale add
-	 * @throws SaleAdvertisementServiceException the sale add service exception
+	 * @param saleAdvertisement the sale advertisement to add
+	 * @throws SaleAdvertisementNotFoundException when sale advertisement not found
 	 */
-	public void remove(final DefaultSaleAdvertisementEntity saleAdd) throws SaleAdvertisementServiceException;
+	public void remove(final DefaultSaleAdvertisementEntity saleAdvertisement)
+			throws SaleAdvertisementNotFoundException;
 
 	/**
 	 * Update.

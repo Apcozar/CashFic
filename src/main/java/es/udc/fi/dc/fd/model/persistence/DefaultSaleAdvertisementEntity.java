@@ -130,6 +130,16 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		this.images = new HashSet<>();
 	}
 
+	public DefaultSaleAdvertisementEntity(String product_title, String product_description,
+			Set<DefaultImageEntity> images, DefaultUserEntity user, LocalDateTime date) {
+		super();
+		this.product_title = product_title;
+		this.product_description = product_description;
+		this.images = images;
+		this.user = user;
+		this.date = date;
+	}
+
 	@Override
 	public final boolean equals(final Object obj) {
 		if (this == obj) {
@@ -148,17 +158,6 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		return Objects.equals(id, other.id) && Objects.equals(date, other.date)
 				&& Objects.equals(product_description, other.product_description)
 				&& Objects.equals(product_title, other.product_title);
-
-	}
-
-	public DefaultSaleAdvertisementEntity(String product_title, String product_description,
-			Set<DefaultImageEntity> images, DefaultUserEntity user, LocalDateTime date) {
-		super();
-		this.product_title = product_title;
-		this.product_description = product_description;
-		this.images = images;
-		this.user = user;
-		this.date = date;
 	}
 
 	/**

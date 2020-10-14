@@ -44,7 +44,10 @@ import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
+import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.service.exceptions.ImageNotFoundException;
 import es.udc.fi.dc.service.exceptions.ImageServiceException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
@@ -80,9 +83,11 @@ public class ITImageService {
 
 	/**
 	 * Verifies that searching an existing image by id returns the expected image.
+	 * 
+	 * @throws ImageNotFoundException
 	 */
 	@Test
-	public void testFindById_Existing_Valid() {
+	public void testFindById_Existing_Valid() throws ImageNotFoundException {
 		final ImageEntity image; // Found entity
 
 		image = service.findById(1);
@@ -93,13 +98,15 @@ public class ITImageService {
 	/**
 	 * Verifies that searching for a not existing image by id returns an empty
 	 * image.
+	 * 
+	 * @throws ImageNotFoundException
 	 */
 	@Test
-	public void testFindById_NotExisting_Invalid() {
-		final ImageEntity image; // Found entity
+	public void testFindById_NotExisting_Invalid() throws ImageNotFoundException {
 
-		image = service.findById(100);
-		Assert.assertEquals(image.getId(), Integer.valueOf(-1));
+		assertThrows(ImageNotFoundException.class, () -> {
+			service.findById(100); // Image with id 100 no exist
+		});
 	}
 
 	/**
@@ -107,10 +114,13 @@ public class ITImageService {
 	 * 
 	 * @throws ImageServiceException
 	 * @throws SaleAdvertisementServiceException
+	 * @throws ImageAlreadyExistsException
+	 * @throws SaleAdvertisementNotFoundException
 	 * 
 	 */
 	@Test
-	public void testAdd_NotExisting_Added() throws ImageServiceException, SaleAdvertisementServiceException {
+	public void testAdd_NotExisting_Added() throws ImageServiceException, SaleAdvertisementServiceException,
+			ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
 		final ImageEntity image; // image to add
 		final Integer imagesCount; // Original number of images
 		final Integer finalImagesCount; // Final number of images
@@ -148,7 +158,8 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException, SaleAdvertisementServiceException {
+	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException,
+			SaleAdvertisementServiceException, ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
 		DefaultImageEntity image; // first image to add
 		DefaultImageEntity secondImage; // Second image to add with the same path
 		DefaultSaleAdvertisementEntity saleAdvertisement;
@@ -177,7 +188,8 @@ public class ITImageService {
 	}
 
 	@Test
-	public void testAdd_Image_Already_Exist_Fail() throws ImageServiceException, SaleAdvertisementServiceException {
+	public void testAdd_Image_Already_Exist_Fail() throws ImageServiceException, SaleAdvertisementServiceException,
+			ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
 		ImageEntity image; // image to add
 		DefaultSaleAdvertisementEntity saleAdvertisement;
 
@@ -193,17 +205,18 @@ public class ITImageService {
 		// Save the image
 		ImageEntity savedImage = service.add((DefaultImageEntity) image);
 
-		// Change path must be unique
+		// Change path it must be unique
 		savedImage.setImagePath("Changed image path");
 
 		// Expected exception, cannot add an existing image (image with assigned id)
-		assertThrows(ImageServiceException.class, () -> {
+		assertThrows(ImageAlreadyExistsException.class, () -> {
 			service.add((DefaultImageEntity) savedImage);
 		});
 	}
 
 	@Test
-	public void testRemove_Image_Exist_Removed() throws ImageServiceException, SaleAdvertisementServiceException {
+	public void testRemove_Image_Exist_Removed() throws ImageServiceException, SaleAdvertisementServiceException,
+			ImageNotFoundException, ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
 		final Integer imagesCount; // Original number of images
 		final Integer finalImagesCount; // Final number of images
 		ImageEntity image; // image to add
@@ -226,13 +239,14 @@ public class ITImageService {
 		// Size decrease 1
 		Assert.assertEquals(Integer.valueOf(finalImagesCount + 1), imagesCount);
 		// Not found image by id
-		ImageEntity foundImage = service.findById(savedImage.getId());
-		Assert.assertEquals(foundImage.getId(), Integer.valueOf(-1));
-
+		assertThrows(ImageNotFoundException.class, () -> {
+			service.findById(savedImage.getId());
+		});
 	}
 
 	@Test
-	public void testRemove_Image_Not_Exist_Fails() throws ImageServiceException, SaleAdvertisementServiceException {
+	public void testRemove_Image_Not_Exist_Fails()
+			throws ImageServiceException, SaleAdvertisementServiceException, SaleAdvertisementNotFoundException {
 		DefaultSaleAdvertisementEntity saleAdvertisement;
 		ImageEntity image; // image to remove
 
@@ -247,7 +261,7 @@ public class ITImageService {
 		image.setId(100);
 
 		// Remove image which not have been saved
-		assertThrows(ImageServiceException.class, () -> {
+		assertThrows(ImageNotFoundException.class, () -> {
 			service.remove((DefaultImageEntity) image);
 		});
 	}
@@ -255,13 +269,13 @@ public class ITImageService {
 	/**
 	 * Verifies that remove existing image two times return an exception.
 	 * 
-	 * @throws ImageServiceException
+	 * @throws ImageNotFoundException
 	 */
 	@Test
-	public void testRemove_Same_Tow_Times_Invalid() throws ImageServiceException {
+	public void testRemove_Same_Tow_Times_Invalid() throws ImageNotFoundException {
 		ImageEntity image = service.findById(1);
 		service.remove((DefaultImageEntity) image);
-		assertThrows(ImageServiceException.class, () -> {
+		assertThrows(ImageNotFoundException.class, () -> {
 			service.remove((DefaultImageEntity) image);
 		});
 	}
@@ -271,6 +285,8 @@ public class ITImageService {
 	 * 
 	 * @throws ImageServiceException
 	 * @throws SaleAdvertisementServiceException
+	 * @throws ImageAlreadyExistsException
+	 * @throws SaleAdvertisementNotFoundException
 	 * 
 	 */
 //	 imageService UPDATE NOT WORK (CHANGE image's sale advertisement, no delete
@@ -278,7 +294,8 @@ public class ITImageService {
 //	 it add new sale advertisement to image and add image to new sale
 //	 advertisement list
 	@Test
-	public void testUpdate_Existing_Image_Updated() throws ImageServiceException, SaleAdvertisementServiceException {
+	public void testUpdate_Existing_Image_Updated() throws ImageServiceException, SaleAdvertisementServiceException,
+			ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
 		DefaultSaleAdvertisementEntity saleAdvertisement; // Initial image's sale advertisement
 		DefaultSaleAdvertisementEntity changeSaleAdvertisement; // sale advertisement for update image
 		DefaultImageEntity image; // image to add and update attributes
@@ -320,15 +337,16 @@ public class ITImageService {
 	 * 
 	 * @throws ImageServiceException
 	 * @throws SaleAdvertisementServiceException
+	 * @throws SaleAdvertisementNotFoundException
 	 * 
 	 */
 	@Test
-	public void testUpdate_NotExisting_Image_Fails() throws ImageServiceException, SaleAdvertisementServiceException {
+	public void testUpdate_NotExisting_Image_Fails()
+			throws ImageServiceException, SaleAdvertisementServiceException, SaleAdvertisementNotFoundException {
 		DefaultSaleAdvertisementEntity saleAdvertisement; // Initial image's sale advertisement
 		DefaultImageEntity image; // image to update attributes
 
 		saleAdvertisement = (DefaultSaleAdvertisementEntity) saleService.findById(1);
-
 		// Create image with attributes
 		image = new DefaultImageEntity();
 		image.setId(100); // Image's id that not exist

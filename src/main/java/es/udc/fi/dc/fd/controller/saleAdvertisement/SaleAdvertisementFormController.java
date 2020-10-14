@@ -19,6 +19,8 @@ import es.udc.fi.dc.fd.controller.ViewConstants;
 import es.udc.fi.dc.fd.model.form.SaleAdvertisementForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 @Controller
@@ -58,13 +60,15 @@ public class SaleAdvertisementFormController {
 	 * @param saleAdvertisementForm the sale add form
 	 * @param bindingResult         the binding result
 	 * @return the welcome view
-	 * @throws SaleAdvertisementServiceException the sale advertisement service
-	 *                                           exception
+	 * @throws SaleAdvertisementServiceException       the sale advertisement
+	 *                                                 service exception
+	 * @throws SaleAdvertisementAlreadyExistsException exception
 	 */
 	@PostMapping(path = "/addSaleAdvertisement")
 	public String addSaleAdvertisement(
 			@Valid @ModelAttribute("saleAdvertisementForm") SaleAdvertisementForm saleAdvertisementForm,
-			BindingResult bindingResult) throws SaleAdvertisementServiceException {
+			BindingResult bindingResult)
+			throws SaleAdvertisementServiceException, SaleAdvertisementAlreadyExistsException {
 
 		if (bindingResult.hasErrors()) {
 			return SaleAdvertisementViewConstants.VIEW_ADD_SALE_ADVERTISEMENT;
@@ -86,11 +90,12 @@ public class SaleAdvertisementFormController {
 	 * @param model                 the model
 	 * 
 	 * @return the welcome view
+	 * @throws SaleAdvertisementNotFoundException exception
 	 */
 	@PutMapping(path = "/{id}")
 	public String updateSaleAdvertisement(@PathVariable Integer id,
 			@Valid @ModelAttribute("saleAdvertisementForm") SaleAdvertisementForm saleAdvertisementForm,
-			BindingResult bindingResult, Model model) {
+			BindingResult bindingResult, Model model) throws SaleAdvertisementNotFoundException {
 
 		try {
 			if (bindingResult.hasErrors()) {
@@ -115,13 +120,14 @@ public class SaleAdvertisementFormController {
 	 *
 	 * @param id    the sale id
 	 * @param model the model
+	 * @throws SaleAdvertisementNotFoundException
 	 */
-	private void checkSaleAdvertisement(Integer id, Model model) {
+	private void checkSaleAdvertisement(Integer id, Model model) throws SaleAdvertisementNotFoundException {
 		try {
 			saleAdvertisementService.findById(id);
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
 					SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
-		} catch (SaleAdvertisementServiceException e) {
+		} catch (SaleAdvertisementNotFoundException e) {
 			// If the exception jump, the sale does not exist
 		}
 	}
