@@ -146,6 +146,31 @@ public class AccountController {
 	}
 
 	/**
+	 * Show profile.
+	 *
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile")
+	public String showProfile(final Model model) {
+
+		String username;
+		DefaultUserEntity user;
+		try {
+			username = this.securityService.findLoggedInUsername();
+			user = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER, user);
+
+		} catch (UserNotFoundException e) {
+			return ViewConstants.VIEW_SIGNIN;
+		}
+
+		return ViewConstants.VIEW_PROFILE;
+
+	}
+
+	/**
 	 * Check if the user name and email already exits
 	 * 
 	 * @param signUpForm the sign up form

@@ -21,10 +21,11 @@ public class ViewConstants {
 	/** Name for the null pointer. */
 	public static final String NULL_POINTER = "received a null pointer as service";
 
-	/**
-	 * Name for the signIn form
-	 */
+	/** Name for the signIn form */
 	public static final String VIEW_SIGNIN = "account/signIn";
+
+	/** Name for the profile view */
+	public static final String VIEW_PROFILE = "account/profile";
 
 	/**
 	 * Private constructor to avoid initialization.

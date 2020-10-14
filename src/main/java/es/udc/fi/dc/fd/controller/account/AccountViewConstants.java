@@ -14,6 +14,12 @@ public class AccountViewConstants {
 	/** Message for incorrect fields . */
 	public static final String ERROR_LOGIN = "error_login";
 
+	/** Name for user name. */
+	public static final String USER_NAME = "username";
+
+	/** The Constant USER. */
+	public static final String USER = "user";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

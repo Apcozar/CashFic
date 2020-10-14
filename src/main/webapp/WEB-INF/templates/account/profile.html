@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.profile}"></title>
+</head>
+
+
+<body>
+	<header class="header" th:include="fragments/menu :: menu"> </header>
+
+
+	<div class="container">
+		<div class="card bg-dark">
+			<div class="card-header">
+				<h3>My profile</h3>
+			</div>
+			<div class="card-body">
+				<table class="table table-striped" aria-describedby="The Profile">
+					<thead>
+						<tr>
+							<th id="login" th:text="#{label.login}"></th>
+							<th id="name" th:text="#{label.name}"></th>
+							<th id="lastName" th:text="#{label.lastName}"></th>
+							<th id="email" th:text="#{label.email}"></th>
+							<th id="city" th:text="#{label.city}"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td th:text="${user.login}"></td>
+							<td th:text="${user.name}"></td>
+							<td th:text="${user.lastName}"></td>
+							<td th:text="${user.email}"></td>
+							<td th:text="${user.city}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+
+<footer>
+	<div th:include="fragments/scripts :: general"></div>
+</footer>
+</html>
