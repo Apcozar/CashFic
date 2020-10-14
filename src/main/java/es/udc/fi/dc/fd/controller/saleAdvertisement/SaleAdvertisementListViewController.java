@@ -2,6 +2,7 @@ package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,8 @@ public class SaleAdvertisementListViewController {
 	 *
 	 * @param saleAdvertisementService the sale advertisement service
 	 */
-	public SaleAdvertisementListViewController(SaleAdvertisementService saleAdvertisementService) {
+	@Autowired
+	public SaleAdvertisementListViewController(final SaleAdvertisementService saleAdvertisementService) {
 		super();
 		this.saleAdvertisementService = checkNotNull(saleAdvertisementService, ViewConstants.NULL_POINTER);
 	}
@@ -46,7 +48,7 @@ public class SaleAdvertisementListViewController {
 	 * @param model the model
 	 */
 	private final void loadViewModel(final ModelMap model) {
-		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENT,
+		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS,
 				saleAdvertisementService.getAllSaleAdvertisements());
 	}
 }

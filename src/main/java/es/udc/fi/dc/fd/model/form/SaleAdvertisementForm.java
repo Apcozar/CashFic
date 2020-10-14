@@ -1,17 +1,16 @@
 package es.udc.fi.dc.fd.model.form;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Set;
 
-import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
-import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * The Class SaleAdvertisementForm.
  */
-public class SaleAdvertisementForm implements Serializable{
+public class SaleAdvertisementForm implements Serializable {
 
 	/**
 	 * Serialization ID
@@ -19,20 +18,15 @@ public class SaleAdvertisementForm implements Serializable{
 	private static final long serialVersionUID = 4078947238523064061L;
 
 	/** The product description. */
+	@NotEmpty(message = "{notEmpty}")
+	@Size(min = 1, max = 255, message = "{productDescriptionSize}")
 	private String productDescription;
-	
+
 	/** The product title. */
+	@NotEmpty(message = "{notEmpty}")
+	@Size(min = 1, max = 30, message = "{productTitleSize}")
 	private String productTitle;
-	
-	/** The user. */
-	private DefaultUserEntity user;
-	
-	/** The date. */
-	private LocalDateTime date;
-	
-	/** The images. */
-	private Set<DefaultImageEntity> images;
-	
+
 	/**
 	 * Constructs a DTO for the sale add form.
 	 */
@@ -45,31 +39,6 @@ public class SaleAdvertisementForm implements Serializable{
 	 */
 	public String getProductDescription() {
 		return productDescription;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(date, images, productDescription, productTitle, user);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SaleAdvertisementForm other = (SaleAdvertisementForm) obj;
-		return Objects.equals(date, other.date) && Objects.equals(images, other.images)
-				&& Objects.equals(productDescription, other.productDescription)
-				&& Objects.equals(productTitle, other.productTitle) && Objects.equals(user, other.user);
-	}
-
-	@Override
-	public String toString() {
-		return "SaleAdvertisementForm [productDescription=" + productDescription + ", productTitle=" + productTitle + ", user="
-				+ user + ", date=" + date + ", images=" + images + "]";
 	}
 
 	/**
@@ -94,47 +63,43 @@ public class SaleAdvertisementForm implements Serializable{
 	}
 
 	/**
-	 * @return the user
+	 * Hash code.
+	 *
+	 * @return the int
 	 */
-	public DefaultUserEntity getUser() {
-		return user;
+	@Override
+	public int hashCode() {
+		return Objects.hash(productDescription, productTitle);
 	}
 
 	/**
-	 * @param user the user to set
+	 * Equals.
+	 *
+	 * @param obj the obj
+	 * @return true, if successful
 	 */
-	public void setUser(DefaultUserEntity user) {
-		this.user = user;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SaleAdvertisementForm other = (SaleAdvertisementForm) obj;
+		return Objects.equals(productDescription, other.productDescription)
+				&& Objects.equals(productTitle, other.productTitle);
 	}
 
 	/**
-	 * @return the date
+	 * To string.
+	 *
+	 * @return the string
 	 */
-	public LocalDateTime getDate() {
-		return date;
+	@Override
+	public String toString() {
+		return "SaleAdvertisementForm [productDescription=" + productDescription + ", productTitle=" + productTitle
+				+ "]";
 	}
-
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(LocalDateTime date) {
-		this.date = date;
-	}
-
-	/**
-	 * @return the images
-	 */
-	public Set<DefaultImageEntity> getImages() {
-		return images;
-	}
-
-	/**
-	 * @param images the images to set
-	 */
-	public void setImages(Set<DefaultImageEntity> images) {
-		this.images = images;
-	}
-	
-	
 
 }

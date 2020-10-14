@@ -1,9 +1,8 @@
 package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 public class SaleAdvertisementViewConstants {
-
-	/** Name for the addSale form. */
-	public static final String VIEW_ADD_SALE_ADVERTISEMENT = "addSaleAdvertisement";
+	
+	public static final String VIEW_SALE_ADVERTISEMENT_FORM = "saleAdvertisement/addSaleAdvertisement";
 
 	/** Name for the addSale form. */
 	public static final String UPDATE_SALE_ADVERTISEMENT = "updateSaleAdvertisement";
@@ -12,10 +11,10 @@ public class SaleAdvertisementViewConstants {
 	public static final String SALE_ADVERTISEMENT_NOT_EXIST = "saleAdvertisementNotExist";
 
 	/** Name for the sales view. */
-	public static final String VIEW_SALE_ADVERTISEMENT_LIST = "/saleAdvertisement/list";
+	public static final String VIEW_SALE_ADVERTISEMENT_LIST = "saleAdvertisement/list";
 
 	/** Sale advertisements parameter name. */
-	public static final String PARAM_SALE_ADVERTISEMENT = "saleAdvertisements";
+	public static final String PARAM_SALE_ADVERTISEMENTS = "saleAdvertisements";
 
 	/**
 	 * Private constructor to avoid initialization.

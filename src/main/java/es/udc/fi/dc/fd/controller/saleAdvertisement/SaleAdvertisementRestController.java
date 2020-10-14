@@ -2,6 +2,7 @@ package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class SaleAdvertisementRestController {
 	 *
 	 * @param saleAdvertisementService the sale advertisement service
 	 */
+	@Autowired
 	public SaleAdvertisementRestController(SaleAdvertisementService saleAdvertisementService) {
 		super();
 		this.saleAdvertisementService = checkNotNull(saleAdvertisementService, ViewConstants.NULL_POINTER);

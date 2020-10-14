@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.addSaleAdvertisement}"></title>
+</head>
+
+<body>
+	<header class="header" th:include="fragments/menu :: menu"></header>
+
+	<div class="container">
+		<div class="card">
+			<div class="card-body">
+				<h1 class="card-title" th:text="#{title.addSaleAdvertisement}"></h1>
+
+				<form th:action="@{/saleAdvertisement/addSaleAdvertisement}"
+					th:object="${saleAdvertisementForm}" method="post" role="form"
+					class="form">
+
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('productTitle')} ? 'error'">
+						<input type="text" id="productTitle" name="productTitle"
+							th:placeholder="Title" class="form-control"
+							th:field="*{productTitle}" autofocus /> <span
+							class="text-danger" th:if="${#fields.hasErrors('productTitle')}"
+							th:errors="*{productTitle}"></span>
+					</div>
+
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('productDescription')} ? 'error'">
+						<input type="text" id="productDescription"
+							name="productDescription" th:placeholder="Description" class="form-control"
+							th:field="*{productDescription}" /> <span class="text-danger"
+							th:if="${#fields.hasErrors('productDescription')}"
+							th:errors="*{productDescription}"></span>
+					</div>
+
+					<div class="form-group">
+						<button class="btn btn-primary btn-block" name="Submit"
+							value="Add" type="Submit" th:text="Add"></button>
+					</div>
+
+				</form>
+
+
+			</div>
+		</div>
+	</div>
+
+</body>

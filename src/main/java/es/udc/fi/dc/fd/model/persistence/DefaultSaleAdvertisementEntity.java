@@ -140,6 +140,15 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		this.date = date;
 	}
 
+	public DefaultSaleAdvertisementEntity(String productTitle, String productDescription, DefaultUserEntity user,
+			LocalDateTime date) {
+		super();
+		this.product_title = productTitle;
+		this.product_description = productDescription;
+		this.user = user;
+		this.date = date;
+	}
+
 	@Override
 	public final boolean equals(final Object obj) {
 		if (this == obj) {

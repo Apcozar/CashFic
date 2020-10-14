@@ -2,6 +2,8 @@ package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.time.LocalDateTime;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,27 +20,45 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import es.udc.fi.dc.fd.controller.ViewConstants;
 import es.udc.fi.dc.fd.model.form.SaleAdvertisementForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
+import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.securityService.SecurityService;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
 import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
+/**
+ * The Class SaleAdvertisementFormController.
+ */
 @Controller
-@RequestMapping("/saleAvertisement")
+@RequestMapping("/saleAdvertisement")
 public class SaleAdvertisementFormController {
 
 	/** The sale add service. */
 	private SaleAdvertisementService saleAdvertisementService;
 
+	/** The security service. */
+	private SecurityService securityService;
+
+	/** The user service. */
+	private UserService userService;
+
 	/**
 	 * Instantiates a new sale add controller.
 	 *
 	 * @param saleAdvertisementService the sale advertisement service
+	 * @param securityService the security service
+	 * @param userService the user service
 	 */
 	@Autowired
-	public SaleAdvertisementFormController(SaleAdvertisementService saleAdvertisementService) {
+	public SaleAdvertisementFormController(final SaleAdvertisementService saleAdvertisementService,
+			final SecurityService securityService, final UserService userService) {
 		super();
 		this.saleAdvertisementService = checkNotNull(saleAdvertisementService, ViewConstants.NULL_POINTER);
+		this.securityService = checkNotNull(securityService, ViewConstants.NULL_POINTER);
+		this.userService = checkNotNull(userService, ViewConstants.NULL_POINTER);
 	}
 
 	/**
@@ -47,11 +67,12 @@ public class SaleAdvertisementFormController {
 	 * @param model the model
 	 * @return the string
 	 */
+
 	@GetMapping(path = "/addSaleAdvertisement")
-	public String showAddSaleAdvertisementView(final Model model) {
+	public String showSaleAdvertisementView(final Model model) {
 		model.addAttribute("saleAdvertisementForm", new SaleAdvertisementForm());
 
-		return SaleAdvertisementViewConstants.VIEW_ADD_SALE_ADVERTISEMENT;
+		return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_FORM;
 	}
 
 	/**
@@ -60,23 +81,29 @@ public class SaleAdvertisementFormController {
 	 * @param saleAdvertisementForm the sale add form
 	 * @param bindingResult         the binding result
 	 * @return the welcome view
-	 * @throws SaleAdvertisementServiceException       the sale advertisement
-	 *                                                 service exception
 	 * @throws SaleAdvertisementAlreadyExistsException exception
 	 */
+
 	@PostMapping(path = "/addSaleAdvertisement")
 	public String addSaleAdvertisement(
 			@Valid @ModelAttribute("saleAdvertisementForm") SaleAdvertisementForm saleAdvertisementForm,
-			BindingResult bindingResult)
-			throws SaleAdvertisementServiceException, SaleAdvertisementAlreadyExistsException {
+			BindingResult bindingResult) throws SaleAdvertisementAlreadyExistsException {
 
-		if (bindingResult.hasErrors()) {
-			return SaleAdvertisementViewConstants.VIEW_ADD_SALE_ADVERTISEMENT;
+		try {
+			if (bindingResult.hasErrors()) {
+				return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_FORM;
+			}
+
+			String username = securityService.findLoggedInUsername();
+
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			saleAdvertisementService.add(new DefaultSaleAdvertisementEntity(saleAdvertisementForm.getProductTitle(),
+					saleAdvertisementForm.getProductDescription(), user, LocalDateTime.now()));
+
+		} catch (UserNotFoundException e) {
+			return ViewConstants.VIEW_SIGNIN;
 		}
-
-		saleAdvertisementService.add(new DefaultSaleAdvertisementEntity(saleAdvertisementForm.getProductTitle(),
-				saleAdvertisementForm.getProductDescription(), saleAdvertisementForm.getImages(),
-				saleAdvertisementForm.getUser(), saleAdvertisementForm.getDate()));
 
 		return ViewConstants.WELCOME;
 	}
@@ -103,15 +130,21 @@ public class SaleAdvertisementFormController {
 				return SaleAdvertisementViewConstants.UPDATE_SALE_ADVERTISEMENT;
 			}
 
-			saleAdvertisementService.update(new DefaultSaleAdvertisementEntity(id,
-					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(),
-					saleAdvertisementForm.getUser(), saleAdvertisementForm.getDate()));
+			String username = securityService.findLoggedInUsername();
+
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			saleAdvertisementService
+					.update(new DefaultSaleAdvertisementEntity(id, saleAdvertisementForm.getProductTitle(),
+							saleAdvertisementForm.getProductDescription(), user, LocalDateTime.now()));
 
 			return ViewConstants.WELCOME;
 		} catch (SaleAdvertisementServiceException e) {
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
 					SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
 			return SaleAdvertisementViewConstants.UPDATE_SALE_ADVERTISEMENT;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.VIEW_SIGNIN;
 		}
 	}
 
@@ -120,16 +153,13 @@ public class SaleAdvertisementFormController {
 	 *
 	 * @param id    the sale id
 	 * @param model the model
-	 * @throws SaleAdvertisementNotFoundException
+	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found exception
 	 */
+
 	private void checkSaleAdvertisement(Integer id, Model model) throws SaleAdvertisementNotFoundException {
-		try {
-			saleAdvertisementService.findById(id);
-			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
-					SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
-		} catch (SaleAdvertisementNotFoundException e) {
-			// If the exception jump, the sale does not exist
-		}
+		saleAdvertisementService.findById(id);
+		model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
+				SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
 	}
 
 }
