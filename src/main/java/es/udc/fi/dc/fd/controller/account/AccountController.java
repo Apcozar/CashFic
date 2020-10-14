@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
+import es.udc.fi.dc.fd.model.form.account.SignInForm;
 import es.udc.fi.dc.fd.model.form.account.SignUpForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
@@ -102,6 +103,46 @@ public class AccountController {
 			model.addAttribute(AccountViewConstants.EMAIL_EXIST, AccountViewConstants.EMAIL_EXIST);
 			return ViewConstants.VIEW_SIGNUP;
 		}
+	}
+
+	/**
+	 * Show sign in view.
+	 *
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/signIn")
+	public String showSignInView(final Model model) {
+		model.addAttribute("signInForm", new SignInForm());
+
+		return ViewConstants.VIEW_SIGNIN;
+	}
+
+	/**
+	 * Sign in.
+	 *
+	 * @param signInForm    the sign in form
+	 * @param bindingResult the binding result
+	 * @param model         the model
+	 * @return the string
+	 */
+	@PostMapping(path = "/signIn")
+	public String signIn(@Valid @ModelAttribute("signInForm") SignInForm signInForm, BindingResult bindingResult,
+			Model model) {
+
+		try {
+			if (bindingResult.hasErrors()) {
+				return ViewConstants.VIEW_SIGNIN;
+			}
+			this.userService.login(signInForm.getLogin(), signInForm.getPassword());
+
+		} catch (Exception e) {
+			model.addAttribute(AccountViewConstants.ERROR_LOGIN, AccountViewConstants.ERROR_LOGIN);
+			return ViewConstants.VIEW_SIGNIN;
+		}
+
+		this.securityService.autologin(signInForm.getLogin(), signInForm.getPassword());
+		return "redirect:/";
 	}
 
 	/**

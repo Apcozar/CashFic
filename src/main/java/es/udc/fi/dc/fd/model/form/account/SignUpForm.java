@@ -39,10 +39,12 @@ public class SignUpForm implements Serializable {
 	/** The email. */
 	@NotEmpty(message = "{notEmpty}")
 	@Email(message = "{notMail}")
+	@Size(min = 1, max = 30, message = "{emailSize}")
 	private String email;
 
 	/** The city. */
 	@NotEmpty(message = "{notEmpty}")
+	@Size(min = 1, max = 30, message = "{citySize}")
 	private String city;
 
 	/**
@@ -161,11 +163,22 @@ public class SignUpForm implements Serializable {
 		this.city = city;
 	}
 
+	/**
+	 * Hash code.
+	 *
+	 * @return the int
+	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(login, password, name, lastName, email, city);
 	}
 
+	/**
+	 * Equals.
+	 *
+	 * @param obj the obj
+	 * @return true, if successful
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -180,6 +193,11 @@ public class SignUpForm implements Serializable {
 				&& Objects.equals(email, other.email) && Objects.equals(city, other.city);
 	}
 
+	/**
+	 * To string.
+	 *
+	 * @return the string
+	 */
 	@Override
 	public String toString() {
 		return "SingUpForm [login=" + login + ", password=" + password + ", name=" + name + ", lastName=" + lastName

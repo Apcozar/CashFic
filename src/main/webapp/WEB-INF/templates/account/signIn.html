@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.signIn}"></title>
+</head>
+<body>
+	<header class="header" th:include="fragments/menu :: menu"></header>
+
+	<div class="container">
+		<div class="card">
+			<div class="card-body">
+				<h1 class="card-title" th:text="#{title.signIn}"></h1>
+
+				<form th:action="@{/signIn}" method="POST"
+					class="form-signin form-horizontal" th:object="${signInForm}">
+
+					<div th:if="${error_login!=null}">
+						<p style="font-size: 20; color: #FF1C19;" class="text-center"
+							th:text="#{error.userOrPassInvalid}"></p>
+					</div>
+					
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('login')} ? 'error'">
+						<input type="text" id="login" name="login"
+							th:placeholder="Login" class="form-control"
+							th:field="*{login}" autofocus /> <span class="text-danger"
+							th:if="${#fields.hasErrors('login')}" th:errors="*{login}"></span>
+					</div>
+
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('password')} ? 'error'">
+						<input type="password" th:placeholder="Password" id="password"
+							name="password" class="form-control" th:field="*{password}" /> <span
+							class="text-danger" th:if="${#fields.hasErrors('password')}"
+							th:errors="*{password}"></span>
+					</div>
+
+					<div class="form-group">
+						<button class="btn btn-primary btn-block" name="Submit"
+							value="Login" type="Submit" th:text="Login"></button>
+					</div>
+				</form>
+				<p class="mb-0">
+					
+					<small><a th:href="@{/signUp}" th:text="#{title.signUp}"></a></small>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	  <div th:include="fragments/scripts :: general" ></div>
+</body>
