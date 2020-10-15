@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.saleAdvertisementList}"></title>
+</head>
+<body>
+	<header class="header" th:include="fragments/menu :: menu"> </header>
+
+	<div class="container">
+		<div class="card bg-dark">
+			<div class="card-header">
+				<h3 th:text="#{title.saleAdvertisementList}"></h3>
+			</div>
+
+			<div class="card-body">
+
+				<table class="table table-striped display dataTable">
+					<thead>
+						<tr>
+							<th th:text="#{label.productTitle}">Title</th>
+							<th th:text="#{label.productDescription}">Description</th>
+							<th th:text="#{label.date}">Date</th>
+							<th th:text="#{label.user}">User</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="saleAdvertisement : ${saleAdvertisements}">
+							<td><a
+								th:href="@{/saleAdvertisement/} + ${saleAdvertisement?.id}">
+									<span th:remove="tag"
+									th:text="${saleAdvertisement?.productTitle}"></span>
+							</a></td>
+							<td><span th:remove="tag"
+								th:text="${saleAdvertisement?.productDescription}">Description</span></td>
+							<td><span th:remove="tag"
+								th:text="${saleAdvertisement?.date}">Date</span></td>
+							<td><span th:remove="tag"
+								th:text="${saleAdvertisement?.user.name}">User</span></td>
+						</tr>
+					</tbody>
+
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		<div th:include="fragments/scripts :: general"></div>
+	</footer>
+</body>
+
+</html>

@@ -15,7 +15,7 @@
 			<div class="card-body">
 				<h1 class="card-title" th:text="#{title.addSaleAdvertisement}"></h1>
 
-				<form th:action="@{/saleAdvertisement/addSaleAdvertisement}"
+				<form th:action="@{/saleAdvertisement/add}"
 					th:object="${saleAdvertisementForm}" method="post" role="form"
 					class="form">
 
@@ -31,8 +31,9 @@
 					<div class="form-group"
 						th:classappend="${#fields.hasErrors('productDescription')} ? 'error'">
 						<input type="text" id="productDescription"
-							name="productDescription" th:placeholder="Description" class="form-control"
-							th:field="*{productDescription}" /> <span class="text-danger"
+							name="productDescription" th:placeholder="Description"
+							class="form-control" th:field="*{productDescription}" /> <span
+							class="text-danger"
 							th:if="${#fields.hasErrors('productDescription')}"
 							th:errors="*{productDescription}"></span>
 					</div>
@@ -50,3 +51,7 @@
 	</div>
 
 </body>
+<footer>
+	<div th:include="fragments/scripts :: general"></div>
+</footer>
+</html>

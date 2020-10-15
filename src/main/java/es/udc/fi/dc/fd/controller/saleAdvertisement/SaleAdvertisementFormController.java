@@ -68,7 +68,7 @@ public class SaleAdvertisementFormController {
 	 * @return the string
 	 */
 
-	@GetMapping(path = "/addSaleAdvertisement")
+	@GetMapping(path = "/add")
 	public String showSaleAdvertisementView(final Model model) {
 		model.addAttribute("saleAdvertisementForm", new SaleAdvertisementForm());
 
@@ -84,7 +84,7 @@ public class SaleAdvertisementFormController {
 	 * @throws SaleAdvertisementAlreadyExistsException exception
 	 */
 
-	@PostMapping(path = "/addSaleAdvertisement")
+	@PostMapping(path = "/add")
 	public String addSaleAdvertisement(
 			@Valid @ModelAttribute("saleAdvertisementForm") SaleAdvertisementForm saleAdvertisementForm,
 			BindingResult bindingResult) throws SaleAdvertisementAlreadyExistsException {

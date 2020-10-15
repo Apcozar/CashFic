@@ -24,8 +24,6 @@
 
 package es.udc.fi.dc.fd.repository;
 
-import java.time.LocalDateTime;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -41,7 +39,12 @@ import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
  */
 public interface SaleAdvertisementRepository extends JpaRepository<DefaultSaleAdvertisementEntity, Integer> {
 	
-	@Query("SELECT s from sale_advertisements ORDER BY date")
-	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsOrderByDateAsc(LocalDateTime date);
+	/**
+	 * Find sale advertisements order by date desc.
+	 *
+	 * @return the iterable
+	 */
+	@Query("SELECT s from SaleAdvertisementEntity s ORDER BY s.date desc")
+	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsOrderByDateDesc();
 
 }

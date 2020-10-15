@@ -26,8 +26,6 @@ package es.udc.fi.dc.fd.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -166,8 +164,8 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	}
 	
 	@Override
-	public final Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDate(LocalDateTime date) {
-		return saleAdvertisementRepository.findSaleAdvertisementsOrderByDateAsc(date);
+	public final Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateDesc() {
+		return saleAdvertisementRepository.findSaleAdvertisementsOrderByDateDesc();
 	}
 
 }

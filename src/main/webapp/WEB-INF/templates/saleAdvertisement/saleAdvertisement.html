@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.saleAdvertisement}"></title>
+</head>
+
+<body>
+	<header class="header" th:include="fragments/menu :: menu"> </header>
+
+	<div th:if="${saleAdvertisementNotExist=='saleAdvertisementNotExist'}"
+		class="container">
+		<p th:if="${productTitle==null}" class="alert alert-danger"
+			role="alert" th:text="#{error.saleAdvertisementNotFound}"></p>
+	</div>
+	<div
+		th:unless="${saleAdvertisementNotExist=='saleAdvertisementNotExist'}"
+		class="container">
+		<div class="container">
+			<div class="card bg-dark">
+				<div class="card-header">
+
+					<h3 th:text="${saleAdvertisement.productTitle}"></h3>
+				</div>
+				<div class="card-body">
+					<p th:text="${saleAdvertisement.productDescription}" />
+					<div>
+						<div>
+							User: <small th:text="${saleAdvertisement.user.name}"></small>
+						</div>
+						<div>
+							Date: <small th:text="${saleAdvertisement.date}"></small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+<footer>
+	<div th:include="fragments/scripts :: general"></div>
+</footer>
+
+</html>

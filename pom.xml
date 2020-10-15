@@ -24,7 +24,7 @@
 	<version>0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>FD Spring MVC Guapi Pop App</name>
+	<name>Cash FIC</name>
 	<description>Test project for FD 2020</description>
 	<url>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</url>
 	<inceptionYear>2020</inceptionYear>
