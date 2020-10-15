@@ -24,6 +24,8 @@
 
 package es.udc.fi.dc.fd.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
@@ -100,5 +102,6 @@ public interface SaleAdvertisementService {
 	 * @throws SaleAdvertisementServiceException the sale add service exception
 	 */
 	SaleAdvertisementEntity update(DefaultSaleAdvertisementEntity saleAdd) throws SaleAdvertisementServiceException;
-
+	
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDate( LocalDateTime date);
 }
