@@ -15,9 +15,9 @@
 			<div class="card-body">
 				<h1 class="card-title" th:text="#{title.addSaleAdvertisement}"></h1>
 
-				<form th:action="@{/saleAdvertisement/add}"
+				<form th:action="@{/saleAdvertisement/addSaleAdvertisement}"
 					th:object="${saleAdvertisementForm}" method="post" role="form"
-					class="form">
+					class="form" enctype="multipart/form-data">
 
 					<div class="form-group"
 						th:classappend="${#fields.hasErrors('productTitle')} ? 'error'">
@@ -31,12 +31,23 @@
 					<div class="form-group"
 						th:classappend="${#fields.hasErrors('productDescription')} ? 'error'">
 						<input type="text" id="productDescription"
-							name="productDescription" th:placeholder="Description"
-							class="form-control" th:field="*{productDescription}" /> <span
-							class="text-danger"
+							name="productDescription" th:placeholder="Description" class="form-control"
+							th:field="*{productDescription}" /> <span class="text-danger"
 							th:if="${#fields.hasErrors('productDescription')}"
 							th:errors="*{productDescription}"></span>
 					</div>
+					
+					<div class="form-group"
+								th:classappend="${#fields.hasErrors('imageFile')}? 'has-error'">
+								<label for="imageFile" class="col-lg-2 control-label"
+									th:text="#{label.imageFile}">ImageFile</label>
+								<div class="col-lg-10">
+									<input type="file" class="form-control" id="imageFile"
+										placeholder="Image File" th:field="*{imageFile}" multiple/> <span
+										class="help-block" th:if="${#fields.hasErrors('imageFile')}"
+										th:errors="*{imageFile}" >Invalid Image File</span>
+								</div>
+							</div>
 
 					<div class="form-group">
 						<button class="btn btn-primary btn-block" name="Submit"

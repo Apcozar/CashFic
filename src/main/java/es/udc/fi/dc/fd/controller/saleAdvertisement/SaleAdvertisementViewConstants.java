@@ -1,10 +1,10 @@
 package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 public class SaleAdvertisementViewConstants {
-	
+
 	/** Name for sale advertisement. */
 	public static final String SALE_ADVERTISEMENT = "saleAdvertisement";
-	
+
 	/** Name for the sale advertisement form */
 	public static final String VIEW_SALE_ADVERTISEMENT_FORM = "saleAdvertisement/addSaleAdvertisement";
 
@@ -22,6 +22,12 @@ public class SaleAdvertisementViewConstants {
 
 	/** Name for the sale advertisement view. */
 	public static final String VIEW_SALE_ADVERTISEMENT = "saleAdvertisement/saleAdvertisement";
+
+	/** Image parameter name. */
+	public static final String PARAM_IMAGES = "images";
+
+	/** First image parameter name. */
+	public static final String PARAM_IMAGE = "first";
 
 	/**
 	 * Private constructor to avoid initialization.

@@ -107,4 +107,15 @@ public interface SaleAdvertisementService {
 	 * @return the sale advertisements by date
 	 */
 	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateDesc();
+
+	/**
+	 * Find by id default.
+	 *
+	 * @param identifier the identifier
+	 * @return the default sale advertisement entity
+	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
+	 *                                            exception
+	 */
+	public DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
+			throws SaleAdvertisementNotFoundException;
 }

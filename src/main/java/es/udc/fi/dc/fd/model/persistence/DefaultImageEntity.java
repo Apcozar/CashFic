@@ -96,6 +96,12 @@ public class DefaultImageEntity implements ImageEntity {
 		super();
 	}
 
+	public DefaultImageEntity(String fileName, String title, DefaultSaleAdvertisementEntity saleAdvertisementEntity) {
+		this.title = title;
+		this.image_path = fileName;
+		this.sale_advertisement = saleAdvertisementEntity;
+	}
+
 	@Override
 	public final boolean equals(final Object obj) {
 		if (this == obj) {

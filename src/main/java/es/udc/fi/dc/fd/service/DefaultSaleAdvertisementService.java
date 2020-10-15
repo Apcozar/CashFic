@@ -162,10 +162,23 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	public final Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisements(final Pageable page) {
 		return saleAdvertisementRepository.findAll(page);
 	}
-	
+
 	@Override
 	public final Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateDesc() {
 		return saleAdvertisementRepository.findSaleAdvertisementsOrderByDateDesc();
+	}
+
+	@Override
+	public final DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
+			throws SaleAdvertisementNotFoundException {
+
+		checkNotNull(identifier, "Received a null pointer as identifier");
+
+		if (!saleAdvertisementRepository.existsById(identifier)) {
+			throw new SaleAdvertisementNotFoundException(identifier);
+		}
+
+		return saleAdvertisementRepository.findById(identifier).get();
 	}
 
 }

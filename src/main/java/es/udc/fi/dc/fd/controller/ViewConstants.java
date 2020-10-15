@@ -27,6 +27,9 @@ public class ViewConstants {
 	/** Name for the profile view */
 	public static final String VIEW_PROFILE = "account/profile";
 
+	/** The Constant UPLOADS_FOLDER_NAME. */
+	public static final String UPLOADS_FOLDER_NAME = "/Images";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

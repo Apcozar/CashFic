@@ -1,11 +1,13 @@
 package es.udc.fi.dc.fd.model.form;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * The Class SaleAdvertisementForm.
@@ -27,11 +29,32 @@ public class SaleAdvertisementForm implements Serializable {
 	@Size(min = 1, max = 30, message = "{productTitleSize}")
 	private String productTitle;
 
+	/** The image file. */
+	private transient List<MultipartFile> imageFile;
+
 	/**
 	 * Constructs a DTO for the sale add form.
 	 */
 	public SaleAdvertisementForm() {
 		super();
+	}
+
+	/**
+	 * Gets the image file.
+	 *
+	 * @return the image file
+	 */
+	public List<MultipartFile> getImageFile() {
+		return imageFile;
+	}
+
+	/**
+	 * Sets the image file.
+	 *
+	 * @param imageFile the new image file
+	 */
+	public void setImageFile(List<MultipartFile> imageFile) {
+		this.imageFile = imageFile;
 	}
 
 	/**
@@ -69,7 +92,7 @@ public class SaleAdvertisementForm implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(productDescription, productTitle);
+		return Objects.hash(productDescription, productTitle, imageFile);
 	}
 
 	/**
@@ -88,7 +111,7 @@ public class SaleAdvertisementForm implements Serializable {
 			return false;
 		SaleAdvertisementForm other = (SaleAdvertisementForm) obj;
 		return Objects.equals(productDescription, other.productDescription)
-				&& Objects.equals(productTitle, other.productTitle);
+				&& Objects.equals(productTitle, other.productTitle) && Objects.equals(imageFile, other.imageFile);
 	}
 
 	/**
