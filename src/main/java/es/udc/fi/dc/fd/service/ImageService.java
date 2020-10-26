@@ -28,9 +28,8 @@ import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
-import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.ImageNotFoundException;
-import es.udc.fi.dc.service.exceptions.ImageServiceException;
+import es.udc.fi.dc.fd.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.ImageNotFoundException;
 
 /**
  * Service for the image domain.
@@ -43,16 +42,6 @@ import es.udc.fi.dc.service.exceptions.ImageServiceException;
 public interface ImageService {
 
 	/**
-	 * Store an image which no exist.
-	 * 
-	 * @param image image to persist imageId should be -1
-	 * @return the persisted image
-	 * @throws ImageServiceException       the ImageService exception
-	 * @throws ImageAlreadyExistsException when the image already exists
-	 */
-	public ImageEntity add(final DefaultImageEntity image) throws ImageServiceException, ImageAlreadyExistsException;
-
-	/**
 	 * Returns an image with the given id.
 	 * <p>
 	 * If no image exists with that id then throw exception
@@ -62,6 +51,37 @@ public interface ImageService {
 	 * @throws ImageNotFoundException exception when image not found
 	 */
 	public ImageEntity findById(final Integer identifier) throws ImageNotFoundException;
+
+	/**
+	 * Store an image which no exist.
+	 * <p>
+	 * Create an image with the entity parameters received. Returns the entity
+	 * persisted with id assigned
+	 * 
+	 * @param image image to persist imageId should be -1
+	 * @return the persisted image
+	 * @throws ImageAlreadyExistsException when the image with id already exists
+	 */
+	public ImageEntity add(final DefaultImageEntity image) throws ImageAlreadyExistsException;
+
+	/**
+	 * Updates an image from persistence. If sale advertisement change, the sale
+	 * advertisement change, the image must be removed from the initial sale
+	 * advertisement
+	 * 
+	 * @param image image to update
+	 * @return updated image
+	 * @throws ImageNotFoundException if image with id not found
+	 */
+	ImageEntity update(DefaultImageEntity image) throws ImageNotFoundException;
+
+	/**
+	 * Removes an image from persistence.
+	 * 
+	 * @param image image to remove
+	 * @throws ImageNotFoundException when image not found
+	 */
+	public void remove(final DefaultImageEntity image) throws ImageNotFoundException;
 
 	/**
 	 * Returns all the images from the DB.
@@ -77,22 +97,5 @@ public interface ImageService {
 	 * @return a paginated collection of images
 	 */
 	public Iterable<DefaultImageEntity> getImages(final Pageable page);
-
-	/**
-	 * Removes an image from persistence.
-	 * 
-	 * @param image image to remove
-	 * @throws ImageNotFoundException when image not found
-	 */
-	public void remove(final DefaultImageEntity image) throws ImageNotFoundException;
-
-	/**
-	 * Updates an image from persistence.
-	 * 
-	 * @param image image to update
-	 * @return updated image
-	 * @throws ImageServiceException the ImageService exception
-	 */
-	ImageEntity update(DefaultImageEntity image) throws ImageServiceException;
 
 }

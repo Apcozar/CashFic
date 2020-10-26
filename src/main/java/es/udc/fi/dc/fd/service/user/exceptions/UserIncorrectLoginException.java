@@ -1,6 +1,6 @@
 package es.udc.fi.dc.fd.service.user.exceptions;
 
-public class IncorrectLoginException extends Exception {
+public class UserIncorrectLoginException extends Exception {
 
 	/**
 	 * SERIAL UID for Serializable
@@ -13,7 +13,7 @@ public class IncorrectLoginException extends Exception {
 	 * @param login    The login
 	 * @param password The email
 	 */
-	public IncorrectLoginException(String login, String password) {
+	public UserIncorrectLoginException(String login, String password) {
 		super("The login : " + login + "and password: " + password + " are incorrect");
 	}
 }

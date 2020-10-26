@@ -37,6 +37,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
@@ -47,13 +48,13 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.ImageNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.ImageServiceException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
-import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.ImageNotFoundException;
-import es.udc.fi.dc.service.exceptions.ImageServiceException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Integration tests for the {@link UserService}.
@@ -62,6 +63,7 @@ import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
  * the example entities repository, these tests are for verifying everything is
  * set up correctly and working.
  */
+@WebAppConfiguration
 @RunWith(JUnitPlatform.class)
 @SpringJUnitConfig
 @Transactional

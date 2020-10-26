@@ -35,9 +35,9 @@ import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
 import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Default implementation of the saleAdd service.
@@ -92,8 +92,9 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		if (!saleAdvertisementRepository.existsById(identifier)) {
 			throw new SaleAdvertisementNotFoundException(identifier);
 		}
-
-		return saleAdvertisementRepository.getOne(identifier);
+		DefaultSaleAdvertisementEntity result = saleAdvertisementRepository.getOne(identifier);
+		DefaultSaleAdvertisementEntity otherResult = saleAdvertisementRepository.findById(identifier).get();
+		return result;
 	}
 
 	/**

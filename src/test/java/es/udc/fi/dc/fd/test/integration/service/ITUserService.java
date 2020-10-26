@@ -34,12 +34,13 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
-import es.udc.fi.dc.fd.service.user.exceptions.EmailNotFoundException;
-import es.udc.fi.dc.fd.service.user.exceptions.IncorrectLoginException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
@@ -49,6 +50,7 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
  * Integration tests for the {@link UserService}.
  * 
  */
+@WebAppConfiguration
 @RunWith(JUnitPlatform.class)
 @SpringJUnitConfig
 @Transactional
@@ -158,11 +160,11 @@ public class ITUserService {
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
 	 *                                          exception
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws EmailNotFoundException           the email not found exception
+	 * @throws UserEmailNotFoundException           the email not found exception
 	 */
 	@Test
 	public void signUpAndFindByEmailTest() throws UserLoginExistsException, UserEmailExistsException,
-			UserLoginAndEmailExistsException, UserNotFoundException, EmailNotFoundException {
+			UserLoginAndEmailExistsException, UserNotFoundException, UserEmailNotFoundException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
 		userService.signUp(expected);
@@ -180,12 +182,12 @@ public class ITUserService {
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
 	 *                                          exception
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws EmailNotFoundException           the email not found exception
-	 * @throws IncorrectLoginException          the incorrect login exception
+	 * @throws UserEmailNotFoundException           the email not found exception
+	 * @throws UserIncorrectLoginException          the incorrect login exception
 	 */
 	@Test
 	public void signUpAndLoginTest() throws UserLoginExistsException, UserEmailExistsException,
-			UserLoginAndEmailExistsException, UserNotFoundException, EmailNotFoundException, IncorrectLoginException {
+			UserLoginAndEmailExistsException, UserNotFoundException, UserEmailNotFoundException, UserIncorrectLoginException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
 		userService.signUp(expected);
@@ -282,11 +284,11 @@ public class ITUserService {
 	/**
 	 * Find by non existent EMAIL test.
 	 *
-	 * @throws EmailNotFoundException the email not found exception
+	 * @throws UserEmailNotFoundException the email not found exception
 	 */
 	@Test
-	public void FindByNonExistentEMAILTest() throws EmailNotFoundException {
-		Assertions.assertThrows(EmailNotFoundException.class, () -> {
+	public void FindByNonExistentEMAILTest() throws UserEmailNotFoundException {
+		Assertions.assertThrows(UserEmailNotFoundException.class, () -> {
 			userService.findByEmail(NON_EXISTENT_EMAIL);
 		});
 	}
@@ -295,14 +297,14 @@ public class ITUserService {
 	 * Sign up and login non existent login test.
 	 *
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws IncorrectLoginException          the incorrect login exception
+	 * @throws UserIncorrectLoginException          the incorrect login exception
 	 * @throws UserLoginExistsException         the user login exists exception
 	 * @throws UserEmailExistsException         the user email exists exception
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
 	 *                                          exception
 	 */
 	@Test
-	public void signUpAndLoginNonExistentLoginTest() throws UserNotFoundException, IncorrectLoginException,
+	public void signUpAndLoginNonExistentLoginTest() throws UserNotFoundException, UserIncorrectLoginException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		Assertions.assertThrows(UserNotFoundException.class, () -> {
 			userService.login(NON_EXISTENT_LOGIN, PASSWORD);
@@ -317,16 +319,16 @@ public class ITUserService {
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
 	 *                                          exception
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws IncorrectLoginException          the incorrect login exception
+	 * @throws UserIncorrectLoginException          the incorrect login exception
 	 */
 	@Test
 	public void signUpAndLoginIncorrectPasswordTest() throws UserLoginExistsException, UserEmailExistsException,
-			UserLoginAndEmailExistsException, UserNotFoundException, IncorrectLoginException {
+			UserLoginAndEmailExistsException, UserNotFoundException, UserIncorrectLoginException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
 		userService.signUp(expected);
 
-		Assertions.assertThrows(IncorrectLoginException.class, () -> {
+		Assertions.assertThrows(UserIncorrectLoginException.class, () -> {
 			userService.login(LOGIN, INCORRECT_PASSWORD);
 		});
 	}

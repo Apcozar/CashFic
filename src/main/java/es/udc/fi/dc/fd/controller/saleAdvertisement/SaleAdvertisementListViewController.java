@@ -22,8 +22,8 @@ import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
 
 @Controller
 @RequestMapping("/saleAdvertisement")

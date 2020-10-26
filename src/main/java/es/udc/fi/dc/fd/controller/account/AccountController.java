@@ -18,7 +18,7 @@ import es.udc.fi.dc.fd.model.form.account.SignUpForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
-import es.udc.fi.dc.fd.service.user.exceptions.EmailNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
@@ -187,7 +187,7 @@ public class AccountController {
 		try {
 			userService.findByEmail(signUpForm.getEmail());
 			model.addAttribute(AccountViewConstants.EMAIL_EXIST, AccountViewConstants.EMAIL_EXIST);
-		} catch (EmailNotFoundException e) {
+		} catch (UserEmailNotFoundException e) {
 			// If the exception jump, the email is not in use
 		}
 	}
@@ -202,7 +202,7 @@ public class AccountController {
 		try {
 			userService.findByEmail(signUpForm.getEmail());
 			model.addAttribute(AccountViewConstants.EMAIL_EXIST, AccountViewConstants.EMAIL_EXIST);
-		} catch (EmailNotFoundException e) {
+		} catch (UserEmailNotFoundException e) {
 			// If the exception jump, the email is not in use
 		}
 	}

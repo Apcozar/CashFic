@@ -36,9 +36,9 @@ INSERT INTO users (login, password, name, last_name, email , city, role) VALUES
 
 INSERT INTO sale_advertisements  (product_title, product_description, user_id, add_date) VALUES  
 	('FirstProduct','FirstProductDescription',1,'2011-03-12 10:34:09'),
-	('SecondProduct', 'SecondProductDescription',1,'2011-03-12 10:34:09'),
-	('ThirdProduct','ThirdProductDescription',1,'2011-03-12 10:34:09');
-	
+	('SecondProduct','SecondProductDescription',1,'2011-03-12 10:34:09'),
+	('ThirdProduct','ThirdProductDescription',1,'2011-03-12 10:34:09'),
+	('FourthProduct','FourthProductDescription',1,'2012-02-02 12:30:19');
 	
 INSERT INTO images (title, image_path, sale_advertisement_id) VALUES
 	('imageTitle1','imagePath1',1),

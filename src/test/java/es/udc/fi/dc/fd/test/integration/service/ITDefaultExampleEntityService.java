@@ -35,6 +35,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.ExampleEntity;
@@ -48,6 +49,7 @@ import es.udc.fi.dc.fd.service.ExampleEntityService;
  * the example entities repository, these tests are for verifying everything is
  * set up correctly and working.
  */
+@WebAppConfiguration
 @RunWith(JUnitPlatform.class)
 @SpringJUnitConfig
 @Transactional
@@ -56,67 +58,63 @@ import es.udc.fi.dc.fd.service.ExampleEntityService;
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
 public class ITDefaultExampleEntityService {
 
-    /**
-     * Service being tested.
-     */
-    @Autowired
-    private ExampleEntityService service;
+	/**
+	 * Service being tested.
+	 */
+	@Autowired
+	private ExampleEntityService service;
 
-    /**
-     * Default constructor.
-     */
-    public ITDefaultExampleEntityService() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public ITDefaultExampleEntityService() {
+		super();
+	}
 
-    /**
-     * Verifies that the service adds entities into persistence.
-     */
-    @Test
-    public void testAdd_NotExisting_Added() {
-        final DefaultExampleEntity entity; // Entity to add
-        final Integer entitiesCount;       // Original number of entities
-        final Integer finalEntitiesCount;  // Final number of entities
+	/**
+	 * Verifies that the service adds entities into persistence.
+	 */
+	@Test
+	public void testAdd_NotExisting_Added() {
+		final DefaultExampleEntity entity; // Entity to add
+		final Integer entitiesCount; // Original number of entities
+		final Integer finalEntitiesCount; // Final number of entities
 
-        entitiesCount = ((Collection<DefaultExampleEntity>) service
-                .getAllEntities()).size();
+		entitiesCount = ((Collection<DefaultExampleEntity>) service.getAllEntities()).size();
 
-        entity = new DefaultExampleEntity();
-        entity.setName("ABC");
+		entity = new DefaultExampleEntity();
+		entity.setName("ABC");
 
-        service.add(entity);
+		service.add(entity);
 
-        finalEntitiesCount = ((Collection<DefaultExampleEntity>) service
-                .getAllEntities()).size();
+		finalEntitiesCount = ((Collection<DefaultExampleEntity>) service.getAllEntities()).size();
 
-        Assert.assertEquals(finalEntitiesCount,Integer.valueOf(entitiesCount + 1));
-    }
+		Assert.assertEquals(finalEntitiesCount, Integer.valueOf(entitiesCount + 1));
+	}
 
-    /**
-     * Verifies that searching an existing entity by id returns the expected
-     * entity.
-     */
-    @Test
-    public void testFindById_Existing_Valid() {
-        final ExampleEntity entity; // Found entity
+	/**
+	 * Verifies that searching an existing entity by id returns the expected entity.
+	 */
+	@Test
+	public void testFindById_Existing_Valid() {
+		final ExampleEntity entity; // Found entity
 
-        entity = service.findById(1);
-        System.out.println(((Collection<DefaultExampleEntity>) service
-                .getAllEntities()).size());
-        Assert.assertEquals(entity.getId(), Integer.valueOf(1));
-    }
+		entity = service.findById(1);
+		System.out.println(((Collection<DefaultExampleEntity>) service.getAllEntities()).size());
+		Assert.assertEquals(entity.getId(), Integer.valueOf(1));
+	}
 
-    /**
-     * Verifies that searching for a not existing entity by id returns an empty
-     * entity.
-     */
-    @Test
-    public void testFindById_NotExisting_Invalid() {
-        final ExampleEntity entity; // Found entity
+	/**
+	 * Verifies that searching for a not existing entity by id returns an empty
+	 * entity.
+	 */
+	@Test
+	public void testFindById_NotExisting_Invalid() {
+		final ExampleEntity entity; // Found entity
 
-        entity = service.findById(100);
+		entity = service.findById(100);
 
-        Assert.assertEquals(entity.getId(), Integer.valueOf(-1));
-    }
+		Assert.assertEquals(entity.getId(), Integer.valueOf(-1));
+	}
 
 }

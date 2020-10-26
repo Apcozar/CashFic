@@ -28,9 +28,9 @@ import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Service for the saleAdd domain.

@@ -36,13 +36,13 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.ImageServiceException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
-import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.ImageServiceException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * The Class SaleAdvertisementFormController.

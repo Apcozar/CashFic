@@ -36,8 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 import es.udc.fi.dc.fd.model.Role;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.repository.UserRepository;
-import es.udc.fi.dc.fd.service.user.exceptions.EmailNotFoundException;
-import es.udc.fi.dc.fd.service.user.exceptions.IncorrectLoginException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
@@ -93,7 +93,7 @@ public class DefaultUserService implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public DefaultUserEntity login(String login, String password)
-			throws UserNotFoundException, IncorrectLoginException {
+			throws UserNotFoundException, UserIncorrectLoginException {
 
 		if (!userDao.existsByLogin(login)) {
 			throw new UserNotFoundException(login);
@@ -104,7 +104,7 @@ public class DefaultUserService implements UserService {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 		if (!passwordEncoder.matches(password, user.getPassword())) {
-			throw new IncorrectLoginException(login, password);
+			throw new UserIncorrectLoginException(login, password);
 		}
 
 		return user;
@@ -130,9 +130,9 @@ public class DefaultUserService implements UserService {
 	}
 
 	@Override
-	public DefaultUserEntity findByEmail(String email) throws EmailNotFoundException {
+	public DefaultUserEntity findByEmail(String email) throws UserEmailNotFoundException {
 		if (!userDao.existsByEmail(email)) {
-			throw new EmailNotFoundException(email);
+			throw new UserEmailNotFoundException(email);
 		}
 
 		return userDao.findByEmail(email);
