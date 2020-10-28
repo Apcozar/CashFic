@@ -18,8 +18,8 @@ import es.udc.fi.dc.fd.model.form.account.SignUpForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
-import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
@@ -116,33 +116,6 @@ public class AccountController {
 		model.addAttribute("signInForm", new SignInForm());
 
 		return ViewConstants.VIEW_SIGNIN;
-	}
-
-	/**
-	 * Sign in.
-	 *
-	 * @param signInForm    the sign in form
-	 * @param bindingResult the binding result
-	 * @param model         the model
-	 * @return the string
-	 */
-	@PostMapping(path = "/signIn")
-	public String signIn(@Valid @ModelAttribute("signInForm") SignInForm signInForm, BindingResult bindingResult,
-			Model model) {
-
-		try {
-			if (bindingResult.hasErrors()) {
-				return ViewConstants.VIEW_SIGNIN;
-			}
-			this.userService.login(signInForm.getLogin(), signInForm.getPassword());
-
-		} catch (Exception e) {
-			model.addAttribute(AccountViewConstants.ERROR_LOGIN, AccountViewConstants.ERROR_LOGIN);
-			return ViewConstants.VIEW_SIGNIN;
-		}
-
-		this.securityService.autologin(signInForm.getLogin(), signInForm.getPassword());
-		return "redirect:/";
 	}
 
 	/**

@@ -47,6 +47,9 @@ public class SaleAdvertisementListViewController {
 	 * Instantiates a new sale advertisement list view controller.
 	 *
 	 * @param saleAdvertisementService the sale advertisement service
+	 * @param context                  the context
+	 * @param imageService             the image service
+	 * @param securityService          the security service
 	 */
 	@Autowired
 	public SaleAdvertisementListViewController(final SaleAdvertisementService saleAdvertisementService,
