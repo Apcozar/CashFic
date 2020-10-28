@@ -13,28 +13,23 @@
 			<div class="card-body">
 				<h1 class="card-title" th:text="#{title.signIn}"></h1>
 
-				<form th:action="@{/signIn}" method="POST"
+				<form th:action="login" method="POST"
 					class="form-signin form-horizontal" th:object="${signInForm}">
 
-					<div th:if="${error_login!=null}">
+					<div th:if="${param.error}">
 						<p style="font-size: 20; color: #FF1C19;" class="text-center"
 							th:text="#{error.userOrPassInvalid}"></p>
 					</div>
 					
-					<div class="form-group"
-						th:classappend="${#fields.hasErrors('login')} ? 'error'">
+					<div class="form-group" >
 						<input type="text" id="login" name="login"
 							th:placeholder="Login" class="form-control"
-							th:field="*{login}" autofocus /> <span class="text-danger"
-							th:if="${#fields.hasErrors('login')}" th:errors="*{login}"></span>
+							th:field="*{login}" autofocus required="required"/>
 					</div>
 
-					<div class="form-group"
-						th:classappend="${#fields.hasErrors('password')} ? 'error'">
+					<div class="form-group" >
 						<input type="password" th:placeholder="Password" id="password"
-							name="password" class="form-control" th:field="*{password}" /> <span
-							class="text-danger" th:if="${#fields.hasErrors('password')}"
-							th:errors="*{password}"></span>
+							name="password" class="form-control" th:field="*{password}" required="required"/>
 					</div>
 
 					<div class="form-group">
