@@ -25,6 +25,7 @@
 package es.udc.fi.dc.fd.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 
@@ -36,7 +37,14 @@ import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
  *
  * @author Santiago
  */
-public interface ImageRepository
-        extends JpaRepository<DefaultImageEntity, Integer> {
+public interface ImageRepository extends JpaRepository<DefaultImageEntity, Integer> {
 
+	/**
+	 * Exists image path.
+	 *
+	 * @param imagePath the image path
+	 * @return true, if successful
+	 */
+	@Query("select count(u)>0 from ImageEntity u where u.image_path = ?1")
+	boolean existsImagePath(String imagePath);
 }

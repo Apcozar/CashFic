@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.MultipartConfig;
@@ -16,6 +19,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
+import es.udc.fi.dc.fd.controller.saleAdvertisement.exceptions.InternalServerErrorException;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.form.SaleAdvertisementForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
@@ -37,7 +42,6 @@ import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.exceptions.ImageAlreadyExistsException;
-import es.udc.fi.dc.fd.service.exceptions.ImageServiceException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
@@ -89,7 +93,7 @@ public class SaleAdvertisementFormController {
 	}
 
 	/**
-	 * Show add sale advertisement view when de "get" petition is done.
+	 * Show add sale advertisement view when the "get" petition is done.
 	 *
 	 * @param model the model
 	 * @return the string
@@ -97,7 +101,7 @@ public class SaleAdvertisementFormController {
 
 	@GetMapping(path = "/add")
 	public String showSaleAdvertisementView(final Model model) {
-		model.addAttribute("saleAdvertisementForm", new SaleAdvertisementForm());
+		model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_FORM, new SaleAdvertisementForm());
 
 		return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_FORM;
 	}
@@ -107,14 +111,15 @@ public class SaleAdvertisementFormController {
 	 *
 	 * @param saleAdvertisementForm the sale add form
 	 * @param bindingResult         the binding result
-	 * @return the welcome view
+	 * @param model                 the model
+	 * @return the view of the add
 	 * @throws SaleAdvertisementAlreadyExistsException exception
 	 */
 
 	@PostMapping(path = "/addSaleAdvertisement")
 	public String addSaleAdvertisement(
-			@Valid @ModelAttribute("saleAdvertisementForm") SaleAdvertisementForm saleAdvertisementForm,
-			BindingResult bindingResult) throws SaleAdvertisementAlreadyExistsException {
+			@Valid @ModelAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_FORM) SaleAdvertisementForm saleAdvertisementForm,
+			BindingResult bindingResult, Model model) throws SaleAdvertisementAlreadyExistsException {
 
 		try {
 			if (bindingResult.hasErrors()) {
@@ -128,22 +133,20 @@ public class SaleAdvertisementFormController {
 			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService
 					.add(new DefaultSaleAdvertisementEntity(saleAdvertisementForm.getProductTitle(),
 							saleAdvertisementForm.getProductDescription(), user, LocalDateTime.now()));
+
 			if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
-				uploadImage(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile());
+				uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
+
+			loadImageViewModel(model, saleAdvertisement.getId());
+			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
+
+			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT;
+
 		} catch (UserNotFoundException e) {
 			return ViewConstants.VIEW_SIGNIN;
 		} catch (SaleAdvertisementNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ImageServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ImageAlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return ViewConstants.WELCOME;
 		}
-
-		return ViewConstants.WELCOME;
 	}
 
 	/**
@@ -159,7 +162,7 @@ public class SaleAdvertisementFormController {
 	 */
 	@PutMapping(path = "/{id}")
 	public String updateSaleAdvertisement(@PathVariable Integer id,
-			@Valid @ModelAttribute("saleAdvertisementForm") SaleAdvertisementForm saleAdvertisementForm,
+			@Valid @ModelAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_FORM) SaleAdvertisementForm saleAdvertisementForm,
 			BindingResult bindingResult, Model model) throws SaleAdvertisementNotFoundException {
 
 		try {
@@ -201,68 +204,189 @@ public class SaleAdvertisementFormController {
 				SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
 	}
 
-	private void uploadImage(Integer saleId, List<MultipartFile> files)
-			throws SaleAdvertisementNotFoundException, ImageServiceException, ImageAlreadyExistsException {
-		InputStream inputStream = null;
-		File newFile = null;
-		String finalFileName = null;
-		String folderPath = "";
-		String login = this.securityService.findLoggedInUsername();
-
-		folderPath = context.getRealPath("/") + ViewConstants.UPLOADS_FOLDER_NAME + "/" + login;
+	/**
+	 * Upload images into the sale.
+	 *
+	 * @param saleId the sale id
+	 * @param files  the images to upload
+	 * @param model  the model
+	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
+	 *                                            exception
+	 */
+	private void uploadImages(Integer saleId, List<MultipartFile> files, Model model)
+			throws SaleAdvertisementNotFoundException {
 		DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(saleId);
+		List<String> imageError = new ArrayList<>();
 
 		for (MultipartFile file : files) {
 			try {
-
-				// Create folder if not exits
-				File folder = new File(folderPath);
-				if ((!folder.exists()) && (!folder.mkdirs())) {
-					// TODO lanzar excepcion
-				}
-
-				// Create new file
-				String originalFileName = file.getOriginalFilename();
-				String fileName = FilenameUtils.removeExtension(originalFileName);
-				String extension = FilenameUtils.getExtension(originalFileName);
-				finalFileName = fileName + "." + extension;
-
-				inputStream = file.getInputStream();
-				newFile = new File(folderPath, finalFileName);
-
-				// If file exists, new version
-				int version = 1;
-				while (newFile.exists()) {
-					finalFileName = fileName + version + "." + extension;
-					newFile = new File(folderPath, finalFileName);
-					version++;
-				}
-
-				if (!newFile.createNewFile()) {
-					// TODO lanzar excepcion
-				}
-
-			} catch (IOException e) {
-				// TODO lanzar excepcion
+				uploadImage(saleAdvertisement, file);
+			} catch (InternalServerErrorException | DataIntegrityViolationException e) {
+				imageError.add(file.getOriginalFilename());
 			}
-
-			try (OutputStream outputStream = new FileOutputStream(newFile)) {
-				int read = 0;
-				byte[] bytes = new byte[1024];
-
-				while ((read = inputStream.read(bytes)) != -1) {
-					outputStream.write(bytes, 0, read);
-				}
-
-			} catch (IOException e) {
-				// TODO crear excepcion
-			}
-
-			DefaultImageEntity image = new DefaultImageEntity(finalFileName, finalFileName, saleAdvertisement);
-
-			imageService.add(image);
 		}
 
+		if (!imageError.isEmpty()) {
+			model.addAttribute(SaleAdvertisementViewConstants.UPLOAD_IMAGE_ERROR, imageError);
+		}
+	}
+
+	/**
+	 * Upload one image into the saleAdvertisement.
+	 *
+	 * @param saleAdvertisement the sale advertisement
+	 * @param file              the image
+	 * @throws InternalServerErrorException the internal server error exception
+	 */
+	private void uploadImage(DefaultSaleAdvertisementEntity saleAdvertisement, MultipartFile file)
+			throws InternalServerErrorException {
+
+		try {
+			InputStream inputStream = file.getInputStream();
+
+			openFolder(getUserFolderAbsolutePath());
+
+			File newFile = createFile(file);
+
+			writeInputStreamIntoFile(inputStream, newFile);
+
+			String finalFileName = newFile.getName();
+			String filePath = getUserFolderRelativePath() + "/" + finalFileName;
+
+			imageService.add(new DefaultImageEntity(filePath, finalFileName, saleAdvertisement));
+		} catch (IOException | InternalServerErrorException | ImageAlreadyExistsException e) {
+			throw new InternalServerErrorException();
+		}
+	}
+
+	/**
+	 * Open the folder or create it if it does not exist.
+	 *
+	 * @param folderPath the folder path
+	 * @return the file
+	 * @throws InternalServerErrorException the internal server error exception if
+	 *                                      can't open or create the folder
+	 */
+	private File openFolder(String folderPath) throws InternalServerErrorException {
+		try {
+			File folder = new File(folderPath);
+
+			if ((!folder.exists()) && (!folder.mkdirs())) {
+				throw new InternalServerErrorException();
+			}
+
+			return folder;
+		} catch (SecurityException e) {
+			throw new InternalServerErrorException();
+		}
+	}
+
+	/**
+	 * Creates the file.
+	 *
+	 * @param uploadFile the upload file
+	 * @return the file
+	 * @throws InternalServerErrorException the internal server error exception
+	 */
+	private File createFile(MultipartFile uploadFile) throws InternalServerErrorException {
+		try {
+			String folderPath = getUserFolderAbsolutePath();
+			String originalFileName = uploadFile.getOriginalFilename();
+			String fileName = FilenameUtils.removeExtension(originalFileName);
+			String extension = FilenameUtils.getExtension(originalFileName);
+
+			String finalFileName = fileName + "." + extension;
+
+			File newFile = new File(folderPath, finalFileName);
+			String filePath = getUserFolderRelativePath() + "/" + finalFileName;
+
+			// If file exists, new version
+			int version = 1;
+			while (newFile.exists() || imageService.existsImagePath(filePath)) {
+				finalFileName = fileName + version + "." + extension;
+				newFile = new File(folderPath, finalFileName);
+				version++;
+				filePath = getUserFolderRelativePath() + "/" + finalFileName;
+			}
+
+			if (!newFile.createNewFile()) {
+				throw new InternalServerErrorException();
+			}
+
+			return newFile;
+		} catch (IOException | SecurityException e) {
+			throw new InternalServerErrorException();
+		}
+	}
+
+	/**
+	 * Write input stream into file.
+	 *
+	 * @param inputStream the input stream
+	 * @param file        the file
+	 * @throws InternalServerErrorException the internal server error exception
+	 */
+	private void writeInputStreamIntoFile(InputStream inputStream, File file) throws InternalServerErrorException {
+		try (OutputStream outputStream = new FileOutputStream(file)) {
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			while ((read = inputStream.read(bytes)) != -1) {
+				outputStream.write(bytes, 0, read);
+			}
+
+		} catch (IOException e) {
+			throw new InternalServerErrorException();
+		}
+	}
+
+	/**
+	 * Gets the user folder absolute path.
+	 *
+	 * @return the user folder absolute path
+	 */
+	private String getUserFolderAbsolutePath() {
+		String login = this.securityService.findLoggedInUsername();
+
+		return context.getRealPath("/") + ViewConstants.UPLOADS_FOLDER_NAME + "/" + login;
+	}
+
+	/**
+	 * Gets the user folder relative path.
+	 *
+	 * @return the user folder relative path
+	 */
+	private String getUserFolderRelativePath() {
+		String login = this.securityService.findLoggedInUsername();
+
+		return ViewConstants.UPLOADS_FOLDER_NAME + "/" + login;
+	}
+
+	/**
+	 * Load image view model.
+	 *
+	 * @param model  the model
+	 * @param saleId the sale id
+	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
+	 *                                            exception
+	 */
+	private final void loadImageViewModel(final Model model, Integer saleId) throws SaleAdvertisementNotFoundException {
+		SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findById(saleId);
+		Set<DefaultImageEntity> imagesSet = saleAdvertisement.getImages();
+		DefaultImageEntity first;
+		List<DefaultImageEntity> images = new ArrayList<>();
+
+		Iterator<DefaultImageEntity> iterator = imagesSet.iterator();
+
+		if (iterator.hasNext()) {
+			first = iterator.next();
+
+			while (iterator.hasNext())
+				images.add(iterator.next());
+
+			model.addAttribute(SaleAdvertisementViewConstants.PARAM_IMAGE, first);
+			model.addAttribute(SaleAdvertisementViewConstants.PARAM_IMAGES, images);
+		}
 	}
 
 }

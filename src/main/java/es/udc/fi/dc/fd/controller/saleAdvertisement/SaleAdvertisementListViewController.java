@@ -73,7 +73,6 @@ public class SaleAdvertisementListViewController {
 		try {
 			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findById(id);
 
-			model.addAttribute("login", saleAdvertisement.getUser().getLogin() + "/");
 			loadImageViewModel(model, saleAdvertisement);
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
 
@@ -108,6 +107,12 @@ public class SaleAdvertisementListViewController {
 				saleAdvertisementService.getSaleAdvertisementsByDateDesc());
 	}
 
+	/**
+	 * Load image view model.
+	 *
+	 * @param model             the model
+	 * @param saleAdvertisement the sale advertisement
+	 */
 	private final void loadImageViewModel(final Model model, SaleAdvertisementEntity saleAdvertisement) {
 		Set<DefaultImageEntity> imagesSet = saleAdvertisement.getImages();
 		DefaultImageEntity first;
