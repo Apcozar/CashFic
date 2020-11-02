@@ -84,6 +84,14 @@ public interface ImageService {
 	public void remove(final DefaultImageEntity image) throws ImageNotFoundException;
 
 	/**
+	 * Exists image path.
+	 *
+	 * @param imagePath the image path
+	 * @return true, if successful
+	 */
+	public boolean existsImagePath(String imagePath);
+
+	/**
 	 * Returns all the images from the DB.
 	 * 
 	 * @return the persisted images

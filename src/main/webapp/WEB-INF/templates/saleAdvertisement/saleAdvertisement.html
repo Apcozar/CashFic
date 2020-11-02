@@ -20,26 +20,27 @@
 		class="container">
 		<div class="container">
 			<div class="card bg-dark">
+				
+				<div th:if="${uploadImageError}">
+					<p th:each="image : ${uploadImageError}" style="font-size: 20; color: #FF1C19;" class="text-center"
+						th:text="${image} + #{error.uploadImageError}"></p>
+				</div>
+				
 				<div class="card-header">
 
 					<h3 th:text="${saleAdvertisement.productTitle}"></h3>
 				</div>
-
-
 
 				<div th:if="${first != null}" id="myCarousel" class="carousel slide"
 					data-ride="carousel">
 					<!-- Wrapper for slides -->
 					<div class="carousel-inner">
 						<div class="item active" th:each="image : ${first}">
-							<img th:src="@{/Images/} + ${login} + ${image?.imagePath}"
-								style="width: 100%;">
+							<img th:src="${image?.imagePath}" style="width: 100%;">
 						</div>
 
 						<div class="item" th:each="image : ${images}">
-							<img th:src="@{/Images/} + ${login} + ${image?.imagePath}"
-								style="width: 100%;">
-
+							<img th:src="${image?.imagePath}" style="width: 100%;">
 
 						</div>
 					</div>
@@ -61,7 +62,7 @@
 					<p th:text="${saleAdvertisement.productDescription}" />
 					<div>
 						<div>
-							User: <small th:text="${saleAdvertisement.user.name}"></small>
+							User: <small th:text="${saleAdvertisement.user.login}"></small>
 						</div>
 						<div>
 							Date: <small th:text="${saleAdvertisement.date}"></small>

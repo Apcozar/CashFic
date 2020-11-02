@@ -25,7 +25,8 @@ public class ImageUploaderConfig {
 	public MultipartResolver multipartResolver() {
 		CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
 		commonsMultipartResolver.setDefaultEncoding("utf-8");
-		commonsMultipartResolver.setMaxUploadSize(20000000);
+		commonsMultipartResolver.setMaxUploadSizePerFile(20000000);
+		commonsMultipartResolver.setMaxUploadSize(20000000 * 10);
 		commonsMultipartResolver.setResolveLazily(false);
 		return commonsMultipartResolver;
 	}
