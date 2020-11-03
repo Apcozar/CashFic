@@ -24,6 +24,9 @@
 
 package es.udc.fi.dc.fd.test.integration.service;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,11 +40,17 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.UserEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
-import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
@@ -91,6 +100,9 @@ public class ITUserService {
 	 */
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private SaleAdvertisementService saleAdvertisementService;
 
 	/**
 	 * Default constructor.
@@ -160,7 +172,7 @@ public class ITUserService {
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
 	 *                                          exception
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws UserEmailNotFoundException           the email not found exception
+	 * @throws UserEmailNotFoundException       the email not found exception
 	 */
 	@Test
 	public void signUpAndFindByEmailTest() throws UserLoginExistsException, UserEmailExistsException,
@@ -182,12 +194,13 @@ public class ITUserService {
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
 	 *                                          exception
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws UserEmailNotFoundException           the email not found exception
-	 * @throws UserIncorrectLoginException          the incorrect login exception
+	 * @throws UserEmailNotFoundException       the email not found exception
+	 * @throws UserIncorrectLoginException      the incorrect login exception
 	 */
 	@Test
-	public void signUpAndLoginTest() throws UserLoginExistsException, UserEmailExistsException,
-			UserLoginAndEmailExistsException, UserNotFoundException, UserEmailNotFoundException, UserIncorrectLoginException {
+	public void signUpAndLoginTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
+			UserNotFoundException, UserEmailNotFoundException, UserIncorrectLoginException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
 		userService.signUp(expected);
@@ -297,7 +310,7 @@ public class ITUserService {
 	 * Sign up and login non existent login test.
 	 *
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws UserIncorrectLoginException          the incorrect login exception
+	 * @throws UserIncorrectLoginException      the incorrect login exception
 	 * @throws UserLoginExistsException         the user login exists exception
 	 * @throws UserEmailExistsException         the user email exists exception
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
@@ -319,7 +332,7 @@ public class ITUserService {
 	 * @throws UserLoginAndEmailExistsException the user login and email exists
 	 *                                          exception
 	 * @throws UserNotFoundException            the user not found exception
-	 * @throws UserIncorrectLoginException          the incorrect login exception
+	 * @throws UserIncorrectLoginException      the incorrect login exception
 	 */
 	@Test
 	public void signUpAndLoginIncorrectPasswordTest() throws UserLoginExistsException, UserEmailExistsException,
@@ -332,4 +345,141 @@ public class ITUserService {
 			userService.login(LOGIN, INCORRECT_PASSWORD);
 		});
 	}
+
+	/**
+	 * Check service updates user entity with sale advertisement added to likes list
+	 * persist it and adds in sale advertisement entity the user in likes list Check
+	 * both sides of relationship
+	 */
+	@Test
+	public void userAddLikeSaleAdvertisementsTest()
+			throws UserNotFoundException, SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException {
+		// Get user
+		DefaultUserEntity user = userService.findById(1);
+		// User no have likes
+		Assert.assertTrue(user.getLikes().isEmpty());
+
+		// Now create and store sale advertisement
+		DefaultSaleAdvertisementEntity firstSaleAdvertisement = new DefaultSaleAdvertisementEntity();
+		firstSaleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		firstSaleAdvertisement.setProductDescription("first sale advertisement product description test");
+		firstSaleAdvertisement.setProductTitle("first saleAdv title test");
+		firstSaleAdvertisement.setUser(user);
+
+		SaleAdvertisementEntity storedFirstSaleAdvertisement = saleAdvertisementService.add(firstSaleAdvertisement);
+
+		// user like sale advertisement
+		UserEntity updatedUser = userService.like(user, storedFirstSaleAdvertisement);
+		// Check if user have sale advertisement in likes
+		Assert.assertEquals(Integer.valueOf(updatedUser.getLikes().size()), Integer.valueOf(1));
+		SaleAdvertisementEntity updatedSaleAdvertisement = saleAdvertisementService
+				.findById(storedFirstSaleAdvertisement.getId());
+		Set<DefaultSaleAdvertisementEntity> userLikes = updatedUser.getLikes();
+		Assert.assertEquals(userLikes.iterator().next(), updatedSaleAdvertisement);
+		// Check if sale advertisement have user in likes
+		Assert.assertEquals(updatedSaleAdvertisement.getLikes().iterator().next(), updatedUser);
+	}
+
+	/**
+	 * Check service updates user entity with sale advertisement added to likes list
+	 * and removed from, check if remove the relationship from both sides
+	 */
+	@Test
+	public void userRemoveLikeSaleAdvertisementsTest()
+			throws UserNotFoundException, SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException {
+		// Get user
+		DefaultUserEntity user = userService.findById(1);
+		// User no have likes
+		Assert.assertTrue(user.getLikes().isEmpty());
+
+		// Create and store sale advertisement
+		DefaultSaleAdvertisementEntity firstSaleAdvertisement = new DefaultSaleAdvertisementEntity();
+		firstSaleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		firstSaleAdvertisement.setProductDescription("first sale advertisement product description test");
+		firstSaleAdvertisement.setProductTitle("first saleAdv title test");
+		firstSaleAdvertisement.setUser(user);
+
+		SaleAdvertisementEntity storedFirstSaleAdvertisement = saleAdvertisementService.add(firstSaleAdvertisement);
+		// User like sale advertisement
+		UserEntity updatedUser = userService.like(user, storedFirstSaleAdvertisement);
+		// Here is same as userAddLikeSaleAdvertisementsTest so avoid checks
+
+		SaleAdvertisementEntity updatedSaleAdvertisement = saleAdvertisementService
+				.findById(storedFirstSaleAdvertisement.getId());
+
+		UserEntity updateAfterRemoveUser = userService.unlike(updatedUser, updatedSaleAdvertisement);
+
+		// Check if user have 0 likes
+		Assert.assertTrue(updateAfterRemoveUser.getLikes().isEmpty());
+
+		// get sale advertisement with like removed Check if have 0 likes
+		SaleAdvertisementEntity updatedAfterRemoveLikeSaleAdvertisement = saleAdvertisementService
+				.findById(storedFirstSaleAdvertisement.getId());
+		Assert.assertTrue(updatedAfterRemoveLikeSaleAdvertisement.getLikes().isEmpty());
+	}
+
+	/**
+	 * Create two users and three sale advertisements. First user likes all sale
+	 * advertisements second user only like second sale advertisement Check that can
+	 * store several sale advertisement liked by user and a sale advertisement can
+	 * store several users who liked it
+	 */
+	@Test
+	public void usersLikeSeveralSaleAdvertisements()
+			throws UserNotFoundException, SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException {
+		// Get users
+		DefaultUserEntity firstUser = userService.findById(1);
+		DefaultUserEntity secondUser = userService.findById(2);
+
+		// Create and store three sale advertisement
+		DefaultSaleAdvertisementEntity firstSaleAdvertisement = new DefaultSaleAdvertisementEntity();
+		firstSaleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		firstSaleAdvertisement.setProductDescription("first sale advertisement product description test");
+		firstSaleAdvertisement.setProductTitle("first saleAdv title test");
+		firstSaleAdvertisement.setUser(firstUser);
+
+		SaleAdvertisementEntity storedFirstSaleAdvertisement = saleAdvertisementService.add(firstSaleAdvertisement);
+
+		// Create and store sale advertisement
+		DefaultSaleAdvertisementEntity secondSaleAdvertisement = new DefaultSaleAdvertisementEntity();
+		secondSaleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		secondSaleAdvertisement.setProductDescription("first sale advertisement product description test");
+		secondSaleAdvertisement.setProductTitle("first saleAdv title test");
+		secondSaleAdvertisement.setUser(firstUser);
+
+		SaleAdvertisementEntity storedSecondSaleAdvertisement = saleAdvertisementService.add(secondSaleAdvertisement);
+
+		// Create and store sale advertisement
+		DefaultSaleAdvertisementEntity thirthSaleAdvertisement = new DefaultSaleAdvertisementEntity();
+		thirthSaleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		thirthSaleAdvertisement.setProductDescription("first sale advertisement product description test");
+		thirthSaleAdvertisement.setProductTitle("first saleAdv title test");
+		thirthSaleAdvertisement.setUser(firstUser);
+
+		SaleAdvertisementEntity storedThirthSaleAdvertisement = saleAdvertisementService.add(thirthSaleAdvertisement);
+
+		// First user likes all sale advertisements
+		UserEntity firstUpdatedUser = userService.like(firstUser, storedFirstSaleAdvertisement);
+		firstUpdatedUser = userService.like(firstUpdatedUser, storedSecondSaleAdvertisement);
+		firstUpdatedUser = userService.like(firstUpdatedUser, storedThirthSaleAdvertisement);
+		// Second user likes second sale advertisement
+		UserEntity secondUpdatedUser = userService.like(secondUser, storedSecondSaleAdvertisement);
+
+		// check that first user have 3 liked sale advertisements
+		Assert.assertEquals(Integer.valueOf(firstUpdatedUser.getLikes().size()), Integer.valueOf(3));
+		// Check that sale advertisements are same as liked
+		Assert.assertTrue(firstUpdatedUser.getLikes()
+				.contains(saleAdvertisementService.findById(storedFirstSaleAdvertisement.getId())));
+		Assert.assertTrue(firstUpdatedUser.getLikes()
+				.contains(saleAdvertisementService.findById(storedSecondSaleAdvertisement.getId())));
+		Assert.assertTrue(firstUpdatedUser.getLikes()
+				.contains(saleAdvertisementService.findById(storedThirthSaleAdvertisement.getId())));
+
+		// check that second sale advertisement have 2 users who liked it
+		Assert.assertTrue(saleAdvertisementService.findById(storedSecondSaleAdvertisement.getId()).getLikes()
+				.contains(secondUpdatedUser));
+		Assert.assertTrue(saleAdvertisementService.findById(storedSecondSaleAdvertisement.getId()).getLikes()
+				.contains(firstUpdatedUser));
+	}
+
 }

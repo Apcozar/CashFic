@@ -24,10 +24,13 @@
 
 package es.udc.fi.dc.fd.service;
 
+import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
-import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
@@ -60,7 +63,7 @@ public interface UserService {
 	 * @param userName the user name
 	 * @param password the password
 	 * @return the default user entity
-	 * @throws UserNotFoundException   the user not found exception
+	 * @throws UserNotFoundException       the user not found exception
 	 * @throws UserIncorrectLoginException the incorrect login exception
 	 */
 	DefaultUserEntity login(String userName, String password) throws UserNotFoundException, UserIncorrectLoginException;
@@ -91,4 +94,33 @@ public interface UserService {
 	 * @throws UserEmailNotFoundException the email not found exception
 	 */
 	DefaultUserEntity findByEmail(String email) throws UserEmailNotFoundException;
+
+	/**
+	 * Add sale advertisement to the user likes and return updated user entity add
+	 * user to the sale advertisement likes
+	 *
+	 * @param user              the user entity to add sale advertisement as like
+	 * @param saleAdvertisement the sale advertisement to add user as like
+	 * @return the updated user entity
+	 * @throws UserNotFoundException              when cannot found the user
+	 * @throws SaleAdvertisementNotFoundException when cannot found the sale
+	 *                                            advertisement
+	 */
+	public UserEntity like(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
+			throws UserNotFoundException, SaleAdvertisementNotFoundException;
+
+	/**
+	 * Remove sale advertisement to the user likes and return updated user entity
+	 * remove user from sale advertisement likes too
+	 *
+	 * @param user              the user entity to remove sale advertisement as like
+	 * @param saleAdvertisement the sale advertisement to remove user as like
+	 * @return the updated user entity
+	 * @throws UserNotFoundException              when cannot found the user
+	 * @throws SaleAdvertisementNotFoundException when cannot found the sale
+	 *                                            advertisement
+	 */
+	public UserEntity unlike(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
+			throws UserNotFoundException, SaleAdvertisementNotFoundException;
+
 }

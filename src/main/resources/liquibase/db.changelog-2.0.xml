@@ -7,6 +7,33 @@
 
 	
 
+	<changeSet author="Santiago" id="like_relationship_intermediate_table">
+		<createTable tableName="likes">
+			<column  name="user_id" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="sale_advertisement_id" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	
+	 <changeSet author="Santiago" id="likes_table_PK">
+        <addPrimaryKey columnNames="user_id, sale_advertisement_id" tableName="likes"/>
+    </changeSet>
+	
+	<changeSet author="Santiago" id="FK_likes_user">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="likes"
+                                 constraintName="FK_likes_user" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+    
+    <changeSet author="Santiago" id="FK_likes_sale_advertisement">
+        <addForeignKeyConstraint baseColumnNames="sale_advertisement_id" baseTableName="likes"
+                                 constraintName="FK_likes_sale_advertisement" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="sale_advertisements"/>
+    </changeSet>
+	
 	
 	
 	

@@ -165,4 +165,27 @@ public interface UserEntity extends Serializable {
 	 */
 	public void setSale_advertisements(final Set<DefaultSaleAdvertisementEntity> sale_advertisements);
 
+	/**
+	 * Returns the sale advertisements likes by user
+	 *
+	 * @return the sale advertisements set
+	 */
+	public Set<DefaultSaleAdvertisementEntity> getLikes();
+
+	/**
+	 * Add sale advertisement to user's like sale advertisement set
+	 *
+	 * @param saleAdvertisement the saleAdvertisement to add to user's like set
+	 */
+	public void addLike(SaleAdvertisementEntity saleAdvertisement);
+
+	/**
+	 * Remove sale advertisement from user's like sale advertisement set. The sale
+	 * advertisement must be in user's like set
+	 *
+	 * @param saleAdvertisement the sale advertisement to remove from user's like
+	 *                          set
+	 */
+	public void removeLike(SaleAdvertisementEntity saleAdvertisement);
+
 }

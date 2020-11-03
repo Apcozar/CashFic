@@ -122,5 +122,12 @@ public interface SaleAdvertisementEntity extends Serializable {
 
 	public void addImage(DefaultImageEntity value);
 
-	void removeImage(DefaultImageEntity image);
+	public void removeImage(DefaultImageEntity image);
+
+	public Set<DefaultUserEntity> getLikes();
+
+	public void removeUsersLike(DefaultUserEntity user);
+
+	public void addUsersLike(DefaultUserEntity user);
+
 }
