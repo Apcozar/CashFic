@@ -12,8 +12,35 @@
 		<addNotNullConstraint tableName="images" columnName="image_path" columnDataType="VARCHAR(255)"/>
 		<addNotNullConstraint tableName="images" columnName="title" columnDataType="VARCHAR(255)"/>
 	</changeSet>
-
 	
+	
+	<changeSet author="Juan" id="followUsers" >
+		<createTable tableName="follow_users">
+			<column name="user_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_follow_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	
+	
+	<changeSet author="Juan" id="followUsersRelation">
+		<addPrimaryKey columnNames="user_id,user_follow_id" tableName="follow_users"/>
+		<addForeignKeyConstraint
+			baseTableName="follow_users"
+			baseColumnNames="user_id"
+			constraintName="FK_follow_users_id"
+			referencedColumnNames="id"
+			referencedTableName="users"/>				
+		<addForeignKeyConstraint
+			baseTableName="follow_users"
+			baseColumnNames="user_follow_id"
+			constraintName="FK_follow_users_user_follow_id"
+			referencedColumnNames="id"
+			referencedTableName="users"/>	
+	</changeSet>
 	
 	
 </databaseChangeLog>
