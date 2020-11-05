@@ -24,13 +24,16 @@
 
 package es.udc.fi.dc.fd.service;
 
+import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
-import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 
 /**
  * Service for the user domain.
@@ -60,7 +63,7 @@ public interface UserService {
 	 * @param userName the user name
 	 * @param password the password
 	 * @return the default user entity
-	 * @throws UserNotFoundException   the user not found exception
+	 * @throws UserNotFoundException       the user not found exception
 	 * @throws UserIncorrectLoginException the incorrect login exception
 	 */
 	DefaultUserEntity login(String userName, String password) throws UserNotFoundException, UserIncorrectLoginException;
@@ -91,4 +94,29 @@ public interface UserService {
 	 * @throws UserEmailNotFoundException the email not found exception
 	 */
 	DefaultUserEntity findByEmail(String email) throws UserEmailNotFoundException;
+
+	/**
+	 * Follow user.
+	 *
+	 * @param user         the user
+	 * @param userToFollow the user to follow
+	 * @return the user entity
+	 * @throws UserNotFoundException       the user not found exception
+	 * @throws UserToFollowExistsException the user to follow exists exception
+	 */
+	UserEntity followUser(UserEntity user, UserEntity userToFollow)
+			throws UserNotFoundException, UserToFollowExistsException;
+
+	/**
+	 * Unfollow user.
+	 *
+	 * @param user           the user
+	 * @param userToUnfollow the user to unfollow
+	 * @return the user entity
+	 * @throws UserNotFoundException           the user not found exception
+	 * @throws UserToUnfollowNotFoundException the user to unfollow not found
+	 *                                         exception
+	 */
+	UserEntity unfollowUser(UserEntity user, UserEntity userToUnfollow)
+			throws UserNotFoundException, UserToUnfollowNotFoundException;
 }
