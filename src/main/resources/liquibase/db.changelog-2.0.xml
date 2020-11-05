@@ -13,7 +13,13 @@
 		<addNotNullConstraint tableName="images" columnName="title" columnDataType="VARCHAR(255)"/>
 	</changeSet>
 
-	
+	<changeSet author="Martin" id="addPrice" >
+		<addColumn tableName="sale_advertisements">
+			<column name="price" type="DECIMAL(10,2)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
 	
 	
 </databaseChangeLog>

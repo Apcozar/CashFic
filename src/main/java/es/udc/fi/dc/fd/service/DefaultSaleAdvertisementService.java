@@ -26,6 +26,9 @@ package es.udc.fi.dc.fd.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -93,7 +96,6 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 			throw new SaleAdvertisementNotFoundException(identifier);
 		}
 		DefaultSaleAdvertisementEntity result = saleAdvertisementRepository.getOne(identifier);
-		DefaultSaleAdvertisementEntity otherResult = saleAdvertisementRepository.findById(identifier).get();
 		return result;
 	}
 
@@ -180,6 +182,28 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		}
 
 		return saleAdvertisementRepository.findById(identifier).get();
+	}
+
+	@Override
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByCity(String city) {
+		return saleAdvertisementRepository.findSaleAdvertisementsByCity(city);
+	}
+
+	@Override
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByKeywords(String keywords) {
+		return saleAdvertisementRepository.findSaleAdvertisementsByKeywords(keywords);
+	}
+
+	@Override
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByPriceRange(BigDecimal minPrice,
+			BigDecimal maxPrice) {
+		return saleAdvertisementRepository.findSaleAdvertisementsByPrice(minPrice, maxPrice);
+	}
+
+	@Override
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateRange(LocalDateTime firstDate,
+			LocalDateTime secondDate) {
+		return saleAdvertisementRepository.findSaleAdvertisementsByDate(firstDate, secondDate);
 	}
 
 }

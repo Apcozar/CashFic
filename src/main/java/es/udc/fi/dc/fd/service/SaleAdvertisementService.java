@@ -24,6 +24,9 @@
 
 package es.udc.fi.dc.fd.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
@@ -118,4 +121,41 @@ public interface SaleAdvertisementService {
 	 */
 	public DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
 			throws SaleAdvertisementNotFoundException;
+
+	/**
+	 * Gets the sale advertisements in a city
+	 * 
+	 * @param city the searched city
+	 * @return the sale advertisements in the city
+	 */
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByCity(String city);
+
+	/**
+	 * Gets the sale advertisements searching by keywords
+	 * 
+	 * @param keywords the searched keywords
+	 * @return the sale advertisements that contains the keywords in its description
+	 */
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByKeywords(String keywords);
+
+	/**
+	 * Gets the sale advertisements searching by price range
+	 * 
+	 * @param minPrice the min price in the price range
+	 * @param maxPrice the max price in the price range
+	 * @return the sale advertisements in the price range searched
+	 */
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByPriceRange(BigDecimal minPrice,
+			BigDecimal maxPrice);
+
+	/**
+	 * Gets the sale advertisements searching by price range.
+	 *
+	 * @param firstDate  the first date in the range
+	 * @param secondDate the second date in the range
+	 * @return the sale advertisements in the date range searched
+	 */
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateRange(LocalDateTime firstDate,
+			LocalDateTime secondDate);
+
 }

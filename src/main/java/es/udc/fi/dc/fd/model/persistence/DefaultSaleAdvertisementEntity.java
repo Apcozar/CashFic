@@ -26,6 +26,7 @@ package es.udc.fi.dc.fd.model.persistence;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
@@ -52,6 +53,10 @@ import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
  * This makes use of JPA annotations for the persistence configuration.
  *
  * @author Santiago
+ */
+/**
+ * @author Martin
+ *
  */
 @Entity(name = "SaleAdvertisementEntity")
 @Table(name = "sale_advertisements")
@@ -109,8 +114,16 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	 * <p>
 	 * To know when the ad was created.
 	 */
-	@Column(name = "add_date", nullable = true, unique = false)
+	@Column(name = "add_date", nullable = false, unique = false)
 	private LocalDateTime date;
+
+	/**
+	 * The price of the sale_advertisement.
+	 * <p>
+	 * To know the price of the sale_advertisement.
+	 */
+	@Column(name = "price", nullable = true, unique = false)
+	private BigDecimal price;
 
 	/**
 	 * Constructs an sale_advertisement entity.
