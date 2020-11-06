@@ -9,9 +9,12 @@
 	<section id="main-section" class="container-fluid">
 		<header class="page-header">
 			<h1 th:text="#{application.title}">Webapp Title</h1>
+			<p th:if="${addSaleAdvertisementRemove!=null}" class="text-danger" th:text="#{label.addSaleRemove}"></p>
 		</header>
 		<p>This is the welcome page.</p>
 	</section>
+	
+	
 
 	<footer>
 		<div th:include="fragments/scripts :: general" />
