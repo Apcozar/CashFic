@@ -226,4 +226,14 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 				price2);
 	}
 
+	/**
+	 * Gets the maximum price of all sale advertisements.
+	 *
+	 * @return the maximum price
+	 */
+	@Override
+	public BigDecimal getMaximumPrice() {
+		return saleAdvertisementRepository.getMaximumPrice();
+	}
+
 }

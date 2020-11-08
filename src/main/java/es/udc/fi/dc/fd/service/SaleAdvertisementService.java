@@ -137,4 +137,11 @@ public interface SaleAdvertisementService {
 	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsBySearchCriteria(String city, String keywords,
 			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
 
+	/**
+	 * Gets the maximum price of all sale advertisements.
+	 *
+	 * @return the maximum price
+	 */
+	public BigDecimal getMaximumPrice();
+
 }

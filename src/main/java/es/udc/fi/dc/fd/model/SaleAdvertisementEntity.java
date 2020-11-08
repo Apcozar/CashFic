@@ -25,6 +25,7 @@
 package es.udc.fi.dc.fd.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -123,4 +124,9 @@ public interface SaleAdvertisementEntity extends Serializable {
 	public void addImage(DefaultImageEntity value);
 
 	void removeImage(DefaultImageEntity image);
+
+	public void setPrice(BigDecimal price);
+
+	public BigDecimal getPrice();
+
 }

@@ -265,4 +265,14 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		return MoreObjects.toStringHelper(this).add("imageId", id).toString();
 	}
 
+	@Override
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	@Override
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
 }
