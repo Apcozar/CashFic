@@ -32,7 +32,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 
-// TODO: Auto-generated Javadoc
 /**
  * Spring-JPA repository for {@link DefaultSaleAdvertisementEntity}.
  * <p>
@@ -52,42 +51,29 @@ public interface SaleAdvertisementRepository extends JpaRepository<DefaultSaleAd
 	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsOrderByDateDesc();
 
 	/**
-	 * Find sale advertisements by city.
+	 * Find sale advertisements by search criteria.
 	 *
-	 * @param city the city
-	 * @return the sale advertisements in the city
+	 * @param city     the city of the sale advertisement
+	 * @param keywords the keywords that should be in the title or description
+	 * @param date1    the oldest date in the date range
+	 * @param date2    the most recent date in the date range
+	 * @param price1   the minimum price in the price range
+	 * @param price2   the maximum price in the price range
+	 * @return the sale advertisements that meet the search criteria order by date
+	 *         with the most recents first
 	 */
-	@Query("SELECT s from SaleAdvertisementEntity s JOIN UserEntity u ON s.user = u.id WHERE u.city = ?1")
-	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByCity(String city);
+	@Query("SELECT s FROM SaleAdvertisementEntity s JOIN UserEntity u ON s.user = u "
+			+ "WHERE u.city LIKE '?1' AND (s.product_title LIKE '%?2%' OR s.product_description LIKE '%?2%') "
+			+ "AND s.date BETWEEN ?3 AND ?4 AND s.price BETWEEN ?5 AND ?6 ORDER BY s.date DESC")
+	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByCriteria(String city, String keywords,
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
 
 	/**
-	 * Find sale advertisements by keywords.
+	 * Gets the maximum price of all sale advertisements.
 	 *
-	 * @param keywords the keywords
-	 * @return the sale advertisements that contains the keywords in its description
+	 * @return the maximum price
 	 */
-	@Query("SELECT s from SaleAdvertisementEntity s WHERE s.product_description LIKE '%?1%'")
-	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByKeywords(String keywords);
-
-	/**
-	 * Find sale advertisements by price range.
-	 *
-	 * @param minPrice the min price in the range
-	 * @param maxPrice the max price in the range
-	 * @return the sale advertisements in the price range searched
-	 */
-	@Query("SELECT s from SaleAdvertisementEntity s WHERE s.price BETWEEN ?1 AND ?2")
-	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByPrice(BigDecimal minPrice, BigDecimal maxPrice);
-
-	/**
-	 * Find sale advertisements by date.
-	 *
-	 * @param firstDate  the first date
-	 * @param secondDate the second date
-	 * @return the sale advertisements in the price range searched
-	 */
-	@Query("SELECT s from SaleAdvertisementEntity s WHERE s.date BETWEEN ?1 AND ?2")
-	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByDate(LocalDateTime firstDate,
-			LocalDateTime secondDate);
+	@Query("SELECT max(s.price) FROM SaleAdvertisementEntity s")
+	BigDecimal getMaximumPrice();
 
 }

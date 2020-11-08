@@ -123,39 +123,18 @@ public interface SaleAdvertisementService {
 			throws SaleAdvertisementNotFoundException;
 
 	/**
-	 * Gets the sale advertisements in a city
-	 * 
-	 * @param city the searched city
-	 * @return the sale advertisements in the city
-	 */
-	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByCity(String city);
-
-	/**
-	 * Gets the sale advertisements searching by keywords
-	 * 
-	 * @param keywords the searched keywords
-	 * @return the sale advertisements that contains the keywords in its description
-	 */
-	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByKeywords(String keywords);
-
-	/**
-	 * Gets the sale advertisements searching by price range
-	 * 
-	 * @param minPrice the min price in the price range
-	 * @param maxPrice the max price in the price range
-	 * @return the sale advertisements in the price range searched
-	 */
-	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByPriceRange(BigDecimal minPrice,
-			BigDecimal maxPrice);
-
-	/**
-	 * Gets the sale advertisements searching by price range.
+	 * Find sale advertisements by search criteria.
 	 *
-	 * @param firstDate  the first date in the range
-	 * @param secondDate the second date in the range
-	 * @return the sale advertisements in the date range searched
+	 * @param city     the city of the sale advertisement
+	 * @param keywords the keywords that should be in the title or description
+	 * @param date1    the oldest date in the date range
+	 * @param date2    the most recent date in the date range
+	 * @param price1   the minimum price in the price range
+	 * @param price2   the maximum price in the price range
+	 * @return the sale advertisements that meet the search criteria order by date
+	 *         with the most recents first
 	 */
-	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateRange(LocalDateTime firstDate,
-			LocalDateTime secondDate);
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsBySearchCriteria(String city, String keywords,
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
 
 }
