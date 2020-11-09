@@ -35,6 +35,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -116,6 +119,16 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@OneToMany(mappedBy = "user")
 	private Set<DefaultSaleAdvertisementEntity> sale_advertisements;
+
+	/** The followers. */
+	@ManyToMany
+	@JoinTable(name = "follow_users", joinColumns = @JoinColumn(name = "user_follow_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private Set<DefaultUserEntity> followers = new HashSet<DefaultUserEntity>();
+
+	/** The followed. */
+	@ManyToMany
+	@JoinTable(name = "follow_users", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_follow_id"))
+	private Set<DefaultUserEntity> followed = new HashSet<DefaultUserEntity>();
 
 	/**
 	 * Constructs an sale_advertisement entity.
@@ -216,9 +229,34 @@ public class DefaultUserEntity implements UserEntity {
 		return role;
 	}
 
+	/**
+	 * Gets the sale advertisements.
+	 *
+	 * @return the sale advertisements
+	 */
 	@Override
 	public Set<DefaultSaleAdvertisementEntity> getSaleAdvertisements() {
 		return sale_advertisements;
+	}
+
+	/**
+	 * Gets the followers.
+	 *
+	 * @return the followers
+	 */
+	@Override
+	public Set<DefaultUserEntity> getFollowers() {
+		return followers;
+	}
+
+	/**
+	 * Gets the followed.
+	 *
+	 * @return the followed
+	 */
+	@Override
+	public Set<DefaultUserEntity> getFollowed() {
+		return followed;
 	}
 
 	/**
@@ -301,9 +339,54 @@ public class DefaultUserEntity implements UserEntity {
 		role = checkNotNull(value, "Received a null pointer as role");
 	}
 
+	/**
+	 * Sets the sale advertisements.
+	 *
+	 * @param value the new sale advertisements
+	 */
 	@Override
 	public void setSale_advertisements(final Set<DefaultSaleAdvertisementEntity> value) {
 		sale_advertisements = checkNotNull(value, "Received a null pointer as images");
+	}
+
+	/**
+	 * Adds the follower user to the list of user followers.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowserUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followers.add(user);
+	}
+
+	/**
+	 * Removes the follower user from the list of used followers.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowserUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followers.remove(user);
+	}
+
+	/**
+	 * Adds the follow user to the list of user followed.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followed.add(user);
+	}
+
+	/**
+	 * Removes the follow user from the list of used followed.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followed.remove(user);
 	}
 
 	@Override
