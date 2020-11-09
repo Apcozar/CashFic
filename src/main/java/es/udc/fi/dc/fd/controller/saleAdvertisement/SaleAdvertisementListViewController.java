@@ -2,12 +2,18 @@ package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.io.File;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -15,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
@@ -109,8 +116,13 @@ public class SaleAdvertisementListViewController {
 	 * @return the string
 	 */
 	@GetMapping(path = "/list")
-	public String showSaleAdvertisementList(final ModelMap model) {
-		loadViewModel(model);
+	public String showSaleAdvertisementList(final ModelMap model, @RequestParam(required = false) String city,
+			@RequestParam(required = false) String keywords,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime minDate,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime maxDate,
+			@RequestParam(required = false) BigDecimal minPrice, @RequestParam(required = false) BigDecimal maxPrice) {
+
+		loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice);
 
 		return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 	}
@@ -122,6 +134,27 @@ public class SaleAdvertisementListViewController {
 	 * @param model the model
 	 * @return the string
 	 */
+
+	private final void loadViewModel(final ModelMap model, String city, String keywords, LocalDateTime minDate,
+			LocalDateTime maxDate, BigDecimal minPrice, BigDecimal maxPrice) {
+
+		if (city == null)
+			city = "%";
+		if (keywords == null)
+			keywords = "";
+		if (minPrice == null)
+			minPrice = BigDecimal.valueOf(0);
+		if (maxPrice == null)
+			maxPrice = saleAdvertisementService.getMaximumPrice();
+		if (minDate == null)
+			minDate = LocalDateTime.MIN;
+		if (maxDate == null)
+			maxDate = LocalDateTime.now();
+
+		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, saleAdvertisementService
+				.getSaleAdvertisementsBySearchCriteria(city, keywords, minDate, maxDate, minPrice, maxPrice));
+    }
+    
 	@PostMapping(path = "/remove/{id}")
 	public String removeSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model) {
 		try {
@@ -147,7 +180,6 @@ public class SaleAdvertisementListViewController {
 		} catch (UserNotFoundException e) {
 			return ViewConstants.WELCOME;
 		}
-
 	}
 
 	/**
