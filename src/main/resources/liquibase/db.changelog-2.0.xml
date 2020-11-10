@@ -51,5 +51,14 @@
 			referencedTableName="users"/>	
 	</changeSet>
 	
+	<changeSet author="Martin" id="changeNullPrices">
+		<update tableName="sale_advertisements">
+			<column name="price" value="10"/>
+			<where>price is null</where>
+		</update>
+		
+		<addNotNullConstraint tableName="sale_advertisements" columnName="price" columnDataType="DECIMAL(10,2)"/>
+	</changeSet>
+	
 	
 </databaseChangeLog>

@@ -1,7 +1,6 @@
 package es.udc.fi.dc.fd.model.form;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,19 +31,19 @@ public class SaleAdvertisementForm implements Serializable {
 
 	/** The price. */
 	@NotEmpty(message = "{notEmpty}")
-	private BigDecimal price;
+	private String price;
 
 	/**
 	 * @return the price
 	 */
-	public BigDecimal getPrice() {
+	public String getPrice() {
 		return price;
 	}
 
 	/**
 	 * @param price the price to set
 	 */
-	public void setPrice(BigDecimal price) {
+	public void setPrice(String price) {
 		this.price = price;
 	}
 

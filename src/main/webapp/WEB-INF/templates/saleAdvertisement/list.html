@@ -23,48 +23,68 @@
 				th:action="@{/saleAdvertisement/list}" method="get">
 
 				<div class="form-group">
-					<input class="form-control mr-sm-1" type="text" id="keywords"
-						name="keywords" placeholder="Search Keywords">
+					<label for="keywords" th:text="#{label.searchKeywords}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="text" id="keywords"
+							name="keywords" placeholder="Search Keywords">
+					</div>
 				</div>
 
 				<div class="form-group">
-					<input class="form-control mr-sm-1" type="text" id="city"
-						name="city" placeholder="Search City">
-				</div>
-
-				<div class="form-group">
-					<div class="input-group date">
-						<input type='date' class="form-control mr-sm-1" id='minDate'
-							name="minDate" /> <span class="input-group-addon"> <span
-							class="glyphicon glyphicon-calendar"></span>
-						</span>
+					<label for="city" th:text="#{label.searchCity}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="text" id="city"
+							name="city" placeholder="Search City">
 					</div>
 				</div>
 
 				<div class="form-group">
 					<div class="input-group date">
-						<input type='date' class="form-control mr-sm-1" id='maxDate'
-							name="maxDate" /> <span class="input-group-addon"> <span
-							class="glyphicon glyphicon-calendar"></span>
-						</span>
+						<label for="minDate" th:text="#{label.minDate}"></label>
+						<div class="md-form md-outline input-with-post-icon datepicker">
+							<input type='date' class="form-control mr-sm-1" id='minDate'
+								name="minDate" placeholder="dd/MM/yyyy" /> <span
+								class="input-group-addon"> <span
+								class="glyphicon glyphicon-calendar"></span>
+							</span>
+						</div>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<input class="form-control mr-sm-1" type="number" min="0"
-						step="any" id="minPrice" name="minPrice"
-						placeholder="Minimum Price">
+					<div class="input-group date">
+						<label for="maxDate" th:text="#{label.maxDate}"></label>
+						<div class="md-form md-outline input-with-post-icon datepicker">
+							<input type='date' class="form-control mr-sm-2" id='maxDate'
+								name="maxDate" placeholder="dd/MM/yyyy" /> <span
+								class="input-group-addon"> <span
+								class="glyphicon glyphicon-calendar"></span>
+							</span>
+						</div>
+					</div>
 				</div>
 
 				<div class="form-group">
-					<input class="form-control mr-sm-1" type="number" min="0"
-						step="any" id="maxPrice" name="maxPrice"
-						placeholder="Maximum Price">
+					<label for="minPrice" th:text="#{label.minPrice}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="number" min="0"
+							step="any" id="minPrice" name="minPrice"
+							placeholder="Minimum Price">
+					</div>
 				</div>
 
 				<div class="form-group">
-					<button class="btn btn-primary btn-block" value="Search"
-						type="Submit" th:text="Search"></button>
+					<label for="maxPrice" th:text="#{label.maxPrice}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="number" min="0"
+							step="any" id="maxPrice" name="maxPrice"
+							placeholder="Maximum Price">
+					</div>
+				</div>
+
+				<div class="form-group">
+						<button class="btn btn-primary btn-block" value="Search"
+							type="Submit" th:text="Search"></button>
 				</div>
 
 			</form>
@@ -141,7 +161,7 @@
 					<div class="product-price-btn"
 						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span>78</span>$
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
 						</p>
 						<p>
 							<span th:remove="tag"

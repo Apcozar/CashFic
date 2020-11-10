@@ -126,7 +126,7 @@
 						<div class="product-price-btn"
 							th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 							<p>
-								<span>78</span>$
+								<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
 							</p>
 							<p>
 								<span th:remove="tag"
