@@ -19,99 +19,125 @@
 		th:unless="${saleAdvertisementNotExist=='saleAdvertisementNotExist'}"
 		class="container">
 		<div class="container">
-			<div class="card bg-dark">
+			<!-- <div class="card bg-dark"> -->
 
-				<div th:if="${uploadImageError}">
-					<p th:each="image : ${uploadImageError}"
-						style="font-size: 20; color: #FF1C19;" class="text-center"
-						th:text="${image} + #{error.uploadImageError}"></p>
-				</div>
+			<div th:if="${uploadImageError}">
+				<p th:each="image : ${uploadImageError}"
+					style="font-size: 20; color: #FF1C19;" class="text-center"
+					th:text="${image} + #{error.uploadImageError}"></p>
+			</div>
 
-				<div class="card-header">
+			<div class="card-header">
 
-					<h3 th:text="${saleAdvertisement.productTitle}"></h3>
+				<!-- <h3 th:text="${saleAdvertisement.productTitle}"></h3> -->
 
-					<!-- Button trigger modal -->
-					<button th:if="${userId} == ${saleAdvertisement.user.id}" type="button" class="btn btn-danger" data-toggle="modal"
-						data-target="#exampleModalCenter" th:text="#{label.remove}"></button>
+				<!-- Button trigger modal -->
+				<button th:if="${userId} == ${saleAdvertisement.user.id}"
+					type="button" class="btn btn-danger" data-toggle="modal"
+					data-target="#exampleModalCenter" th:text="#{label.remove}"></button>
+				<div class="modal fade" id="exampleModalCenter" tabindex="-1"
+					role="dialog" aria-labelledby="exampleModalCenterTitle"
+					aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLongTitle"
+									th:text="#{title.remove}"></h5>
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<span th:text="#{label.removeAddText}"></span>
+							</div>
+							<div class="modal-footer">
+								<form method="post"
+									th:action="@{/saleAdvertisement/} + @{remove/} + ${saleAdvertisement.id}"
+									th:object="${saleAdvertisement.id}">
+									<button type="button" class="btn btn-secondary"
+										data-dismiss="modal" th:text="#{label.cancel}"></button>
 
-					<!-- Modal -->
-					<div class="modal fade" id="exampleModalCenter" tabindex="-1"
-						role="dialog" aria-labelledby="exampleModalCenterTitle"
-						aria-hidden="true">
-						<div class="modal-dialog modal-dialog-centered" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="exampleModalLongTitle"
-										th:text="#{title.remove}"></h5>
-									<button type="button" class="close" data-dismiss="modal"
-										aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-								<div class="modal-body">
-									<span th:text="#{label.removeAddText}"></span>
-								</div>
-								<div class="modal-footer">
-									<form method="post" th:action="@{/saleAdvertisement/} + @{remove/} + ${saleAdvertisement.id}" th:object="${saleAdvertisement.id}">
-										<button type="button" class="btn btn-secondary"
-											data-dismiss="modal" th:text="#{label.cancel}"></button>
-
-										<button type="submit" class="btn btn-danger"
-											th:text="#{label.remove}"></button>
-									</form>
-								</div>
+									<button type="submit" class="btn btn-danger"
+										th:text="#{label.remove}"></button>
+								</form>
 							</div>
 						</div>
 					</div>
 				</div>
+			</div>
 
-				
-				<div th:if="${saleAdvertisement.images.isEmpty() == false}"
-						th:id="@{myCarousel} + ${saleAdvertisement.id}"
-						class="carousel slide" data-ride="carousel" style="width: 100%; height: 100%">
-						<div class="carousel-inner" style="width: 100%; height: 100%">
-							<div th:each="image, iter : ${saleAdvertisement.images}"
-								th:class="${iter.first}  ? 'item active':'item'" style="width: 100%; height: 100%">
-								<img th:src="${image?.imagePath}" class="img-responsive"
-									style="width: 100%; height: 100%" alt="Product Images"
-									onerror="this.error=null;this.src='https://farm5.staticflickr.com/4363/36346283311_74018f6e7d_o.png';">
+			<div class="container">
+				<div class="wrapper">
+					<div class="product-img">
+						<div th:if="${saleAdvertisement?.images.isEmpty() == false}"
+							th:id="@{myCarousel} + ${saleAdvertisement?.id}"
+							class="carousel slide" data-ride="carousel"
+							style="width: 100%; height: 100%">
+							<div class="carousel-inner" style="width: 100%; height: 100%">
+								<div th:each="image, iter : ${saleAdvertisement?.images}"
+									th:class="${iter.first}  ? 'item active':'item'"
+									style="width: 100%; height: 100%">
+									<img th:src="${image?.imagePath}" class="img-responsive"
+										style="width: 100%; height: 100%" alt="Product Images"
+										onerror="this.error=null;this.src='https://farm5.staticflickr.com/4363/36346283311_74018f6e7d_o.png';">
+								</div>
+
+								<!-- Left and right controls -->
+								<a class="left carousel-control"
+									th:href="@{#myCarousel} + ${saleAdvertisement?.id}"
+									data-slide="prev"> <span
+									class="glyphicon glyphicon-chevron-left"></span> <span
+									class="sr-only">Previous</span>
+								</a> <a class="right carousel-control"
+									th:href="@{#myCarousel} + ${saleAdvertisement?.id}"
+									data-slide="next"> <span
+									class="glyphicon glyphicon-chevron-right"></span> <span
+									class="sr-only">Next</span>
+								</a>
 							</div>
-
-							<!-- Left and right controls -->
-							<a class="left carousel-control"
-								th:href="@{#myCarousel} + ${saleAdvertisement.id}"
-								data-slide="prev"> <span
-								class="glyphicon glyphicon-chevron-left"></span> <span
-								class="sr-only">Previous</span>
-							</a> <a class="right carousel-control"
-								th:href="@{#myCarousel} + ${saleAdvertisement.id}"
-								data-slide="next"> <span
-								class="glyphicon glyphicon-chevron-right"></span> <span
-								class="sr-only">Next</span>
-							</a>
 						</div>
+
+						<div th:unless="${saleAdvertisement?.images.isEmpty() == false}"
+							class="no_images">
+							<h3 th:text="#{label.noImages}"></h3>
+						</div>
+
+
 					</div>
-
-
-				<div class="card-body">
-					<p th:text="${saleAdvertisement.productDescription}" />
-					<div>
-						<div>
-							User: <small th:text="${saleAdvertisement.user.login}"></small>
+					<div class="product-info">
+						<div class="product-text">
+							<h1>
+								<a th:href="@{/saleAdvertisement/} + ${saleAdvertisement?.id}">
+									<span th:remove="tag"
+									th:text="${saleAdvertisement?.productTitle}"></span>
+								</a>
+							</h1>
+							<h2>
+								<span th:remove="tag" th:text="${saleAdvertisement?.user.login}"></span>
+								<button class="fa fa-user-plus"></button>
+							</h2>
+							<p>
+								<span th:remove="tag"
+									th:text="${saleAdvertisement?.productDescription}"></span>
+							</p>
 						</div>
-						<div>
-							Date: <small th:text="${saleAdvertisement.date}"></small>
+
+						<div class="product-price-btn"
+							th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
+							<p>
+								<span>78</span>$
+							</p>
+							<p>
+								<span th:remove="tag"
+									th:text="${#dates.format(sdf.parse(saleAdvertisement?.date), 'dd/MM/yy HH:mm')}">Date</span>
+							</p>
+							<button class="fa fa-thumbs-up"></button>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
-
-
-
-
 	</div>
 </body>
 
