@@ -20,6 +20,21 @@ public class AccountViewConstants {
 	/** The Constant USER. */
 	public static final String USER = "user";
 
+	/** The Constant FOLLOWLIST. */
+	public static final String FOLLOWLIST = "followList";
+
+	/** The Constant FOLLOW_NAME. */
+	public static final String FOLLOW_NAME = "followName";
+
+	/** The Constant FOLLOWERS. */
+	public static final String FOLLOWERS = "followers";
+
+	/** The Constant FOLLOWED. */
+	public static final String FOLLOWED = "followed";
+
+	/** The Constant USER_LOGGED. */
+	public static final String USER_LOGGED = "userLogged";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

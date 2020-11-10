@@ -65,9 +65,18 @@
 							</a>
 						</h1>
 						<h2>
-							<span th:remove="tag" th:text="${saleAdvertisement?.user.login}"></span>
-							<button class="fa fa-user-plus"></button>
-						</h2>
+                            <span th:remove="tag" th:text="${saleAdvertisement?.user.login}"></span>
+                            <th:block th:if="${user.id} != ${saleAdvertisement?.user.id}">
+                            <a th:if="${user.followed.contains(saleAdvertisement?.user)} == false" type="button"
+                                th:href="@{/follow/} + ${saleAdvertisement?.user.id}">
+                                <i class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+                            </a>
+                            <a th:unless="${user.followed.contains(saleAdvertisement?.user)} == false" type="button"
+                                th:href="@{/unfollow/} + ${saleAdvertisement?.user.id}">
+                                <i class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+                            </a>
+                            </th:block>
+                        </h2>
 						<p>
 							<span th:remove="tag"
 								th:text="${saleAdvertisement?.productDescription}"></span>

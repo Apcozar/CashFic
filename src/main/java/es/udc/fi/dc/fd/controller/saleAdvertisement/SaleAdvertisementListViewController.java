@@ -18,12 +18,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
+import es.udc.fi.dc.fd.controller.account.AccountViewConstants;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
+import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 
 @Controller
 @RequestMapping("/saleAdvertisement")
@@ -39,6 +43,11 @@ public class SaleAdvertisementListViewController {
 	private ServletContext context;
 
 	/**
+	 * The User service.
+	 */
+	private UserService userService;
+
+	/**
 	 * The Security service.
 	 */
 	private SecurityService securityService;
@@ -50,15 +59,18 @@ public class SaleAdvertisementListViewController {
 	 * @param context                  the context
 	 * @param imageService             the image service
 	 * @param securityService          the security service
+	 * @param userService              the user service
 	 */
 	@Autowired
 	public SaleAdvertisementListViewController(final SaleAdvertisementService saleAdvertisementService,
-			final ServletContext context, final ImageService imageService, final SecurityService securityService) {
+			final ServletContext context, final ImageService imageService, final SecurityService securityService,
+			final UserService userService) {
 		super();
 		this.saleAdvertisementService = checkNotNull(saleAdvertisementService, ViewConstants.NULL_POINTER);
 		this.imageService = checkNotNull(imageService, ViewConstants.NULL_POINTER);
 		this.securityService = checkNotNull(securityService, ViewConstants.NULL_POINTER);
 		this.context = checkNotNull(context, ViewConstants.NULL_POINTER);
+		this.userService = checkNotNull(userService, ViewConstants.NULL_POINTER);
 	}
 
 	/**
@@ -92,9 +104,17 @@ public class SaleAdvertisementListViewController {
 	 */
 	@GetMapping(path = "/list")
 	public String showSaleAdvertisementList(final ModelMap model) {
-		loadViewModel(model);
 
-		return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user;
+			user = userService.findByLogin(username);
+			model.addAttribute(AccountViewConstants.USER, user);
+			loadViewModel(model);
+			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
 	}
 
 	/**
