@@ -2,12 +2,9 @@ package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.io.File;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -138,10 +135,12 @@ public class SaleAdvertisementListViewController {
 	private final void loadViewModel(final ModelMap model, String city, String keywords, LocalDateTime minDate,
 			LocalDateTime maxDate, BigDecimal minPrice, BigDecimal maxPrice) {
 
-		if (city == null)
+		if (city == null || city == "")
 			city = "%";
 		if (keywords == null)
 			keywords = "";
+		if (keywords.contains("%"))
+			keywords = "\\%";
 		if (minPrice == null)
 			minPrice = BigDecimal.valueOf(0);
 		if (maxPrice == null)
@@ -153,8 +152,8 @@ public class SaleAdvertisementListViewController {
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, saleAdvertisementService
 				.getSaleAdvertisementsBySearchCriteria(city, keywords, minDate, maxDate, minPrice, maxPrice));
-    }
-    
+	}
+
 	@PostMapping(path = "/remove/{id}")
 	public String removeSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model) {
 		try {
