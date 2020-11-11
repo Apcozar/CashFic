@@ -19,8 +19,11 @@
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 
+
+
 			<form class="form-inline my-2 my-lg-0"
-				th:action="@{/saleAdvertisement/list}" method="get">
+				th:action="${viewName} == 'viewList' ? @{/saleAdvertisement/list} : @{/saleAdvertisement/followedList}"
+				method="get">
 
 				<div class="form-group">
 					<label for="keywords" th:text="#{label.searchKeywords}"></label>
@@ -83,8 +86,8 @@
 				</div>
 
 				<div class="form-group">
-						<button class="btn btn-primary btn-block" value="Search"
-							type="Submit" th:text="Search"></button>
+					<button class="btn btn-primary btn-block" value="Search"
+						type="Submit" th:text="Search"></button>
 				</div>
 
 			</form>
@@ -149,18 +152,22 @@
 							</a>
 						</h1>
 						<h2>
-                            <span th:remove="tag" th:text="${saleAdvertisement?.user.login}"></span>
-                            <th:block th:if="${user.id} != ${saleAdvertisement?.user.id}">
-                            <a th:if="${user.followed.contains(saleAdvertisement?.user)} == false" type="button"
-                                th:href="@{/follow/} + ${saleAdvertisement?.user.id}">
-                                <i class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
-                            </a>
-                            <a th:unless="${user.followed.contains(saleAdvertisement?.user)} == false" type="button"
-                                th:href="@{/unfollow/} + ${saleAdvertisement?.user.id}">
-                                <i class="fa fa-user-times fa-lg" aria-hidden="true"></i>
-                            </a>
-                            </th:block>
-                        </h2>
+							<span th:remove="tag" th:text="${saleAdvertisement?.user.login}"></span>
+							<th:block th:if="${user.id} != ${saleAdvertisement?.user.id}">
+								<a
+									th:if="${user.followed.contains(saleAdvertisement?.user)} == false"
+									type="button"
+									th:href="@{/follow/} + ${saleAdvertisement?.user.id}"> <i
+									class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+								</a>
+								<a
+									th:unless="${user.followed.contains(saleAdvertisement?.user)} == false"
+									type="button"
+									th:href="@{/unfollow/} + ${saleAdvertisement?.user.id}"> <i
+									class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+								</a>
+							</th:block>
+						</h2>
 						<p>
 							<span th:remove="tag"
 								th:text="${saleAdvertisement?.productDescription}"></span>
@@ -170,7 +177,7 @@
 					<div class="product-price-btn"
 						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>ï¿½
 						</p>
 						<p>
 							<span th:remove="tag"
