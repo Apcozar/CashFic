@@ -60,5 +60,13 @@
 		<addNotNullConstraint tableName="sale_advertisements" columnName="price" columnDataType="DECIMAL(10,2)"/>
 	</changeSet>
 	
+	<changeSet author="Juan" id="addState" >
+		<addColumn tableName="sale_advertisements">
+			<column name="state" type="TINYINT">
+				<constraints nullable="true" unique="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+	
 	
 </databaseChangeLog>

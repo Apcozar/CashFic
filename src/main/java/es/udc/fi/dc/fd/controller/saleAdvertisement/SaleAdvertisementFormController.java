@@ -142,10 +142,7 @@ public class SaleAdvertisementFormController {
 			if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
 				uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
 
-			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
-			model.addAttribute(ViewConstants.USER_ID, user.getId());
-
-			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT;
+			return "redirect:" + "/saleAdvertisement/" + saleAdvertisement.getId();
 
 		} catch (UserNotFoundException e) {
 			return ViewConstants.VIEW_SIGNIN;

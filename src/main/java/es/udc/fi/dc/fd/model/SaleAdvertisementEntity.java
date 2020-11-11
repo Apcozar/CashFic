@@ -85,11 +85,17 @@ public interface SaleAdvertisementEntity extends Serializable {
 	public LocalDateTime getDate();
 
 	/**
-	 * Sets the identifier assigned to this sale_advertisement.
+	 * Gets the state.
 	 *
-	 * @param identifier the identifier for the sale_advertisement
+	 * @return the state
 	 */
+	public State getState();
 
+	/**
+	 * Sets the id.
+	 *
+	 * @param identifier the new id
+	 */
 	public void setId(final Integer identifier);
 
 	/**
@@ -121,12 +127,39 @@ public interface SaleAdvertisementEntity extends Serializable {
 	 */
 	public void setDate(final LocalDateTime date);
 
+	/**
+	 * Sets the state.
+	 *
+	 * @param state the new state
+	 */
+	public void setState(State state);
+
+	/**
+	 * Adds the image.
+	 *
+	 * @param value the value
+	 */
 	public void addImage(DefaultImageEntity value);
 
+	/**
+	 * Removes the image.
+	 *
+	 * @param image the image
+	 */
 	void removeImage(DefaultImageEntity image);
 
+	/**
+	 * Sets the price.
+	 *
+	 * @param price the new price
+	 */
 	public void setPrice(BigDecimal price);
 
+	/**
+	 * Gets the price.
+	 *
+	 * @return the price
+	 */
 	public BigDecimal getPrice();
 
 }
