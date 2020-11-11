@@ -148,7 +148,13 @@
 						<h1>
 							<a th:href="@{/saleAdvertisement/} + ${saleAdvertisement?.id}">
 								<span th:remove="tag"
-								th:text="${saleAdvertisement?.productTitle}"></span>
+								th:if="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+								th:text="${saleAdvertisement?.productTitle}"></span> <del
+									th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+									th:text="${saleAdvertisement?.productTitle}"></del> <small
+								class="text-muted"
+								th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+								th:text="#{label.onHoldInfo}"></small>
 							</a>
 						</h1>
 						<h2>

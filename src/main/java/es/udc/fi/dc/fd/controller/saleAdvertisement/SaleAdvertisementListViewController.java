@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,8 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
@@ -98,7 +101,7 @@ public class SaleAdvertisementListViewController {
 
 			model.addAttribute(ViewConstants.USER_ID, user.getId());
 
-			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findById(id);
+			DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(id);
 
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
 
@@ -300,5 +303,73 @@ public class SaleAdvertisementListViewController {
 			file.delete();
 		}
 
+	}
+
+	/**
+	 * Sets the on hold sale advertisement.
+	 *
+	 * @param id      the id
+	 * @param model   the model
+	 * @param request the request
+	 * @return the string
+	 */
+	@PostMapping(path = "/setOnHold/{id}")
+	public String setOnHoldSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model,
+			HttpServletRequest request) {
+
+		try {
+			SaleAdvertisementEntity saleAdvertisement;
+			saleAdvertisement = saleAdvertisementService.findById(id);
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			if (!saleAdvertisement.getUser().getId().equals(user.getId())) {
+				return ViewConstants.WELCOME;
+			}
+
+			saleAdvertisementService.setOnHoldAdvertisement(saleAdvertisement.getId());
+
+			String previousPage = request.getHeader("Referer");
+
+			return "redirect:" + previousPage;
+
+		} catch (SaleAdvertisementNotFoundException | UserNotFoundException
+				| SaleAdvertisementAlreadyOnHoldException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Sets the on sale sale advertisement.
+	 *
+	 * @param id      the id
+	 * @param model   the model
+	 * @param request the request
+	 * @return the string
+	 */
+	@PostMapping(path = "/setOnSale/{id}")
+	public String setOnSaleSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model,
+			HttpServletRequest request) {
+
+		try {
+			SaleAdvertisementEntity saleAdvertisement;
+			saleAdvertisement = saleAdvertisementService.findById(id);
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			if (!saleAdvertisement.getUser().getId().equals(user.getId())) {
+				return ViewConstants.WELCOME;
+			}
+
+			saleAdvertisementService.setOnSaleAdvertisement(saleAdvertisement.getId());
+
+			String previousPage = request.getHeader("Referer");
+
+			return "redirect:" + previousPage;
+
+		} catch (SaleAdvertisementNotFoundException | UserNotFoundException
+				| SaleAdvertisementAlreadyOnSaleException e) {
+			return ViewConstants.WELCOME;
+		}
 	}
 }
