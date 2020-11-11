@@ -47,6 +47,16 @@
 							th:if="${#fields.hasErrors('productDescription')}"
 							th:errors="*{productDescription}"></span>
 					</div>
+					
+					<div class="form-group"
+						th:classappend="${#fields.hasErrors('price')} ? 'error'">
+						<input type="number" id="price" step="any" min="0"
+							name="price" th:placeholder="Price"
+							class="form-control" th:field="*{price}" /> <span
+							class="text-danger"
+							th:if="${#fields.hasErrors('price')}"
+							th:errors="*{price}"></span>
+					</div>
 
 					<div class="form-group"
 						th:classappend="${#fields.hasErrors('imageFile')}? 'has-error'">

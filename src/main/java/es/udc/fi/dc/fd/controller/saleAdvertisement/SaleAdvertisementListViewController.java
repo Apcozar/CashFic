@@ -2,18 +2,17 @@ package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.io.File;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -117,10 +116,9 @@ public class SaleAdvertisementListViewController {
 	 */
 	@GetMapping(path = "/list")
 	public String showSaleAdvertisementList(final ModelMap model, @RequestParam(required = false) String city,
-			@RequestParam(required = false) String keywords,
-			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime minDate,
-			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime maxDate,
-			@RequestParam(required = false) BigDecimal minPrice, @RequestParam(required = false) BigDecimal maxPrice) {
+			@RequestParam(required = false) String keywords, @RequestParam(required = false) String minDate,
+			@RequestParam(required = false) String maxDate, @RequestParam(required = false) BigDecimal minPrice,
+			@RequestParam(required = false) BigDecimal maxPrice) {
 
 		loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice);
 
@@ -135,26 +133,42 @@ public class SaleAdvertisementListViewController {
 	 * @return the string
 	 */
 
-	private final void loadViewModel(final ModelMap model, String city, String keywords, LocalDateTime minDate,
-			LocalDateTime maxDate, BigDecimal minPrice, BigDecimal maxPrice) {
+	private final void loadViewModel(final ModelMap model, String city, String keywords, String minDate, String maxDate,
+			BigDecimal minPrice, BigDecimal maxPrice) {
 
-		if (city == null)
+		LocalDate minimumDate;
+		LocalDate maximumDate;
+
+		if (city == null || city.isEmpty())
+			city = "%";
+		else if (city.contains("%"))
+			keywords = "\\%";
+		if (city == null || city.isEmpty())
 			city = "%";
 		if (keywords == null)
 			keywords = "";
+		if (keywords.contains("%"))
+			keywords = "\\%";
 		if (minPrice == null)
 			minPrice = BigDecimal.valueOf(0);
 		if (maxPrice == null)
 			maxPrice = saleAdvertisementService.getMaximumPrice();
-		if (minDate == null)
-			minDate = LocalDateTime.MIN;
-		if (maxDate == null)
-			maxDate = LocalDateTime.now();
+		if (minDate == null || minDate.isEmpty())
+			minimumDate = LocalDate.MIN;
+		else
+			minimumDate = LocalDate.parse(minDate, DateTimeFormatter.ISO_LOCAL_DATE);
 
-		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, saleAdvertisementService
-				.getSaleAdvertisementsBySearchCriteria(city, keywords, minDate, maxDate, minPrice, maxPrice));
-    }
-    
+		if (maxDate == null || maxDate.isEmpty())
+			maximumDate = LocalDate.now();
+		else
+			maximumDate = LocalDate.parse(maxDate, DateTimeFormatter.ISO_LOCAL_DATE);
+
+		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS,
+				saleAdvertisementService.getSaleAdvertisementsBySearchCriteria(city, keywords,
+						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
+						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice));
+	}
+
 	@PostMapping(path = "/remove/{id}")
 	public String removeSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model) {
 		try {
@@ -194,15 +208,5 @@ public class SaleAdvertisementListViewController {
 			file.delete();
 		}
 
-	}
-
-	/**
-	 * Load view model.
-	 *
-	 * @param model the model
-	 */
-	private final void loadViewModel(final ModelMap model) {
-		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS,
-				saleAdvertisementService.getSaleAdvertisementsByDateDesc());
 	}
 }
