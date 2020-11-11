@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -126,7 +128,31 @@ public class SaleAdvertisementListViewController {
 			DefaultUserEntity user;
 			user = userService.findByLogin(username);
 			model.addAttribute(AccountViewConstants.USER, user);
-		    loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice);
+			loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice);
+			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME, SaleAdvertisementViewConstants.VIEW_LIST);
+			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	@GetMapping(path = "/followedList")
+	public String showFollowedSaleAdvertisementList(final ModelMap model, @RequestParam(required = false) String city,
+			@RequestParam(required = false) String keywords, @RequestParam(required = false) String minDate,
+			@RequestParam(required = false) String maxDate, @RequestParam(required = false) BigDecimal minPrice,
+			@RequestParam(required = false) BigDecimal maxPrice) {
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user;
+			Set<DefaultUserEntity> followed;
+
+			user = userService.findByLogin(username);
+			followed = user.getFollowed();
+
+			model.addAttribute(AccountViewConstants.USER, user);
+			loadViewModelFollow(model, city, keywords, minDate, maxDate, minPrice, maxPrice, followed);
+			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME,
+					SaleAdvertisementViewConstants.VIEW_FILTERED_LIST);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 		} catch (UserNotFoundException e) {
 			return ViewConstants.WELCOME;
@@ -134,13 +160,16 @@ public class SaleAdvertisementListViewController {
 	}
 
 	/**
-	 * Removes the sale advertisement and its images.
+	 * Load view model.
 	 *
-	 * @param id    the id
-	 * @param model the model
-	 * @return the string
+	 * @param model    the model
+	 * @param city     the city
+	 * @param keywords the keywords
+	 * @param minDate  the min date
+	 * @param maxDate  the max date
+	 * @param minPrice the min price
+	 * @param maxPrice the max price
 	 */
-
 	private final void loadViewModel(final ModelMap model, String city, String keywords, String minDate, String maxDate,
 			BigDecimal minPrice, BigDecimal maxPrice) {
 
@@ -175,7 +204,62 @@ public class SaleAdvertisementListViewController {
 				saleAdvertisementService.getSaleAdvertisementsBySearchCriteria(city, keywords,
 						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
 						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice));
+
 	}
+
+	private final void loadViewModelFollow(final ModelMap model, String city, String keywords, String minDate,
+			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed) {
+
+		LocalDate minimumDate;
+		LocalDate maximumDate;
+
+		if (city == null || city.isEmpty())
+			city = "%";
+		else if (city.contains("%"))
+			keywords = "\\%";
+		if (city == null || city.isEmpty())
+			city = "%";
+		if (keywords == null)
+			keywords = "";
+		if (keywords.contains("%"))
+			keywords = "\\%";
+		if (minPrice == null)
+			minPrice = BigDecimal.valueOf(0);
+		if (maxPrice == null)
+			maxPrice = saleAdvertisementService.getMaximumPrice();
+		if (minDate == null || minDate.isEmpty())
+			minimumDate = LocalDate.MIN;
+		else
+			minimumDate = LocalDate.parse(minDate, DateTimeFormatter.ISO_LOCAL_DATE);
+
+		if (maxDate == null || maxDate.isEmpty())
+			maximumDate = LocalDate.now();
+		else
+			maximumDate = LocalDate.parse(maxDate, DateTimeFormatter.ISO_LOCAL_DATE);
+
+		Iterable<DefaultSaleAdvertisementEntity> unfiltered = saleAdvertisementService
+				.getSaleAdvertisementsBySearchCriteria(city, keywords,
+						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
+						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice);
+
+		List<DefaultSaleAdvertisementEntity> filtered = new ArrayList<>();
+
+		for (DefaultSaleAdvertisementEntity add : unfiltered) {
+			if (followed.contains(add.getUser()))
+				filtered.add(add);
+		}
+
+		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, filtered);
+
+	}
+
+	/**
+	 * Removes the sale advertisement and its images.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
 
 	@PostMapping(path = "/remove/{id}")
 	public String removeSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model) {
