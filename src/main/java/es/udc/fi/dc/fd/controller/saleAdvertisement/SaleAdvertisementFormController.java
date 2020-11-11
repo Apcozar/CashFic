@@ -7,11 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.MultipartConfig;
@@ -130,15 +129,21 @@ public class SaleAdvertisementFormController {
 
 			DefaultUserEntity user = userService.findByLogin(username);
 
-			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService
-					.add(new DefaultSaleAdvertisementEntity(saleAdvertisementForm.getProductTitle(),
-							saleAdvertisementForm.getProductDescription(), user, LocalDateTime.now()));
+			double price = Double.parseDouble(saleAdvertisementForm.getPrice());
+
+			DefaultSaleAdvertisementEntity defaultSaleAdvertisement = new DefaultSaleAdvertisementEntity(
+					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user,
+					LocalDateTime.now());
+
+			defaultSaleAdvertisement.setPrice(BigDecimal.valueOf(price));
+
+			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.add(defaultSaleAdvertisement);
 
 			if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
 				uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
 
-			loadImageViewModel(model, saleAdvertisement.getId());
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
+			model.addAttribute(ViewConstants.USER_ID, user.getId());
 
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT;
 
@@ -360,33 +365,6 @@ public class SaleAdvertisementFormController {
 		String login = this.securityService.findLoggedInUsername();
 
 		return ViewConstants.UPLOADS_FOLDER_NAME + "/" + login;
-	}
-
-	/**
-	 * Load image view model.
-	 *
-	 * @param model  the model
-	 * @param saleId the sale id
-	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
-	 *                                            exception
-	 */
-	private final void loadImageViewModel(final Model model, Integer saleId) throws SaleAdvertisementNotFoundException {
-		SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findById(saleId);
-		Set<DefaultImageEntity> imagesSet = saleAdvertisement.getImages();
-		DefaultImageEntity first;
-		List<DefaultImageEntity> images = new ArrayList<>();
-
-		Iterator<DefaultImageEntity> iterator = imagesSet.iterator();
-
-		if (iterator.hasNext()) {
-			first = iterator.next();
-
-			while (iterator.hasNext())
-				images.add(iterator.next());
-
-			model.addAttribute(SaleAdvertisementViewConstants.PARAM_IMAGE, first);
-			model.addAttribute(SaleAdvertisementViewConstants.PARAM_IMAGES, images);
-		}
 	}
 
 }

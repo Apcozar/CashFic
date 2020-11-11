@@ -12,8 +12,17 @@
 		<addNotNullConstraint tableName="images" columnName="image_path" columnDataType="VARCHAR(255)"/>
 		<addNotNullConstraint tableName="images" columnName="title" columnDataType="VARCHAR(255)"/>
 	</changeSet>
-	
-	
+
+
+	<changeSet author="Martin" id="addPrice" >
+		<addColumn tableName="sale_advertisements">
+			<column name="price" type="DECIMAL(10,2)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+
 	<changeSet author="Juan" id="followUsers" >
 		<createTable tableName="follow_users">
 			<column name="user_id" type="BIGINT">
@@ -40,6 +49,15 @@
 			constraintName="FK_follow_users_user_follow_id"
 			referencedColumnNames="id"
 			referencedTableName="users"/>	
+	</changeSet>
+	
+	<changeSet author="Martin" id="changeNullPrices">
+		<update tableName="sale_advertisements">
+			<column name="price" value="10"/>
+			<where>price is null</where>
+		</update>
+		
+		<addNotNullConstraint tableName="sale_advertisements" columnName="price" columnDataType="DECIMAL(10,2)"/>
 	</changeSet>
 	
 	

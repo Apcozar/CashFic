@@ -24,6 +24,7 @@
 
 package es.udc.fi.dc.fd.test.integration.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -142,6 +143,8 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("ExampleProductDescription");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+
 		// Save sale advertisement entity
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 
@@ -196,6 +199,7 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("Product description");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
 
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 
@@ -269,6 +273,7 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("Product description");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
 
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 		// Initial count of sale advertisements
@@ -371,6 +376,7 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("Product description");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
 
 		// Sale advertisement 0 images
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);

@@ -3,18 +3,99 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
-<head th:include="fragments/header :: header">
+<head>
 <title th:text="#{title.saleAdvertisementList}"></title>
-<link
-	href="https://fonts.googleapis.com/css?family=Bentham|Playfair+Display|Raleway:400,500|Suranna|Trocchi"
-	rel="stylesheet">
+<th:block th:include="fragments/header :: header"></th:block>
+
+<link rel="stylesheet" type="text/css"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker-standalone.css">
 
 </head>
 <body>
 	<header class="header" th:include="fragments/menu :: menu"> </header>
 
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+			<form class="form-inline my-2 my-lg-0"
+				th:action="@{/saleAdvertisement/list}" method="get">
+
+				<div class="form-group">
+					<label for="keywords" th:text="#{label.searchKeywords}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="text" id="keywords"
+							name="keywords" placeholder="Search Keywords">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="city" th:text="#{label.searchCity}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="text" id="city"
+							name="city" placeholder="Search City">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="input-group date">
+						<label for="minDate" th:text="#{label.minDate}"></label>
+						<div class="md-form md-outline input-with-post-icon datepicker">
+							<input type='date' class="form-control mr-sm-1" id='minDate'
+								name="minDate" placeholder="dd/MM/yyyy" /> <span
+								class="input-group-addon"> <span
+								class="glyphicon glyphicon-calendar"></span>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="input-group date">
+						<label for="maxDate" th:text="#{label.maxDate}"></label>
+						<div class="md-form md-outline input-with-post-icon datepicker">
+							<input type='date' class="form-control mr-sm-2" id='maxDate'
+								name="maxDate" placeholder="dd/MM/yyyy" /> <span
+								class="input-group-addon"> <span
+								class="glyphicon glyphicon-calendar"></span>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="minPrice" th:text="#{label.minPrice}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="number" min="0"
+							step="any" id="minPrice" name="minPrice"
+							placeholder="Minimum Price">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="maxPrice" th:text="#{label.maxPrice}"></label>
+					<div>
+						<input class="form-control mr-sm-2" type="number" min="0"
+							step="any" id="maxPrice" name="maxPrice"
+							placeholder="Maximum Price">
+					</div>
+				</div>
+
+				<div class="form-group">
+						<button class="btn btn-primary btn-block" value="Search"
+							type="Submit" th:text="Search"></button>
+				</div>
+
+			</form>
+
+		</div>
+	</nav>
+
+
+
 	<div class="container">
-		<div class="card bg-dark">
+		<div class="card bg-light">
 			<div class="card-header">
 				<h3 th:text="#{title.saleAdvertisementList}"></h3>
 			</div>
@@ -25,10 +106,12 @@
 
 					<div th:if="${saleAdvertisement?.images.isEmpty() == false}"
 						th:id="@{myCarousel} + ${saleAdvertisement?.id}"
-						class="carousel slide" data-ride="carousel" style="width: 100%; height: 100%">
+						class="carousel slide" data-ride="carousel"
+						style="width: 100%; height: 100%">
 						<div class="carousel-inner" style="width: 100%; height: 100%">
 							<div th:each="image, iter : ${saleAdvertisement?.images}"
-								th:class="${iter.first}  ? 'item active':'item'" style="width: 100%; height: 100%">
+								th:class="${iter.first}  ? 'item active':'item'"
+								style="width: 100%; height: 100%">
 								<img th:src="${image?.imagePath}" class="img-responsive"
 									style="width: 100%; height: 100%" alt="Product Images"
 									onerror="this.error=null;this.src='https://farm5.staticflickr.com/4363/36346283311_74018f6e7d_o.png';">
@@ -49,13 +132,14 @@
 						</div>
 					</div>
 
-					<div th:unless="${saleAdvertisement?.images.isEmpty() == false}" class="no_images">
-				      <h3 th:text="#{label.noImages}"></h3>
-			      </div>
-      
+					<div th:unless="${saleAdvertisement?.images.isEmpty() == false}"
+						class="no_images">
+						<h3 th:text="#{label.noImages}"></h3>
+					</div>
+
 
 				</div>
-				
+
 				<div class="product-info">
 					<div class="product-text">
 						<h1>
@@ -82,26 +166,26 @@
 								th:text="${saleAdvertisement?.productDescription}"></span>
 						</p>
 					</div>
-					
+
 					<div class="product-price-btn"
-						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yyyy HH:mm')}">
+						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span>78</span>$
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
 						</p>
 						<p>
 							<span th:remove="tag"
-								th:text="${#dates.format(sdf.parse(saleAdvertisement?.date), 'dd/MM/yyyy HH:mm')}">Date</span>
+								th:text="${#dates.format(sdf.parse(saleAdvertisement?.date), 'dd/MM/yy HH:mm')}">Date</span>
 						</p>
 						<button class="fa fa-thumbs-up"></button>
 					</div>
 				</div>
-				
+
 			</div>
 		</div>
 	</div>
 
 	<footer>
-		<div th:include="fragments/scripts :: general"></div>
+		<div th:include="fragments/scriptsDateTime :: general"></div>
 	</footer>
 </body>
 

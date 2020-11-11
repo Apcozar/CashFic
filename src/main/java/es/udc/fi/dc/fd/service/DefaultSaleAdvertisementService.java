@@ -26,6 +26,9 @@ package es.udc.fi.dc.fd.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -93,7 +96,6 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 			throw new SaleAdvertisementNotFoundException(identifier);
 		}
 		DefaultSaleAdvertisementEntity result = saleAdvertisementRepository.getOne(identifier);
-		DefaultSaleAdvertisementEntity otherResult = saleAdvertisementRepository.findById(identifier).get();
 		return result;
 	}
 
@@ -154,21 +156,45 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		saleAdvertisementRepository.delete(saleAdvertisement);
 	}
 
+	/**
+	 * Gets the all sale advertisements.
+	 *
+	 * @return the all sale advertisements
+	 */
 	@Override
 	public final Iterable<DefaultSaleAdvertisementEntity> getAllSaleAdvertisements() {
 		return saleAdvertisementRepository.findAll();
 	}
 
+	/**
+	 * Gets the sale advertisements.
+	 *
+	 * @param page the page
+	 * @return the sale advertisements
+	 */
 	@Override
 	public final Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisements(final Pageable page) {
 		return saleAdvertisementRepository.findAll(page);
 	}
 
+	/**
+	 * Gets the sale advertisements by date desc.
+	 *
+	 * @return the sale advertisements by date desc
+	 */
 	@Override
 	public final Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateDesc() {
 		return saleAdvertisementRepository.findSaleAdvertisementsOrderByDateDesc();
 	}
 
+	/**
+	 * Find by id default.
+	 *
+	 * @param identifier the identifier
+	 * @return the implemented sale advertisement entity
+	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
+	 *                                            exception
+	 */
 	@Override
 	public final DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
 			throws SaleAdvertisementNotFoundException {
@@ -180,6 +206,34 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		}
 
 		return saleAdvertisementRepository.findById(identifier).get();
+	}
+
+	/**
+	 * Gets the sale advertisements by search criteria.
+	 *
+	 * @param city     the city
+	 * @param keywords the keywords
+	 * @param date1    the date 1
+	 * @param date2    the date 2
+	 * @param price1   the price 1
+	 * @param price2   the price 2
+	 * @return the sale advertisements by search criteria
+	 */
+	@Override
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsBySearchCriteria(String city, String keywords,
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2) {
+		return saleAdvertisementRepository.findSaleAdvertisementsByCriteria(city, keywords, date1, date2, price1,
+				price2);
+	}
+
+	/**
+	 * Gets the maximum price of all sale advertisements.
+	 *
+	 * @return the maximum price
+	 */
+	@Override
+	public BigDecimal getMaximumPrice() {
+		return saleAdvertisementRepository.getMaximumPrice();
 	}
 
 }
