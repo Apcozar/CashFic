@@ -19,8 +19,11 @@
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 
+
+
 			<form class="form-inline my-2 my-lg-0"
-				th:action="@{/saleAdvertisement/list}" method="get">
+				th:action="${viewName} == 'viewList' ? @{/saleAdvertisement/list} : @{/saleAdvertisement/followedList}"
+				method="get">
 
 				<div class="form-group">
 					<label for="keywords" th:text="#{label.searchKeywords}"></label>
@@ -180,7 +183,7 @@
 					<div class="product-price-btn"
 						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>ï¿½
 						</p>
 						<p>
 							<span th:remove="tag"
