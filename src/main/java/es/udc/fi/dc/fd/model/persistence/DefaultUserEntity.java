@@ -121,14 +121,13 @@ public class DefaultUserEntity implements UserEntity {
 	private Set<DefaultSaleAdvertisementEntity> sale_advertisements;
 
 	/** The followers. */
-	@ManyToMany
-	@JoinTable(name = "follow_users", joinColumns = @JoinColumn(name = "user_follow_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-	private Set<DefaultUserEntity> followers = new HashSet<DefaultUserEntity>();
+	@ManyToMany(mappedBy = "followed")
+	private Set<DefaultUserEntity> followers = new HashSet<>();
 
 	/** The followed. */
 	@ManyToMany
 	@JoinTable(name = "follow_users", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_follow_id"))
-	private Set<DefaultUserEntity> followed = new HashSet<DefaultUserEntity>();
+	private Set<DefaultUserEntity> followed = new HashSet<>();
 
 	/**
 	 * Constructs an sale_advertisement entity.

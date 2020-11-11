@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
+import es.udc.fi.dc.fd.controller.account.AccountViewConstants;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
@@ -65,6 +66,7 @@ public class SaleAdvertisementListViewController {
 	 * @param imageService             the image service
 	 * @param userService              the user service
 	 * @param securityService          the security service
+	 * @param userService              the user service
 	 */
 	@Autowired
 	public SaleAdvertisementListViewController(final SaleAdvertisementService saleAdvertisementService,
@@ -119,10 +121,16 @@ public class SaleAdvertisementListViewController {
 			@RequestParam(required = false) String keywords, @RequestParam(required = false) String minDate,
 			@RequestParam(required = false) String maxDate, @RequestParam(required = false) BigDecimal minPrice,
 			@RequestParam(required = false) BigDecimal maxPrice) {
-
-		loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice);
-
-		return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user;
+			user = userService.findByLogin(username);
+			model.addAttribute(AccountViewConstants.USER, user);
+		    loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice);
+			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
 	}
 
 	/**
