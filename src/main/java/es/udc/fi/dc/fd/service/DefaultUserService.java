@@ -34,9 +34,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.Role;
+import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
 import es.udc.fi.dc.fd.repository.UserRepository;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -61,15 +65,24 @@ public class DefaultUserService implements UserService {
 	private final UserRepository userDao;
 
 	/**
+	 * Repository for the domain entities handled by the service.
+	 */
+	private final SaleAdvertisementRepository saleAdvertisementRepository;
+
+	/**
 	 * Constructs an user service with the specified repository.
-	 *
-	 * @param repository the repository for the user instances
+	 * 
+	 * @param repository                  the repository for the user instances
+	 * @param saleAdvertisementRepository the repository for sale advertisements
 	 */
 	@Autowired
-	public DefaultUserService(final UserRepository repository) {
+	public DefaultUserService(final UserRepository repository,
+			final SaleAdvertisementRepository saleAdvertisementRepository) {
 		super();
 
 		userDao = checkNotNull(repository, "Received a null pointer as repository");
+		this.saleAdvertisementRepository = checkNotNull(saleAdvertisementRepository,
+				"Received a null pointer as saleAdvertisementRepository");
 	}
 
 	@Override
@@ -142,6 +155,42 @@ public class DefaultUserService implements UserService {
 	}
 
 	@Override
+	public UserEntity like(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
+			throws UserNotFoundException, SaleAdvertisementNotFoundException {
+		checkNotNull(user, "Received a null pointer as user");
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
+			throw new SaleAdvertisementNotFoundException(saleAdvertisement.getId());
+		}
+
+		saleAdvertisement.addUsersLike((DefaultUserEntity) user);
+		saleAdvertisementRepository.save((DefaultSaleAdvertisementEntity) saleAdvertisement);
+		user.addLike(saleAdvertisement);
+
+		return userDao.save((DefaultUserEntity) user);
+	}
+
+	@Override
+	public UserEntity unlike(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
+			throws UserNotFoundException, SaleAdvertisementNotFoundException {
+		checkNotNull(user, "Received a null pointer as user");
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
+			throw new SaleAdvertisementNotFoundException(saleAdvertisement.getId());
+		}
+		saleAdvertisement.removeUsersLike((DefaultUserEntity) user);
+		saleAdvertisementRepository.save((DefaultSaleAdvertisementEntity) saleAdvertisement);
+		user.removeLike(saleAdvertisement);
+
+		return userDao.save((DefaultUserEntity) user);
+	}
+
 	public UserEntity followUser(UserEntity user, UserEntity userToFollow)
 			throws UserNotFoundException, UserToFollowExistsException {
 		if (!userDao.existsById(user.getId())) {

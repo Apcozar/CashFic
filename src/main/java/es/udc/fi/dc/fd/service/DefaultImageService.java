@@ -57,8 +57,9 @@ public class DefaultImageService implements ImageService {
 	/**
 	 * Constructs an image service with the specified repositories.
 	 *
-	 * @param imageRepository             the image repository
-	 * @param saleAdvertisementRepository the sale advertisement repository
+	 * @param imageRepository             the repository for the image instances
+	 * @param saleAdvertisementRepository the repository for the sale advertisement
+	 *                                    instances
 	 */
 	@Autowired
 	public DefaultImageService(final ImageRepository imageRepository,

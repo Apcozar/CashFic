@@ -141,6 +141,12 @@ public interface SaleAdvertisementEntity extends Serializable {
 	 */
 	public void addImage(DefaultImageEntity value);
 
+	public Set<DefaultUserEntity> getLikes();
+
+	public void removeUsersLike(DefaultUserEntity user);
+
+	public void addUsersLike(DefaultUserEntity user);
+
 	/**
 	 * Removes the image.
 	 *

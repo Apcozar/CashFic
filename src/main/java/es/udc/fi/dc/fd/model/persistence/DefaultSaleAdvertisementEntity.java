@@ -38,6 +38,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -117,6 +118,9 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	 */
 	@Column(name = "add_date", nullable = false, unique = false)
 	private LocalDateTime date;
+
+	@ManyToMany(mappedBy = "likedSaleAdvertisements")
+	private Set<DefaultUserEntity> usersLikes = new HashSet<DefaultUserEntity>();
 
 	/**
 	 * The price of the sale_advertisement.
@@ -274,8 +278,26 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	}
 
 	@Override
+
+	public void addUsersLike(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		usersLikes.add(user);
+	}
+
+	@Override
+	public void removeUsersLike(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		usersLikes.remove(user);
+	}
+
+	@Override
+	public Set<DefaultUserEntity> getLikes() {
+		return usersLikes;
+	}
+
 	public void setState(final State value) {
 		state = checkNotNull(value, "Received a null pointer as state");
+
 	}
 
 	@Override

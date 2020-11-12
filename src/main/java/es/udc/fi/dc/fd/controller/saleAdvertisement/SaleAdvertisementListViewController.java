@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import es.udc.fi.dc.fd.controller.ViewConstants;
 import es.udc.fi.dc.fd.controller.account.AccountViewConstants;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.UserEntity;
+import es.udc.fi.dc.fd.model.dto.SaleAdvertisementWithLoggedUserInfoDTO;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
@@ -131,7 +133,7 @@ public class SaleAdvertisementListViewController {
 			DefaultUserEntity user;
 			user = userService.findByLogin(username);
 			model.addAttribute(AccountViewConstants.USER, user);
-			loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice);
+			loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice, user);
 			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME, SaleAdvertisementViewConstants.VIEW_LIST);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 		} catch (UserNotFoundException e) {
@@ -153,11 +155,67 @@ public class SaleAdvertisementListViewController {
 			followed = user.getFollowed();
 
 			model.addAttribute(AccountViewConstants.USER, user);
-			loadViewModelFollow(model, city, keywords, minDate, maxDate, minPrice, maxPrice, followed);
+			loadViewModelFollow(model, city, keywords, minDate, maxDate, minPrice, maxPrice, followed, user);
 			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME,
 					SaleAdvertisementViewConstants.VIEW_FILTERED_LIST);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Follow user.
+	 *
+	 * @param id      the id
+	 * @param model   the model
+	 * @param request the request
+	 * @return the string
+	 */
+	@GetMapping(path = "/like/{id}")
+	public String likeSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model,
+			HttpServletRequest request) {
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			SaleAdvertisementEntity saleAdvertisementToLike = saleAdvertisementService.findById(id);
+
+			userService.like(user, saleAdvertisementToLike);
+
+			String previousPage = request.getHeader("Referer");
+
+			return "redirect:" + previousPage;
+
+		} catch (UserNotFoundException | SaleAdvertisementNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Follow user.
+	 *
+	 * @param id      the id
+	 * @param model   the model
+	 * @param request the request
+	 * @return the string
+	 */
+	@GetMapping(path = "/unlike/{id}")
+	public String unlikeSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model,
+			HttpServletRequest request) {
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			SaleAdvertisementEntity saleAdvertisementToLike = saleAdvertisementService.findById(id);
+
+			userService.unlike(user, saleAdvertisementToLike);
+
+			String previousPage = request.getHeader("Referer");
+
+			return "redirect:" + previousPage;
+
+		} catch (UserNotFoundException | SaleAdvertisementNotFoundException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -174,7 +232,7 @@ public class SaleAdvertisementListViewController {
 	 * @param maxPrice the max price
 	 */
 	private final void loadViewModel(final ModelMap model, String city, String keywords, String minDate, String maxDate,
-			BigDecimal minPrice, BigDecimal maxPrice) {
+			BigDecimal minPrice, BigDecimal maxPrice, UserEntity user) {
 
 		LocalDate minimumDate;
 		LocalDate maximumDate;
@@ -203,15 +261,25 @@ public class SaleAdvertisementListViewController {
 		else
 			maximumDate = LocalDate.parse(maxDate, DateTimeFormatter.ISO_LOCAL_DATE);
 
-		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS,
-				saleAdvertisementService.getSaleAdvertisementsBySearchCriteria(city, keywords,
+		Iterable<DefaultSaleAdvertisementEntity> saleAdvertisementsList = saleAdvertisementService
+				.getSaleAdvertisementsBySearchCriteria(city, keywords,
 						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
-						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice));
+						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice);
+		ArrayList<SaleAdvertisementWithLoggedUserInfoDTO> list = new ArrayList<>();
+
+		saleAdvertisementsList.forEach((saleAdvertisement) -> {
+			list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+					user.getLikes().contains(saleAdvertisement),
+					user.getFollowed().contains(saleAdvertisement.getUser())));
+		});
+
+		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, list);
 
 	}
 
 	private final void loadViewModelFollow(final ModelMap model, String city, String keywords, String minDate,
-			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed) {
+			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed,
+			UserEntity user) {
 
 		LocalDate minimumDate;
 		LocalDate maximumDate;
@@ -245,11 +313,13 @@ public class SaleAdvertisementListViewController {
 						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
 						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice);
 
-		List<DefaultSaleAdvertisementEntity> filtered = new ArrayList<>();
+		List<SaleAdvertisementWithLoggedUserInfoDTO> filtered = new ArrayList<>();
 
-		for (DefaultSaleAdvertisementEntity add : unfiltered) {
-			if (followed.contains(add.getUser()))
-				filtered.add(add);
+		for (DefaultSaleAdvertisementEntity saleAdvertisement : unfiltered) {
+			if (followed.contains(saleAdvertisement.getUser()))
+				filtered.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+						user.getLikes().contains(saleAdvertisement),
+						user.getFollowed().contains(saleAdvertisement.getUser()))));
 		}
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, filtered);

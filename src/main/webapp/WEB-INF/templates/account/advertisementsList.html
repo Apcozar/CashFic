@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.followList}"></title>
+<link
+	href="https://fonts.googleapis.com/css?family=Bentham|Playfair+Display|Raleway:400,500|Suranna|Trocchi"
+	rel="stylesheet">
+
+</head>
+<body>
+	<header class="header" th:include="fragments/menu :: menu"> </header>
+
+	<div class="container-fluid">
+		<div class="page-heading">
+			<div class="media clearfix">
+				<div class="media-left pr30">
+					<i class="fa fa-user-circle-o fa-5x" aria-hidden="true"></i>
+				</div>
+				<div class="media-body">
+					<h2 class="media-heading">
+						<a th:href="@{/profile/} + ${user.id}" th:text="${user.login}"></a>
+						<th:block th:if="${userLogged.id} != ${user.id}">
+							<a th:if="${userLogged.followed.contains(user)} == false"
+								type="button" th:href="@{/follow/} + ${user.id}"> <i
+								class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+							</a>
+							<a th:unless="${userLogged.followed.contains(user)} == false"
+								type="button" th:href="@{/unfollow/} + ${user.id}"> <i
+								class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+							</a>
+						</th:block>
+					</h2>
+					<div class="media-links">
+						<p class="small">
+							<i class="fa fa-user-circle" aria-hidden="true"
+								th:text="${user.name} + ' ' + ${user.lastName}"></i>
+						</p>
+						<p class="small">
+							<i class="fa fa-envelope" aria-hidden="true"
+								th:text="${user.email}"></i>
+						</p>
+						<p class="small">
+							<i class="fa fa-map-marker" aria-hidden="true"
+								th:text="${user.city}"></i>
+						</p>
+					</div>
+					<div class="media-links pull-right">
+						<ul class="list-inline">
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${user.id} + @{/advertisements}"
+										th:text="${user.getSaleAdvertisements().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Adds}"></em></small>
+							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${user.id} + @{/likes}"
+										th:text="${user.getLikes().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Likes}"></em></small>
+							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/followers/} + ${user.id}"
+										th:text="${user.followers.size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-user-circle"
+									th:text="#{label.Followers}"></em></small>
+							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/followed/} + ${user.id}"
+										th:text="${user.followed.size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-user-circle"
+									th:text="#{label.Following}"></em></small>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="card bg-light">
+			<div class="card-header">
+				<h3>
+					<span th:if="${userAdvertisementsView == 'userLikes'}"
+						th:text="#{title.likes}"></span> <span
+						th:if="${userAdvertisementsView == 'userAdvertisements'}"
+						th:text="#{title.saleAdvertisementList}"></span>
+				</h3>
+			</div>
+
+			<div class="wrapper"
+				th:each="saleAdvertisement : ${saleAdvertisements}">
+				<div class="product-img">
+
+					<div th:if="${saleAdvertisement?.images.isEmpty() == false}"
+						th:id="@{myCarousel} + ${saleAdvertisement?.id}"
+						class="carousel slide" data-ride="carousel"
+						style="width: 100%; height: 100%">
+						<div class="carousel-inner" style="width: 100%; height: 100%">
+							<div th:each="image, iter : ${saleAdvertisement?.images}"
+								th:class="${iter.first}  ? 'item active':'item'"
+								style="width: 100%; height: 100%">
+								<img th:src="${image?.imagePath}" class="img-responsive"
+									style="width: 100%; height: 100%" alt="Product Images"
+									onerror="this.error=null;this.src='https://farm5.staticflickr.com/4363/36346283311_74018f6e7d_o.png';">
+							</div>
+
+							<!-- Left and right controls -->
+							<a class="left carousel-control"
+								th:href="@{#myCarousel} + ${saleAdvertisement?.id}"
+								data-slide="prev"> <span
+								class="glyphicon glyphicon-chevron-left"></span> <span
+								class="sr-only">Previous</span>
+							</a> <a class="right carousel-control"
+								th:href="@{#myCarousel} + ${saleAdvertisement?.id}"
+								data-slide="next"> <span
+								class="glyphicon glyphicon-chevron-right"></span> <span
+								class="sr-only">Next</span>
+							</a>
+						</div>
+					</div>
+
+					<div th:unless="${saleAdvertisement?.images.isEmpty() == false}"
+						class="no_images">
+						<h3 th:text="#{label.noImages}"></h3>
+					</div>
+
+
+				</div>
+
+				<div class="product-info">
+					<div class="product-text">
+						<h1>
+							<a th:href="@{/saleAdvertisement/} + ${saleAdvertisement?.id}">
+								<span th:remove="tag"
+								th:if="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+								th:text="${saleAdvertisement?.productTitle}"></span> <del
+									th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+									th:text="${saleAdvertisement?.productTitle}"></del> <small
+								class="text-muted"
+								th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+								th:text="#{label.onHoldInfo}"></small>
+							</a>
+						</h1>
+						<h2>
+							<span th:remove="tag" th:text="${saleAdvertisement?.user.login}"></span>
+							<th:block
+								th:if="${userLogged.id} != ${saleAdvertisement?.user.id}">
+								<a
+									th:if="${userLogged.followed.contains(saleAdvertisement?.user)} == false"
+									type="button"
+									th:href="@{/follow/} + ${saleAdvertisement?.user.id}"> <i
+									class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+								</a>
+								<a
+									th:unless="${userLogged.followed.contains(saleAdvertisement?.user)} == false"
+									type="button"
+									th:href="@{/unfollow/} + ${saleAdvertisement?.user.id}"> <i
+									class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+								</a>
+							</th:block>
+						</h2>
+						<p>
+							<span th:remove="tag"
+								th:text="${saleAdvertisement?.productDescription}"></span>
+						</p>
+					</div>
+
+					<div class="product-price-btn"
+						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
+						<p>
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
+						</p>
+						<p>
+							<span th:remove="tag"
+								th:text="${#dates.format(sdf.parse(saleAdvertisement?.date), 'dd/MM/yy HH:mm')}">Date</span>
+						</p>
+
+
+
+
+
+						<th:block
+							th:if="${userLogged.id} != ${saleAdvertisement?.user.id}">
+							<p>
+								<a
+									th:if="${userLogged.getLikes().contains(saleAdvertisement)} == false"
+									type="button"
+									th:href="@{/saleAdvertisement/like/} + ${saleAdvertisement?.id}">
+									<i class="far fa-heart" style="color: #fb2c00;"
+									aria-hidden="true"></i>
+								</a>
+							</p>
+							<p>
+								<a
+									th:unless="${userLogged.getLikes().contains(saleAdvertisement)} == false"
+									type="button"
+									th:href="@{/saleAdvertisement/unlike/} + ${saleAdvertisement?.id}">
+									<i class="fas fa-heart" style="color: #fb2c00;"
+									aria-hidden="true"></i>
+								</a>
+							</p>
+						</th:block>
+						<p>
+							<small class="text-muted"><em class="far fa-heart"
+								th:text="${saleAdvertisement?.getLikes().size()}"></em></small>
+						</p>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		<div th:include="fragments/scripts :: general"></div>
+	</footer>
+</body>
+
+</html>
