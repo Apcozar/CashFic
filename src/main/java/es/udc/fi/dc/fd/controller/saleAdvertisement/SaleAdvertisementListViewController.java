@@ -102,6 +102,7 @@ public class SaleAdvertisementListViewController {
 			DefaultUserEntity user = userService.findByLogin(username);
 
 			model.addAttribute(ViewConstants.USER_ID, user.getId());
+			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
 
 			DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(id);
 
