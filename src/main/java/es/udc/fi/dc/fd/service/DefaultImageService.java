@@ -162,6 +162,16 @@ public class DefaultImageService implements ImageService {
 	}
 
 	/**
+	 * Exists image path.
+	 *
+	 * @param imagePath the image path
+	 * @return true, if successful
+	 */
+	public boolean existsImagePath(String imagePath) {
+		return imageRepository.existsImagePath(imagePath);
+	}
+
+	/**
 	 * Returns all the images from the DB.
 	 * 
 	 * @return the persisted images

@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 
 /**
  * A user entity.
@@ -101,6 +102,20 @@ public interface UserEntity extends Serializable {
 	 * @return the user's sale_advertisements
 	 */
 	public Set<DefaultSaleAdvertisementEntity> getSaleAdvertisements();
+
+	/**
+	 * Gets the followers.
+	 *
+	 * @return the followers
+	 */
+	public Set<DefaultUserEntity> getFollowers();
+
+	/**
+	 * Gets the followed.
+	 *
+	 * @return the followed
+	 */
+	public Set<DefaultUserEntity> getFollowed();
 
 	/**
 	 * Sets the identifier assigned to this user.
@@ -187,5 +202,33 @@ public interface UserEntity extends Serializable {
 	 *                          set
 	 */
 	public void removeLike(SaleAdvertisementEntity saleAdvertisement);
+
+	/**
+	 * Adds the follower user to the list of user followers.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowserUser(DefaultUserEntity user);
+
+	/**
+	 * Removes the follower user from the list of used followers.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowserUser(DefaultUserEntity user);
+
+	/**
+	 * Adds the follow user to the list of user followed.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowUser(DefaultUserEntity user);
+
+	/**
+	 * Removes the follow user from the list of used followed.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowUser(DefaultUserEntity user);
 
 }

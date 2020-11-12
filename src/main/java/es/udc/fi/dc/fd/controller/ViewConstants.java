@@ -30,6 +30,12 @@ public class ViewConstants {
 	/** The Constant UPLOADS_FOLDER_NAME. */
 	public static final String UPLOADS_FOLDER_NAME = "/Images";
 
+	/** The Constant SERVER_ERROR. */
+	public static final String SERVER_ERROR = "500";
+
+	/** The Constant USER_ID. */
+	public static final String USER_ID = "userId";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

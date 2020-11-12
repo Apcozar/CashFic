@@ -50,7 +50,7 @@
 
 	<issueManagement>
 		<system>Redmine</system>
-		<url>https://redmine.fic.udc.es/project/CashFIC/issues</url>
+		<url>https://redmine.fic.udc.es/projects/cashfic/issues</url>
 	</issueManagement>
 
 	<ciManagement>

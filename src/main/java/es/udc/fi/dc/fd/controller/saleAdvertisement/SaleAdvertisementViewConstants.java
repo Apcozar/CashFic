@@ -29,6 +29,15 @@ public class SaleAdvertisementViewConstants {
 	/** First image parameter name. */
 	public static final String PARAM_IMAGE = "first";
 
+	/** Name for the UPLOAD_IMAGE_ERROR. */
+	public static final String UPLOAD_IMAGE_ERROR = "uploadImageError";
+
+	/** Name for the SALE_ADVERTISEMENT_FORM. */
+	public static final String SALE_ADVERTISEMENT_FORM = "saleAdvertisementForm";
+
+	/** Name for the MAX_SIZE_ERROR. */
+	public static final String MAX_SIZE_ERROR = "maxSize";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

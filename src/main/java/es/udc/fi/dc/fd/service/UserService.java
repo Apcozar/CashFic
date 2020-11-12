@@ -34,6 +34,8 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 
 /**
  * Service for the user domain.
@@ -123,4 +125,28 @@ public interface UserService {
 	public UserEntity unlike(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
 			throws UserNotFoundException, SaleAdvertisementNotFoundException;
 
+	/**
+	 * Follow user
+	 * 
+	 * @param user         the user
+	 * @param userToFollow the user to follow
+	 * @return the user entity
+	 * @throws UserNotFoundException       the user not found exception
+	 * @throws UserToFollowExistsException the user to follow exists exception
+	 */
+	UserEntity followUser(UserEntity user, UserEntity userToFollow)
+			throws UserNotFoundException, UserToFollowExistsException;
+
+	/**
+	 * Unfollow user.
+	 *
+	 * @param user           the user
+	 * @param userToUnfollow the user to unfollow
+	 * @return the user entity
+	 * @throws UserNotFoundException           the user not found exception
+	 * @throws UserToUnfollowNotFoundException the user to unfollow not found
+	 *                                         exception
+	 */
+	UserEntity unfollowUser(UserEntity user, UserEntity userToUnfollow)
+			throws UserNotFoundException, UserToUnfollowNotFoundException;
 }

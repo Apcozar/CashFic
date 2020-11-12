@@ -54,6 +54,8 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 
 /**
  * Integration tests for the {@link UserService}.
@@ -347,9 +349,9 @@ public class ITUserService {
 	}
 
 	/**
-	 * Check service updates user entity with sale advertisement added to likes list
-	 * persist it and adds in sale advertisement entity the user in likes list Check
-	 * both sides of relationship
+	 * <<<<<<< HEAD Check service updates user entity with sale advertisement added
+	 * to likes list persist it and adds in sale advertisement entity the user in
+	 * likes list Check both sides of relationship
 	 */
 	@Test
 	public void userAddLikeSaleAdvertisementsTest()
@@ -482,4 +484,252 @@ public class ITUserService {
 				.contains(firstUpdatedUser));
 	}
 
+	/**
+	 * Follow user user not found test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToFollowExistsException      the user to follow exists exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void followUserUserNotFoundTest() throws UserNotFoundException, UserToFollowExistsException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToFollow = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(userToFollow);
+
+		user.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.followUser(user, userToFollow);
+		});
+	}
+
+	/**
+	 * Follow user user to follow not found test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToFollowExistsException      the user to follow exists exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void followUserUserToFollowNotFoundTest() throws UserNotFoundException, UserToFollowExistsException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToFollow = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+
+		userToFollow.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.followUser(user, userToFollow);
+		});
+	}
+
+	/**
+	 * Follow user user to follow exists test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToFollowExistsException      the user to follow exists exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void followUserUserToFollowExistsTest() throws UserNotFoundException, UserToFollowExistsException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToFollow = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToFollow);
+
+		userService.followUser(user, userToFollow);
+
+		Assertions.assertThrows(UserToFollowExistsException.class, () -> {
+			userService.followUser(user, userToFollow);
+		});
+	}
+
+	/**
+	 * Follow user test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToFollowExistsException      the user to follow exists exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void followUserTest() throws UserNotFoundException, UserToFollowExistsException, UserLoginExistsException,
+			UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
+		DefaultUserEntity user3 = createUser("login3", "user3@udc.es");
+		DefaultUserEntity user4 = createUser("login4", "user4@udc.es");
+
+		userService.signUp(user);
+		userService.signUp(user2);
+		userService.signUp(user3);
+		userService.signUp(user4);
+
+		// Check if one user follows only one user in both directions
+		Assert.assertEquals(user.getFollowed().size(), 0);
+		userService.followUser(user, user2);
+		Assert.assertTrue(user.getFollowed().contains(user2));
+		Assert.assertTrue(user2.getFollowers().contains(user));
+		Assert.assertEquals(user2.getFollowers().size(), 1);
+
+		// Check if one user follows many users in both directions
+		userService.followUser(user, user3);
+		userService.followUser(user, user4);
+		Assert.assertEquals(user.getFollowed().size(), 3);
+		Assert.assertTrue(user.getFollowed().contains(user3));
+		Assert.assertTrue(user3.getFollowers().contains(user));
+		Assert.assertEquals(user3.getFollowers().size(), 1);
+		Assert.assertTrue(user.getFollowed().contains(user4));
+		Assert.assertTrue(user4.getFollowers().contains(user));
+		Assert.assertEquals(user4.getFollowers().size(), 1);
+	}
+
+	/**
+	 * Unfollow user user not found test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToUnfollowNotFoundException  the user to unfollow not found
+	 *                                          exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void unfollowUserUserNotFoundTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToUnfollow = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(userToUnfollow);
+
+		user.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.unfollowUser(user, userToUnfollow);
+		});
+	}
+
+	/**
+	 * Unfollow user user to unfollow test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToUnfollowNotFoundException  the user to unfollow not found
+	 *                                          exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void unfollowUserUserToUnfollowNotFoundTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToUnfollow = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+
+		userToUnfollow.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.unfollowUser(user, userToUnfollow);
+		});
+	}
+
+	/**
+	 * Unfollow user user to follow not found test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToUnfollowNotFoundException  the user to unfollow not found
+	 *                                          exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	public void unfollowUserUserToFollowNotExistsTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToUnfollow = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToUnfollow);
+
+		Assertions.assertThrows(UserToUnfollowNotFoundException.class, () -> {
+			userService.unfollowUser(user, userToUnfollow);
+		});
+	}
+
+	/**
+	 * Unfollow user test.
+	 *
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws UserToUnfollowNotFoundException  the user to unfollow not found
+	 *                                          exception
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserToFollowExistsException      the user to follow exists exception
+	 */
+	@Test
+	public void unfollowUserTest()
+			throws UserNotFoundException, UserToUnfollowNotFoundException, UserLoginExistsException,
+			UserEmailExistsException, UserLoginAndEmailExistsException, UserToFollowExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
+		DefaultUserEntity user3 = createUser("login3", "user3@udc.es");
+		DefaultUserEntity user4 = createUser("login4", "user4@udc.es");
+
+		userService.signUp(user);
+		userService.signUp(user2);
+		userService.signUp(user3);
+		userService.signUp(user4);
+
+		// Check if one user unfollows only one user in both directions
+		userService.followUser(user, user2);
+		userService.unfollowUser(user, user2);
+		Assert.assertEquals(user.getFollowed().size(), 0);
+		Assert.assertFalse(user.getFollowed().contains(user2));
+		Assert.assertFalse(user2.getFollowers().contains(user));
+
+		// Check if one user unfollows many users in both directions
+		userService.followUser(user, user2);
+		userService.followUser(user, user3);
+		userService.followUser(user, user4);
+		userService.unfollowUser(user, user2);
+		Assert.assertEquals(user.getFollowed().size(), 2);
+		Assert.assertFalse(user.getFollowed().contains(user2));
+		Assert.assertFalse(user2.getFollowers().contains(user));
+		Assert.assertEquals(user2.getFollowers().size(), 0);
+		userService.unfollowUser(user, user3);
+		Assert.assertEquals(user.getFollowed().size(), 1);
+		Assert.assertFalse(user.getFollowed().contains(user3));
+		Assert.assertFalse(user3.getFollowers().contains(user));
+		Assert.assertEquals(user3.getFollowers().size(), 0);
+		userService.unfollowUser(user, user4);
+		Assert.assertEquals(user.getFollowed().size(), 0);
+		Assert.assertFalse(user.getFollowed().contains(user3));
+		Assert.assertFalse(user4.getFollowers().contains(user));
+		Assert.assertEquals(user4.getFollowers().size(), 0);
+	}
 }

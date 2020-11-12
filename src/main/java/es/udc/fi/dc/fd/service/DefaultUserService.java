@@ -47,6 +47,8 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 
 /**
  * Default implementation of the user service.
@@ -69,8 +71,9 @@ public class DefaultUserService implements UserService {
 
 	/**
 	 * Constructs an user service with the specified repository.
-	 *
-	 * @param repository the repository for the user instances
+	 * 
+	 * @param repository                  the repository for the user instances
+	 * @param saleAdvertisementRepository the repository for sale advertisements
 	 */
 	@Autowired
 	public DefaultUserService(final UserRepository repository,
@@ -188,4 +191,38 @@ public class DefaultUserService implements UserService {
 		return userDao.save((DefaultUserEntity) user);
 	}
 
+	public UserEntity followUser(UserEntity user, UserEntity userToFollow)
+			throws UserNotFoundException, UserToFollowExistsException {
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		if (!userDao.existsById(userToFollow.getId())) {
+			throw new UserNotFoundException(userToFollow.getId());
+		}
+		if (user.getFollowed().contains(userToFollow)) {
+			throw new UserToFollowExistsException(userToFollow);
+		}
+		user.addFollowUser((DefaultUserEntity) userToFollow);
+		userToFollow.addFollowserUser((DefaultUserEntity) user);
+		userDao.save((DefaultUserEntity) userToFollow);
+		return userDao.save((DefaultUserEntity) user);
+	}
+
+	@Override
+	public UserEntity unfollowUser(UserEntity user, UserEntity userToUnfollow)
+			throws UserNotFoundException, UserToUnfollowNotFoundException {
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		if (!userDao.existsById(userToUnfollow.getId())) {
+			throw new UserNotFoundException(userToUnfollow.getId());
+		}
+		if (!user.getFollowed().contains(userToUnfollow)) {
+			throw new UserToUnfollowNotFoundException(userToUnfollow);
+		}
+		user.removeFollowUser((DefaultUserEntity) userToUnfollow);
+		userToUnfollow.removeFollowserUser((DefaultUserEntity) user);
+		userDao.save((DefaultUserEntity) userToUnfollow);
+		return userDao.save((DefaultUserEntity) user);
+	}
 }
