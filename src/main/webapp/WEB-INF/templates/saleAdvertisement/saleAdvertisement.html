@@ -159,24 +159,28 @@
 							<h2>
 								<span th:remove="tag" th:text="${saleAdvertisement?.user.login}"></span>
 								<th:block
-								th:if="${userLogged.id} != ${saleAdvertisement?.user.id}">
-								<a
-									th:if="${userLogged.followed.contains(saleAdvertisement?.user)} == false"
-									type="button"
-									th:href="@{/follow/} + ${saleAdvertisement?.user.id}"> <i
-									class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
-								</a>
-								<a
-									th:unless="${userLogged.followed.contains(saleAdvertisement?.user)} == false"
-									type="button"
-									th:href="@{/unfollow/} + ${saleAdvertisement?.user.id}"> <i
-									class="fa fa-user-times fa-lg" aria-hidden="true"></i>
-								</a>
-							</th:block>
+									th:if="${userLogged.id} != ${saleAdvertisement?.user.id}">
+									<a
+										th:if="${userLogged.followed.contains(saleAdvertisement?.user)} == false"
+										type="button"
+										th:href="@{/follow/} + ${saleAdvertisement?.user.id}"> <i
+										class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+									</a>
+									<a
+										th:unless="${userLogged.followed.contains(saleAdvertisement?.user)} == false"
+										type="button"
+										th:href="@{/unfollow/} + ${saleAdvertisement?.user.id}"> <i
+										class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+									</a>
+								</th:block>
 							</h2>
 							<p>
 								<span th:remove="tag"
 									th:text="${saleAdvertisement?.productDescription}"></span>
+							</p>
+							<p>
+								<span th:remove="tag"><i class="fa fa-map-marker"
+									aria-hidden="true" th:text="${saleAdvertisement?.user.city}"></i></span>
 							</p>
 						</div>
 
@@ -189,32 +193,32 @@
 								<span th:remove="tag"
 									th:text="${#dates.format(sdf.parse(saleAdvertisement?.date), 'dd/MM/yy HH:mm')}">Date</span>
 							</p>
-							
+
 							<th:block
-							th:if="${userLogged.id} != ${saleAdvertisement?.user.id}">
+								th:if="${userLogged.id} != ${saleAdvertisement?.user.id}">
+								<p>
+									<a
+										th:if="${userLogged.getLikes().contains(saleAdvertisement)} == false"
+										type="button"
+										th:href="@{/saleAdvertisement/like/} + ${saleAdvertisement?.id}">
+										<i class="far fa-heart" style="color: #fb2c00;"
+										aria-hidden="true"></i>
+									</a>
+								</p>
+								<p>
+									<a
+										th:unless="${userLogged.getLikes().contains(saleAdvertisement)} == false"
+										type="button"
+										th:href="@{/saleAdvertisement/unlike/} + ${saleAdvertisement?.id}">
+										<i class="fas fa-heart" style="color: #fb2c00;"
+										aria-hidden="true"></i>
+									</a>
+								</p>
+							</th:block>
 							<p>
-								<a
-									th:if="${userLogged.getLikes().contains(saleAdvertisement)} == false"
-									type="button"
-									th:href="@{/saleAdvertisement/like/} + ${saleAdvertisement?.id}">
-									<i class="far fa-heart" style="color: #fb2c00;"
-									aria-hidden="true"></i>
-								</a>
+								<small class="text-muted"><em class="far fa-heart"
+									th:text="${saleAdvertisement?.getLikes().size()}"></em></small>
 							</p>
-							<p>
-								<a
-									th:unless="${userLogged.getLikes().contains(saleAdvertisement)} == false"
-									type="button"
-									th:href="@{/saleAdvertisement/unlike/} + ${saleAdvertisement?.id}">
-									<i class="fas fa-heart" style="color: #fb2c00;"
-									aria-hidden="true"></i>
-								</a>
-							</p>
-						</th:block>
-						<p>
-							<small class="text-muted"><em class="far fa-heart"
-								th:text="${saleAdvertisement?.getLikes().size()}"></em></small>
-						</p>
 						</div>
 					</div>
 				</div>

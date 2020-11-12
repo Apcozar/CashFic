@@ -95,6 +95,9 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	private final boolean userLikeSaleAdvertisement;
 
+	/** The city of the user. */
+	private final String city;
+
 	public BigDecimal getPrice() {
 		return price;
 	}
@@ -122,6 +125,7 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		this.loggedUserFollowsSaleAdvertisementUser = loggedUserFollowsSaleAdvertisementUser;
 		state = saleAdvertisement.getState().toString();
 		price = saleAdvertisement.getPrice();
+		city = saleAdvertisement.getUser().getCity();
 
 		saleAdvertisement.getImages().forEach((image) -> {
 			images.add(new ImageDTO(image));
@@ -192,6 +196,10 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 
 	public boolean isLoggedUserFollowsSaleAdvertisementUser() {
 		return loggedUserFollowsSaleAdvertisementUser;
+	}
+
+	public String getCity() {
+		return city;
 	}
 
 	@Override
@@ -280,7 +288,8 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 				+ state + ", ownerUserId=" + ownerUserId + ", date=" + date + ", saleAdvertisementID="
 				+ saleAdvertisementID + ", saleAdvertisementLikesCount=" + saleAdvertisementLikesCount
 				+ ", userLikeSaleAdvertisement=" + userLikeSaleAdvertisement
-				+ ", loggedUserFollowsSaleAdvertisementUser=" + loggedUserFollowsSaleAdvertisementUser + "]";
+				+ ", loggedUserFollowsSaleAdvertisementUser=" + loggedUserFollowsSaleAdvertisementUser + ", city="
+				+ city + "]";
 	}
 
 }

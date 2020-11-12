@@ -347,6 +347,12 @@ public class SaleAdvertisementListViewController {
 			}
 
 			deleteImages(saleAdvertisement.getImages());
+
+			Object[] likes = saleAdvertisement.getLikes().toArray();
+			for (int i = 0; i < likes.length; i++) {
+				userService.unlike((UserEntity) likes[i], saleAdvertisement);
+			}
+
 			saleAdvertisementService.remove((DefaultSaleAdvertisementEntity) saleAdvertisement);
 
 			model.addAttribute("addSaleAdvertisementRemove", "addSaleAdvertisementRemove");

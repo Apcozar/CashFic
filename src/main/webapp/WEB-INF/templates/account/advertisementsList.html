@@ -174,12 +174,16 @@
 							<span th:remove="tag"
 								th:text="${saleAdvertisement?.productDescription}"></span>
 						</p>
+						<p>
+							<span th:remove="tag"><i class="fa fa-map-marker" aria-hidden="true"
+								th:text="${saleAdvertisement?.user.city}"></i></span>
+						</p>
 					</div>
 
 					<div class="product-price-btn"
 						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>â‚¬
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
 						</p>
 						<p>
 							<span th:remove="tag"
