@@ -197,11 +197,11 @@
 				<database.tag>postgres</database.tag>
 			</properties>
 			<dependencies>
-					<!-- https://mvnrepository.com/artifact/org.checkerframework/checker-qual -->
+				<!-- https://mvnrepository.com/artifact/org.checkerframework/checker-qual -->
 				<dependency>
-				    <groupId>org.checkerframework</groupId>
-				    <artifactId>checker-qual</artifactId>
-				    <version>3.6.1</version>
+					<groupId>org.checkerframework</groupId>
+					<artifactId>checker-qual</artifactId>
+					<version>3.6.1</version>
 				</dependency>
 				<dependency>
 					<!-- Postgres connector -->
@@ -478,7 +478,7 @@
 		<thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
 		<webjars.bootstrap.version>3.4.1</webjars.bootstrap.version>
 		<webjars.bootswatch.version>3.3.7</webjars.bootswatch.version>
-		<webjars.fontAwesome.version>5.7.2</webjars.fontAwesome.version>
+		<webjars.fontAwesome.version>5.15.1</webjars.fontAwesome.version>
 		<webjars.html5shiv.version>3.7.3-1</webjars.html5shiv.version>
 		<webjars.jquery.version>3.3.1-2</webjars.jquery.version>
 		<webjars.locator.version>0.34</webjars.locator.version>
@@ -624,32 +624,32 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<!-- Spring Security -->
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 			<version>5.1.6.RELEASE</version>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<!-- Spring Security -->
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<version>5.0.0.RELEASE</version>
-		</dependency>	
-		<dependency>
-			<!-- Spring Security -->
-   		 	<groupId>org.springframework.security</groupId>
-    		<artifactId>spring-security-web</artifactId>
-   			 <version>5.0.0.RELEASE</version>
 		</dependency>
 		<dependency>
 			<!-- Spring Security -->
-    		<groupId>org.springframework.security</groupId>
-    		<artifactId>spring-security-config</artifactId>
-    		<version>5.0.0.RELEASE</version>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>5.0.0.RELEASE</version>
 		</dependency>
-		
+		<dependency>
+			<!-- Spring Security -->
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>5.0.0.RELEASE</version>
+		</dependency>
+
 		<!-- ============================================== -->
 		<!-- ================= ASPECTJ ==================== -->
 		<!-- ============================================== -->
@@ -727,9 +727,9 @@
 			<version>${thymeleaf.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.thymeleaf.extras</groupId>
-		    <artifactId>thymeleaf-extras-springsecurity5</artifactId>
-		    <version>3.0.4.RELEASE</version>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity5</artifactId>
+			<version>3.0.4.RELEASE</version>
 		</dependency>
 		<!-- ============================================== -->
 		<!-- ============== JASPERREPORTS ================= -->
@@ -877,21 +877,21 @@
 			<version>${glassfish.el}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
 		<dependency>
-		    <groupId>commons-fileupload</groupId>
-		    <artifactId>commons-fileupload</artifactId>
-		    <version>1.4</version>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.4</version>
 		</dependency>
-	
-	    <!-- Apache Commons IO -->
-	    <dependency>
-	      <groupId>commons-io</groupId>
-	      <artifactId>commons-io</artifactId>
-	      <version>2.8.0</version>
-	    </dependency>
-		
+
+		<!-- Apache Commons IO -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+
 		<!-- ============================================== -->
 		<!-- =========== VERSION ENFORCEMENT ============== -->
 		<!-- ============================================== -->

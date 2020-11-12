@@ -32,6 +32,8 @@ import org.springframework.data.domain.Pageable;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
@@ -143,5 +145,39 @@ public interface SaleAdvertisementService {
 	 * @return the maximum price
 	 */
 	public BigDecimal getMaximumPrice();
+
+	/**
+	 * Are hold advertisement.
+	 *
+	 * @param identifier the identifier
+	 * @return true, if successful
+	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
+	 *                                            exception
+	 */
+	public boolean areOnHoldAdvertisement(Integer identifier) throws SaleAdvertisementNotFoundException;
+
+	/**
+	 * Sets the advertisement on hold state.
+	 *
+	 * @param identifier the new on hold advertisement
+	 * @throws SaleAdvertisementNotFoundException      the sale advertisement not
+	 *                                                 found exception
+	 * @throws SaleAdvertisementAlreadyOnHoldException the sale advertisement
+	 *                                                 already on hold exception
+	 */
+	public void setOnHoldAdvertisement(Integer identifier)
+			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException;
+
+	/**
+	 * Sets the advertisement on sale state.
+	 *
+	 * @param identifier the new on sale advertisement
+	 * @throws SaleAdvertisementNotFoundException      the sale advertisement not
+	 *                                                 found exception
+	 * @throws SaleAdvertisementAlreadyOnSaleException the sale advertisement
+	 *                                                 already on sale exception
+	 */
+	public void setOnSaleAdvertisement(Integer identifier)
+			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnSaleException;
 
 }

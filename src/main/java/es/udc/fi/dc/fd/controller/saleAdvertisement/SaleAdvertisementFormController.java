@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,17 +129,20 @@ public class SaleAdvertisementFormController {
 
 			DefaultUserEntity user = userService.findByLogin(username);
 
-			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService
-					.add(new DefaultSaleAdvertisementEntity(saleAdvertisementForm.getProductTitle(),
-							saleAdvertisementForm.getProductDescription(), user, LocalDateTime.now()));
+			double price = Double.parseDouble(saleAdvertisementForm.getPrice());
+
+			DefaultSaleAdvertisementEntity defaultSaleAdvertisement = new DefaultSaleAdvertisementEntity(
+					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user,
+					LocalDateTime.now());
+
+			defaultSaleAdvertisement.setPrice(BigDecimal.valueOf(price));
+
+			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.add(defaultSaleAdvertisement);
 
 			if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
 				uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
 
-			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
-			model.addAttribute(ViewConstants.USER_ID, user.getId());
-
-			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT;
+			return "redirect:" + "/saleAdvertisement/" + saleAdvertisement.getId();
 
 		} catch (UserNotFoundException e) {
 			return ViewConstants.VIEW_SIGNIN;

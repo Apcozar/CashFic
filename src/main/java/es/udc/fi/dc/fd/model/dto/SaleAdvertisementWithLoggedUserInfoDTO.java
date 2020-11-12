@@ -25,6 +25,7 @@
 package es.udc.fi.dc.fd.model.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -62,11 +63,28 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 * Sale advertisement's owner user Login
 	 */
 	private final String ownerUserLogin;
+
+	/**
+	 * Sale advertisement's state
+	 */
+	private final String state;
+
+	public String getState() {
+		return state;
+	}
+
+	/**
+	 * Sale advertisement's owner user identifier
+	 */
+	private final Integer ownerUserId;
+
 	/**
 	 * Sale advertisement's publish date
 	 */
 	private final LocalDateTime date;
-	// Should not use id?
+
+	private final BigDecimal price;
+
 	private final Integer saleAdvertisementID;
 	/**
 	 * Sale advertisement's likes count
@@ -77,11 +95,20 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	private final boolean userLikeSaleAdvertisement;
 
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	/**
+	 * boolean true if logged user likes sale advertisement false if not
+	 */
+	private final boolean loggedUserFollowsSaleAdvertisementUser;
+
 	/**
 	 * Constructs SaleAdvertisementWithLoggedUserInfoDTO DTO.
 	 */
 	public SaleAdvertisementWithLoggedUserInfoDTO(SaleAdvertisementEntity saleAdvertisement,
-			boolean userLikeSaleAdvertisement) {
+			boolean userLikeSaleAdvertisement, boolean loggedUserFollowsSaleAdvertisementUser) {
 		super();
 
 		productTitle = saleAdvertisement.getProductTitle();
@@ -91,6 +118,10 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		saleAdvertisementID = saleAdvertisement.getId();
 		date = saleAdvertisement.getDate();
 		this.userLikeSaleAdvertisement = userLikeSaleAdvertisement;
+		ownerUserId = saleAdvertisement.getUser().getId();
+		this.loggedUserFollowsSaleAdvertisementUser = loggedUserFollowsSaleAdvertisementUser;
+		state = saleAdvertisement.getState().toString();
+		price = saleAdvertisement.getPrice();
 
 		saleAdvertisement.getImages().forEach((image) -> {
 			images.add(new ImageDTO(image));
@@ -155,17 +186,28 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		return userLikeSaleAdvertisement;
 	}
 
+	public Integer getOwnerUserId() {
+		return ownerUserId;
+	}
+
+	public boolean isLoggedUserFollowsSaleAdvertisementUser() {
+		return loggedUserFollowsSaleAdvertisementUser;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((date == null) ? 0 : date.hashCode());
 		result = prime * result + ((images == null) ? 0 : images.hashCode());
+		result = prime * result + (loggedUserFollowsSaleAdvertisementUser ? 1231 : 1237);
+		result = prime * result + ((ownerUserId == null) ? 0 : ownerUserId.hashCode());
 		result = prime * result + ((ownerUserLogin == null) ? 0 : ownerUserLogin.hashCode());
 		result = prime * result + ((productDescription == null) ? 0 : productDescription.hashCode());
 		result = prime * result + ((productTitle == null) ? 0 : productTitle.hashCode());
 		result = prime * result + ((saleAdvertisementID == null) ? 0 : saleAdvertisementID.hashCode());
 		result = prime * result + ((saleAdvertisementLikesCount == null) ? 0 : saleAdvertisementLikesCount.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
 		result = prime * result + (userLikeSaleAdvertisement ? 1231 : 1237);
 		return result;
 	}
@@ -188,6 +230,13 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 			if (other.images != null)
 				return false;
 		} else if (!images.equals(other.images))
+			return false;
+		if (loggedUserFollowsSaleAdvertisementUser != other.loggedUserFollowsSaleAdvertisementUser)
+			return false;
+		if (ownerUserId == null) {
+			if (other.ownerUserId != null)
+				return false;
+		} else if (!ownerUserId.equals(other.ownerUserId))
 			return false;
 		if (ownerUserLogin == null) {
 			if (other.ownerUserLogin != null)
@@ -214,6 +263,11 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 				return false;
 		} else if (!saleAdvertisementLikesCount.equals(other.saleAdvertisementLikesCount))
 			return false;
+		if (state == null) {
+			if (other.state != null)
+				return false;
+		} else if (!state.equals(other.state))
+			return false;
 		if (userLikeSaleAdvertisement != other.userLikeSaleAdvertisement)
 			return false;
 		return true;
@@ -221,10 +275,12 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 
 	@Override
 	public String toString() {
-		return "SaleAdvertisementDTO [images=" + images + ", productTitle=" + productTitle + ", productDescription="
-				+ productDescription + ", ownerUserLogin=" + ownerUserLogin + ", date=" + date
-				+ ", saleAdvertisementID=" + saleAdvertisementID + ", saleAdvertisementLikesCount="
-				+ saleAdvertisementLikesCount + ", userLikeSaleAdvertisement=" + userLikeSaleAdvertisement + "]";
+		return "SaleAdvertisementWithLoggedUserInfoDTO [images=" + images + ", productTitle=" + productTitle
+				+ ", productDescription=" + productDescription + ", ownerUserLogin=" + ownerUserLogin + ", state="
+				+ state + ", ownerUserId=" + ownerUserId + ", date=" + date + ", saleAdvertisementID="
+				+ saleAdvertisementID + ", saleAdvertisementLikesCount=" + saleAdvertisementLikesCount
+				+ ", userLikeSaleAdvertisement=" + userLikeSaleAdvertisement
+				+ ", loggedUserFollowsSaleAdvertisementUser=" + loggedUserFollowsSaleAdvertisementUser + "]";
 	}
 
 }

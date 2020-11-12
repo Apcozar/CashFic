@@ -24,6 +24,7 @@
 
 package es.udc.fi.dc.fd.test.integration.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -367,6 +368,7 @@ public class ITUserService {
 		firstSaleAdvertisement.setProductDescription("first sale advertisement product description test");
 		firstSaleAdvertisement.setProductTitle("first saleAdv title test");
 		firstSaleAdvertisement.setUser(user);
+		firstSaleAdvertisement.setPrice(BigDecimal.valueOf(10));
 
 		SaleAdvertisementEntity storedFirstSaleAdvertisement = saleAdvertisementService.add(firstSaleAdvertisement);
 
@@ -400,6 +402,7 @@ public class ITUserService {
 		firstSaleAdvertisement.setProductDescription("first sale advertisement product description test");
 		firstSaleAdvertisement.setProductTitle("first saleAdv title test");
 		firstSaleAdvertisement.setUser(user);
+		firstSaleAdvertisement.setPrice(BigDecimal.valueOf(10));
 
 		SaleAdvertisementEntity storedFirstSaleAdvertisement = saleAdvertisementService.add(firstSaleAdvertisement);
 		// User like sale advertisement
@@ -439,6 +442,7 @@ public class ITUserService {
 		firstSaleAdvertisement.setProductDescription("first sale advertisement product description test");
 		firstSaleAdvertisement.setProductTitle("first saleAdv title test");
 		firstSaleAdvertisement.setUser(firstUser);
+		firstSaleAdvertisement.setPrice(BigDecimal.valueOf(10));
 
 		SaleAdvertisementEntity storedFirstSaleAdvertisement = saleAdvertisementService.add(firstSaleAdvertisement);
 
@@ -448,6 +452,7 @@ public class ITUserService {
 		secondSaleAdvertisement.setProductDescription("first sale advertisement product description test");
 		secondSaleAdvertisement.setProductTitle("first saleAdv title test");
 		secondSaleAdvertisement.setUser(firstUser);
+		secondSaleAdvertisement.setPrice(BigDecimal.valueOf(10));
 
 		SaleAdvertisementEntity storedSecondSaleAdvertisement = saleAdvertisementService.add(secondSaleAdvertisement);
 
@@ -457,6 +462,7 @@ public class ITUserService {
 		thirthSaleAdvertisement.setProductDescription("first sale advertisement product description test");
 		thirthSaleAdvertisement.setProductTitle("first saleAdv title test");
 		thirthSaleAdvertisement.setUser(firstUser);
+		thirthSaleAdvertisement.setPrice(BigDecimal.valueOf(10));
 
 		SaleAdvertisementEntity storedThirthSaleAdvertisement = saleAdvertisementService.add(thirthSaleAdvertisement);
 

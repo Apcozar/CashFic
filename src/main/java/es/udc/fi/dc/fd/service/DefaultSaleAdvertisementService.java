@@ -28,17 +28,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.State;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
 import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
@@ -236,4 +240,49 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		return saleAdvertisementRepository.getMaximumPrice();
 	}
 
+	@Override
+	public boolean areOnHoldAdvertisement(Integer identifier) throws SaleAdvertisementNotFoundException {
+		Optional<DefaultSaleAdvertisementEntity> saleAdvertisement = saleAdvertisementRepository.findById(identifier);
+
+		if (!saleAdvertisement.isPresent())
+			throw new SaleAdvertisementNotFoundException(identifier);
+
+		State state = saleAdvertisement.get().getState();
+
+		return state.equals(State.STATE_ON_HOLD);
+	}
+
+	@Override
+	public void setOnHoldAdvertisement(Integer identifier)
+			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException {
+		Optional<DefaultSaleAdvertisementEntity> saleAdvertisement = saleAdvertisementRepository.findById(identifier);
+
+		if (!saleAdvertisement.isPresent())
+			throw new SaleAdvertisementNotFoundException(identifier);
+
+		State state = saleAdvertisement.get().getState();
+
+		if (state.equals(State.STATE_ON_HOLD))
+			throw new SaleAdvertisementAlreadyOnHoldException(identifier);
+
+		saleAdvertisement.get().setState(State.STATE_ON_HOLD);
+		saleAdvertisementRepository.save(saleAdvertisement.get());
+	}
+
+	@Override
+	public void setOnSaleAdvertisement(Integer identifier)
+			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnSaleException {
+		Optional<DefaultSaleAdvertisementEntity> saleAdvertisement = saleAdvertisementRepository.findById(identifier);
+
+		if (!saleAdvertisement.isPresent())
+			throw new SaleAdvertisementNotFoundException(identifier);
+
+		State state = saleAdvertisement.get().getState();
+
+		if (state.equals(State.STATE_ON_SALE))
+			throw new SaleAdvertisementAlreadyOnSaleException(identifier);
+
+		saleAdvertisement.get().setState(State.STATE_ON_SALE);
+		saleAdvertisementRepository.save(saleAdvertisement.get());
+	}
 }

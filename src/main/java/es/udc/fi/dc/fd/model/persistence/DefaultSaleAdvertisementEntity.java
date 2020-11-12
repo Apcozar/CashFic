@@ -47,6 +47,7 @@ import javax.persistence.Transient;
 import com.google.common.base.MoreObjects;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.State;
 
 /**
  * Persistent entity for the sale_advertisements.
@@ -129,6 +130,10 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	@Column(name = "price", nullable = true, unique = false)
 	private BigDecimal price;
 
+	/** The state. */
+	@Column(name = "state", nullable = true, unique = false)
+	private State state;
+
 	/**
 	 * Constructs an sale_advertisement entity.
 	 */
@@ -145,6 +150,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		this.user = user;
 		this.date = date;
 		this.images = new HashSet<>();
+		this.state = State.STATE_ON_SALE;
 	}
 
 	public DefaultSaleAdvertisementEntity(String product_title, String product_description,
@@ -155,6 +161,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		this.images = images;
 		this.user = user;
 		this.date = date;
+		this.state = State.STATE_ON_SALE;
 	}
 
 	public DefaultSaleAdvertisementEntity(String productTitle, String productDescription, DefaultUserEntity user,
@@ -164,6 +171,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		this.product_description = productDescription;
 		this.user = user;
 		this.date = date;
+		this.state = State.STATE_ON_SALE;
 	}
 
 	@Override
@@ -183,7 +191,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		final DefaultSaleAdvertisementEntity other = (DefaultSaleAdvertisementEntity) obj;
 		return Objects.equals(id, other.id) && Objects.equals(date, other.date)
 				&& Objects.equals(product_description, other.product_description)
-				&& Objects.equals(product_title, other.product_title);
+				&& Objects.equals(product_title, other.product_title) && Objects.equals(state, other.state);
 	}
 
 	/**
@@ -222,6 +230,11 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	@Override
 	public LocalDateTime getDate() {
 		return date;
+	}
+
+	@Override
+	public State getState() {
+		return state;
 	}
 
 	@Override
@@ -265,6 +278,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	}
 
 	@Override
+
 	public void addUsersLike(DefaultUserEntity user) {
 		checkNotNull(user, "Received a null pointer as user");
 		usersLikes.add(user);
@@ -279,6 +293,11 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	@Override
 	public Set<DefaultUserEntity> getLikes() {
 		return usersLikes;
+	}
+
+	public void setState(final State value) {
+		state = checkNotNull(value, "Received a null pointer as state");
+
 	}
 
 	@Override

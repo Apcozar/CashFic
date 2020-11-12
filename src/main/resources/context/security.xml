@@ -13,7 +13,9 @@
         <intercept-url pattern="/signIn" access="isAnonymous()"/>
         <intercept-url pattern="/signUp" access="isAnonymous()"/>
         <intercept-url pattern="/profile" access="isAuthenticated()"/>
+        <intercept-url pattern="/profile/**" access="isAuthenticated()"/>
         <intercept-url pattern="/saleAdvertisement/**" access="isAuthenticated()"/>
+
   
         <form-login login-page="/signIn" default-target-url="/" always-use-default-target="false" authentication-failure-url="/signIn?error" username-parameter="login" password-parameter="password"/>
         <logout logout-url="/logout" logout-success-url="/" delete-cookies="JSESSIONID"/>

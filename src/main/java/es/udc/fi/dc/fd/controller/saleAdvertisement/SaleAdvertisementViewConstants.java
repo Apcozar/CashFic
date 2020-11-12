@@ -38,6 +38,15 @@ public class SaleAdvertisementViewConstants {
 	/** Name for the MAX_SIZE_ERROR. */
 	public static final String MAX_SIZE_ERROR = "maxSize";
 
+	/** The Constant VIEW_NAME. */
+	public static final String VIEW_NAME = "viewName";
+
+	/** The Constant VIEW_LIST. */
+	public static final String VIEW_LIST = "viewList";
+
+	/** The Constant VIEW_FILTERED_LIST. */
+	public static final String VIEW_FILTERED_LIST = "viewFilteredList";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

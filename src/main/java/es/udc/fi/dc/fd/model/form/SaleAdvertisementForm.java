@@ -29,6 +29,24 @@ public class SaleAdvertisementForm implements Serializable {
 	@Size(min = 1, max = 30, message = "{productTitleSize}")
 	private String productTitle;
 
+	/** The price. */
+	@NotEmpty(message = "{notEmpty}")
+	private String price;
+
+	/**
+	 * @return the price
+	 */
+	public String getPrice() {
+		return price;
+	}
+
+	/**
+	 * @param price the price to set
+	 */
+	public void setPrice(String price) {
+		this.price = price;
+	}
+
 	/** The image file. */
 	private transient List<MultipartFile> imageFile;
 
@@ -92,7 +110,7 @@ public class SaleAdvertisementForm implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(productDescription, productTitle, imageFile);
+		return Objects.hash(productDescription, productTitle, imageFile, price);
 	}
 
 	/**
@@ -111,7 +129,8 @@ public class SaleAdvertisementForm implements Serializable {
 			return false;
 		SaleAdvertisementForm other = (SaleAdvertisementForm) obj;
 		return Objects.equals(productDescription, other.productDescription)
-				&& Objects.equals(productTitle, other.productTitle) && Objects.equals(imageFile, other.imageFile);
+				&& Objects.equals(productTitle, other.productTitle) && Objects.equals(imageFile, other.imageFile)
+				&& Objects.equals(price, other.price);
 	}
 
 	/**
@@ -122,7 +141,7 @@ public class SaleAdvertisementForm implements Serializable {
 	@Override
 	public String toString() {
 		return "SaleAdvertisementForm [productDescription=" + productDescription + ", productTitle=" + productTitle
-				+ "]";
+				+ ", price=" + price + "]";
 	}
 
 }
