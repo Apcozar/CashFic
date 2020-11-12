@@ -285,6 +285,60 @@ public class AccountController {
 	}
 
 	/**
+	 * Show user followers by id.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/{id}/advertisements")
+	public String showUserAdvertisements(@PathVariable(value = "id") Integer id, Model model) {
+
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+
+			DefaultUserEntity user;
+			user = userService.findById(id);
+			model.addAttribute(AccountViewConstants.USER, user);
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, user.getSaleAdvertisements());
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_ADVERTISEMENTS);
+			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Show user followed by user id.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/{id}/likes")
+	public String showUserLikes(@PathVariable(value = "id") Integer id, Model model) {
+
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+
+			DefaultUserEntity user;
+			user = userService.findById(id);
+			model.addAttribute(AccountViewConstants.USER, user);
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, user.getLikes());
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_LIKES);
+			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
 	 * Check if the user name and email already exits
 	 * 
 	 * @param signUpForm the sign up form

@@ -56,15 +56,14 @@
 						<ul class="list-inline">
 							<li class="list-inline-item">
 								<h5 class="text-center">
-									<a th:href="@{/profile/} + ${user.id}"
+									<a th:href="@{/profile/} + ${user.id} + @{/advertisements}"
 										th:text="${user.getSaleAdvertisements().size()}"></a>
 								</h5> <small class="text-muted"><em class="fa fa-picture-o"
 									th:text="#{label.Adds}"></em></small>
 							</li>
-<!-- CAMBIAAAAAAR DESPUEEEEES -->
 							<li class="list-inline-item">
 								<h5 class="text-center">
-									<a th:href="@{/profile/} + ${user.id}"
+									<a th:href="@{/profile/} + ${user.id} + @{/likes}"
 										th:text="${user.getLikes().size()}"></a>
 								</h5> <small class="text-muted"><em class="fa fa-picture-o"
 									th:text="#{label.Likes}"></em></small>

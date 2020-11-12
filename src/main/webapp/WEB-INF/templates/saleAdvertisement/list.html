@@ -134,13 +134,10 @@
 							</a>
 						</div>
 					</div>
-
 					<div th:unless="${saleAdvertisement?.images.isEmpty() == false}"
 						class="no_images">
 						<h3 th:text="#{label.noImages}"></h3>
 					</div>
-
-
 				</div>
 
 				<div class="product-info">
@@ -192,22 +189,28 @@
 								th:text="${#dates.format(sdf.parse(saleAdvertisement?.date), 'dd/MM/yy HH:mm')}">Date</span>
 						</p>
 						<th:block th:if="${user.id} != ${saleAdvertisement?.ownerUserId}">
-							<a
-								th:if="${saleAdvertisement?.userLikeSaleAdvertisement} == false"
-								type="button"
-								th:href="@{/saleAdvertisement/like/} + ${saleAdvertisement?.saleAdvertisementID}">
-								<i class="far fa-heart" aria-hidden="true"></i>
-							</a>
-							<a
-								th:unless="${saleAdvertisement?.userLikeSaleAdvertisement} == false"
-								type="button"
-								th:href="@{/saleAdvertisement/unlike/} + ${saleAdvertisement?.saleAdvertisementID}">
-								<i class="fas fa-heart" aria-hidden="true"></i>
-							</a>
+							<p>
+								<a
+									th:if="${saleAdvertisement?.userLikeSaleAdvertisement} == false"
+									type="button"
+									th:href="@{/saleAdvertisement/like/} + ${saleAdvertisement?.saleAdvertisementID}">
+									<i class="far fa-heart" style="color: #fb2c00;"
+									aria-hidden="true"></i>
+								</a>
+							</p>
+							<p>
+								<a
+									th:unless="${saleAdvertisement?.userLikeSaleAdvertisement} == false"
+									type="button"
+									th:href="@{/saleAdvertisement/unlike/} + ${saleAdvertisement?.saleAdvertisementID}">
+									<i class="fas fa-heart" style="color: #fb2c00;"
+									aria-hidden="true"></i>
+								</a>
+							</p>
 						</th:block>
 						<p>
-							<span th:remove="tag"
-								th:text="${saleAdvertisement?.saleAdvertisementLikesCount}">Date</span>
+							<small class="text-muted"><em class="far fa-heart"
+								th:text="${saleAdvertisement?.saleAdvertisementLikesCount}"></em></small>
 						</p>
 
 					</div>
