@@ -24,6 +24,7 @@
 
 package es.udc.fi.dc.fd.test.integration.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -37,23 +38,30 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.State;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.ImageNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.ImageServiceException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
-import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.ImageNotFoundException;
-import es.udc.fi.dc.service.exceptions.ImageServiceException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Integration tests for the {@link UserService}.
@@ -62,6 +70,7 @@ import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
  * the example entities repository, these tests are for verifying everything is
  * set up correctly and working.
  */
+@WebAppConfiguration
 @RunWith(JUnitPlatform.class)
 @SpringJUnitConfig
 @Transactional
@@ -140,6 +149,8 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("ExampleProductDescription");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+
 		// Save sale advertisement entity
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 
@@ -194,6 +205,7 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("Product description");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
 
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 
@@ -267,6 +279,7 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("Product description");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
 
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 		// Initial count of sale advertisements
@@ -291,32 +304,44 @@ public class ITSaleAdvertisementService {
 	 * @throws ImageNotFoundException
 	 * @throws ImageAlreadyExistsException
 	 * @throws SaleAdvertisementNotFoundException
+	 * @throws SaleAdvertisementAlreadyExistsException
 	 */
 	@Test
-	public void testRemove_ExistingWithImages_Removed()
-			throws SaleAdvertisementServiceException, UserNotFoundException, ImageServiceException,
-			ImageNotFoundException, ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
-		final SaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
+	public void testRemove_ExistingWithImages_Removed() throws SaleAdvertisementServiceException, UserNotFoundException,
+			ImageServiceException, ImageNotFoundException, ImageAlreadyExistsException,
+			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyExistsException {
+		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
 
-		saleAdvertisement = service.findById(1);
+		// Get user for sale advertisement
+		DefaultUserEntity user = (DefaultUserEntity) userService.findById(1);
+
+		// Create new sale advertisement
+		saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setProductTitle("test product title");
+		saleAdvertisement.setProductDescription("Product description");
+		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
+		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+
+		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 		// Create sale advertisement's images
 		// First image
 		ImageEntity firstImage = new DefaultImageEntity();
 		firstImage.setTitle("test image title");
 		firstImage.setImagePath("test image path");
-		firstImage.setSale_advertisement((DefaultSaleAdvertisementEntity) saleAdvertisement);
+		firstImage.setSale_advertisement((DefaultSaleAdvertisementEntity) savedSaleAdvertisement);
 
 		ImageEntity savedFirstImage = imageService.add((DefaultImageEntity) firstImage);
 		// Second image
 		ImageEntity secondImage = new DefaultImageEntity();
 		secondImage.setTitle("test image title");
 		secondImage.setImagePath("test second image path");
-		secondImage.setSale_advertisement((DefaultSaleAdvertisementEntity) saleAdvertisement);
+		secondImage.setSale_advertisement((DefaultSaleAdvertisementEntity) savedSaleAdvertisement);
 
 		ImageEntity savedSecondImage = imageService.add((DefaultImageEntity) secondImage);
 
 		// Get updated sale advertisement
-		SaleAdvertisementEntity updatedSaleAdvertisement = service.findById(1);
+		SaleAdvertisementEntity updatedSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
 
 		// Initial count of sale advertisements
 		int initialCount = ((Collection<DefaultSaleAdvertisementEntity>) service.getAllSaleAdvertisements()).size();
@@ -369,6 +394,7 @@ public class ITSaleAdvertisementService {
 		saleAdvertisement.setProductDescription("Product description");
 		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
 		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
 
 		// Sale advertisement 0 images
 		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
@@ -424,6 +450,141 @@ public class ITSaleAdvertisementService {
 		// Sale advertisement have first and third images
 		Assert.assertTrue(afterRemoveSaleAdvertisement.getImages().contains(firstSavedImage));
 		Assert.assertTrue(afterRemoveSaleAdvertisement.getImages().contains(thirdSavedImage));
+	}
+
+	@Test
+	public void testSetOnHoldAdvertisement() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, SaleAdvertisementAlreadyExistsException,
+			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException {
+		DefaultUserEntity user = new DefaultUserEntity("login", "1234", "userName", "userLastName", "user@email",
+				"city");
+		userService.signUp(user);
+
+		// Create new sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setProductTitle("ExampleProductTittle");
+		saleAdvertisement.setProductDescription("ExampleProductDescription");
+		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+		saleAdvertisement.setState(State.STATE_ON_SALE);
+
+		// Save sale advertisement entity
+		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
+
+		Assert.assertFalse(service.areOnHoldAdvertisement(savedSaleAdvertisement.getId()));
+
+		service.setOnHoldAdvertisement(savedSaleAdvertisement.getId());
+
+		SaleAdvertisementEntity foundSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
+
+		Assert.assertTrue(service.areOnHoldAdvertisement(foundSaleAdvertisement.getId()));
+		Assert.assertTrue(foundSaleAdvertisement.getState().equals(State.STATE_ON_HOLD));
+	}
+
+	@Test
+	public void testSetOnSaleAdvertisement()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
+			SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException,
+			SaleAdvertisementAlreadyOnHoldException, SaleAdvertisementAlreadyOnSaleException {
+		DefaultUserEntity user = new DefaultUserEntity("login", "1234", "userName", "userLastName", "user@email",
+				"city");
+		userService.signUp(user);
+
+		// Create new sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setProductTitle("ExampleProductTittle");
+		saleAdvertisement.setProductDescription("ExampleProductDescription");
+		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+		saleAdvertisement.setState(State.STATE_ON_SALE);
+
+		// Save sale advertisement entity
+		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
+
+		Assert.assertFalse(service.areOnHoldAdvertisement(savedSaleAdvertisement.getId()));
+
+		service.setOnHoldAdvertisement(savedSaleAdvertisement.getId());
+
+		SaleAdvertisementEntity foundSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
+
+		Assert.assertTrue(service.areOnHoldAdvertisement(foundSaleAdvertisement.getId()));
+		Assert.assertTrue(foundSaleAdvertisement.getState().equals(State.STATE_ON_HOLD));
+
+		service.setOnSaleAdvertisement(savedSaleAdvertisement.getId());
+
+		foundSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
+
+		Assert.assertFalse(service.areOnHoldAdvertisement(foundSaleAdvertisement.getId()));
+		Assert.assertTrue(foundSaleAdvertisement.getState().equals(State.STATE_ON_SALE));
+	}
+
+	@Test
+	public void testSaleAdvertisementAlreadyOnSaleException() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, SaleAdvertisementAlreadyExistsException {
+		DefaultUserEntity user = new DefaultUserEntity("login", "1234", "userName", "userLastName", "user@email",
+				"city");
+		userService.signUp(user);
+
+		// Create new sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setProductTitle("ExampleProductTittle");
+		saleAdvertisement.setProductDescription("ExampleProductDescription");
+		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+		saleAdvertisement.setState(State.STATE_ON_SALE);
+
+		// Save sale advertisement entity
+		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
+
+		Assertions.assertThrows(SaleAdvertisementAlreadyOnSaleException.class, () -> {
+			service.setOnSaleAdvertisement(savedSaleAdvertisement.getId());
+		});
+	}
+
+	@Test
+	public void testSaleAdvertisementAlreadyOnHoldException() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, SaleAdvertisementAlreadyExistsException,
+			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException {
+		DefaultUserEntity user = new DefaultUserEntity("login", "1234", "userName", "userLastName", "user@email",
+				"city");
+		userService.signUp(user);
+
+		// Create new sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setProductTitle("ExampleProductTittle");
+		saleAdvertisement.setProductDescription("ExampleProductDescription");
+		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+		saleAdvertisement.setState(State.STATE_ON_SALE);
+
+		// Save sale advertisement entity
+		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
+
+		service.setOnHoldAdvertisement(savedSaleAdvertisement.getId());
+
+		Assertions.assertThrows(SaleAdvertisementAlreadyOnHoldException.class, () -> {
+			service.setOnHoldAdvertisement(savedSaleAdvertisement.getId());
+		});
+	}
+
+	@Test
+	public void testSaleAdvertisementSetOnSaleNotFoundException() {
+
+		Assertions.assertThrows(SaleAdvertisementNotFoundException.class, () -> {
+			service.setOnSaleAdvertisement(-1);
+		});
+	}
+
+	@Test
+	public void testSaleAdvertisementSetOnHoldNotFoundException() {
+
+		Assertions.assertThrows(SaleAdvertisementNotFoundException.class, () -> {
+			service.setOnHoldAdvertisement(-1);
+		});
 	}
 
 }

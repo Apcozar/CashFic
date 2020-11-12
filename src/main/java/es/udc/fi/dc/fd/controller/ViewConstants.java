@@ -13,6 +13,9 @@ public class ViewConstants {
 	 */
 	public static final String WELCOME = "welcome";
 
+	/** The Constant USER. */
+	public static final String USER = "user";
+
 	/**
 	 * Name for the signUp form
 	 */
@@ -27,8 +30,20 @@ public class ViewConstants {
 	/** Name for the profile view */
 	public static final String VIEW_PROFILE = "account/profile";
 
+	/** The Constant VIEW_FOLLOW_LIST. */
+	public static final String VIEW_FOLLOW_LIST = "account/followList";
+
 	/** The Constant UPLOADS_FOLDER_NAME. */
 	public static final String UPLOADS_FOLDER_NAME = "/Images";
+
+	/** The Constant SERVER_ERROR. */
+	public static final String SERVER_ERROR = "500";
+
+	/** The Constant USER_ID. */
+	public static final String USER_ID = "userId";
+
+	/** The Constant USER_ADVERTISEMENTS_LIKES_LIST. */
+	public static final String USER_ADVERTISEMENTS_LIKES_LIST = "account/advertisementsList";
 
 	/**
 	 * Private constructor to avoid initialization.

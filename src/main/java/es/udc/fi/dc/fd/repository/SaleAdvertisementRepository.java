@@ -24,6 +24,9 @@
 
 package es.udc.fi.dc.fd.repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -38,13 +41,39 @@ import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
  * @author Santiago
  */
 public interface SaleAdvertisementRepository extends JpaRepository<DefaultSaleAdvertisementEntity, Integer> {
-	
+
 	/**
 	 * Find sale advertisements order by date desc.
 	 *
-	 * @return the iterable
+	 * @return the sale advertisements order by date with the most recents first
 	 */
 	@Query("SELECT s from SaleAdvertisementEntity s ORDER BY s.date desc")
 	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsOrderByDateDesc();
+
+	/**
+	 * Find sale advertisements by search criteria.
+	 *
+	 * @param city     the city of the sale advertisement
+	 * @param keywords the keywords that should be in the title or description
+	 * @param date1    the oldest date in the date range
+	 * @param date2    the most recent date in the date range
+	 * @param price1   the minimum price in the price range
+	 * @param price2   the maximum price in the price range
+	 * @return the sale advertisements that meet the search criteria order by date
+	 *         with the most recents first
+	 */
+	@Query("SELECT s FROM SaleAdvertisementEntity s JOIN UserEntity u ON s.user = u WHERE u.city LIKE ?1 "
+			+ "AND (s.product_title LIKE %?2% OR s.product_description LIKE %?2%) AND s.date BETWEEN ?3 AND ?4 "
+			+ "AND (s.price BETWEEN ?5 AND ?6 OR s.price is null) ORDER BY s.date DESC")
+	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByCriteria(String city, String keywords,
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
+
+	/**
+	 * Gets the maximum price of all sale advertisements.
+	 *
+	 * @return the maximum price
+	 */
+	@Query("SELECT max(s.price) FROM SaleAdvertisementEntity s")
+	BigDecimal getMaximumPrice();
 
 }

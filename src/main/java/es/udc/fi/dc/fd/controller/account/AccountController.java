@@ -2,6 +2,7 @@ package es.udc.fi.dc.fd.controller.account;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
@@ -18,11 +20,13 @@ import es.udc.fi.dc.fd.model.form.account.SignUpForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
-import es.udc.fi.dc.fd.service.user.exceptions.EmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 
 @Controller
 public class AccountController {
@@ -119,33 +123,6 @@ public class AccountController {
 	}
 
 	/**
-	 * Sign in.
-	 *
-	 * @param signInForm    the sign in form
-	 * @param bindingResult the binding result
-	 * @param model         the model
-	 * @return the string
-	 */
-	@PostMapping(path = "/signIn")
-	public String signIn(@Valid @ModelAttribute("signInForm") SignInForm signInForm, BindingResult bindingResult,
-			Model model) {
-
-		try {
-			if (bindingResult.hasErrors()) {
-				return ViewConstants.VIEW_SIGNIN;
-			}
-			this.userService.login(signInForm.getLogin(), signInForm.getPassword());
-
-		} catch (Exception e) {
-			model.addAttribute(AccountViewConstants.ERROR_LOGIN, AccountViewConstants.ERROR_LOGIN);
-			return ViewConstants.VIEW_SIGNIN;
-		}
-
-		this.securityService.autologin(signInForm.getLogin(), signInForm.getPassword());
-		return "redirect:/";
-	}
-
-	/**
 	 * Show profile.
 	 *
 	 * @param model the model
@@ -160,6 +137,7 @@ public class AccountController {
 			username = this.securityService.findLoggedInUsername();
 			user = userService.findByLogin(username);
 
+			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
 			model.addAttribute(AccountViewConstants.USER, user);
 
 		} catch (UserNotFoundException e) {
@@ -167,7 +145,197 @@ public class AccountController {
 		}
 
 		return ViewConstants.VIEW_PROFILE;
+	}
 
+	/**
+	 * Show user profile by id.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/{id}")
+	public String showUserProfile(@PathVariable(value = "id") Integer id, final Model model) {
+
+		DefaultUserEntity user;
+		try {
+
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+
+			user = userService.findById(id);
+
+			model.addAttribute(AccountViewConstants.USER, user);
+
+		} catch (UserNotFoundException e) {
+			return ViewConstants.VIEW_SIGNIN;
+		}
+
+		return ViewConstants.VIEW_PROFILE;
+	}
+
+	/**
+	 * Follow user.
+	 *
+	 * @param id      the id
+	 * @param model   the model
+	 * @param request the request
+	 * @return the string
+	 */
+	@GetMapping(path = "/follow/{id}")
+	public String followUser(@PathVariable(value = "id") Integer id, Model model, HttpServletRequest request) {
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			DefaultUserEntity userToFollow = userService.findById(id);
+
+			userService.followUser(user, userToFollow);
+
+			String previousPage = request.getHeader("Referer");
+
+			return "redirect:" + previousPage;
+
+		} catch (UserNotFoundException | UserToFollowExistsException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Follow user.
+	 *
+	 * @param id      the id
+	 * @param model   the model
+	 * @param request the request
+	 * @return the string
+	 */
+	@GetMapping(path = "/unfollow/{id}")
+	public String unfollowUser(@PathVariable(value = "id") Integer id, Model model, HttpServletRequest request) {
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			DefaultUserEntity userToFollow = userService.findById(id);
+
+			userService.unfollowUser(user, userToFollow);
+
+			String previousPage = request.getHeader("Referer");
+
+			return "redirect:" + previousPage;
+
+		} catch (UserNotFoundException | UserToUnfollowNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Show user followers by id.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/followers/{id}")
+	public String showUserFollowers(@PathVariable(value = "id") Integer id, Model model) {
+
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+
+			DefaultUserEntity user;
+			user = userService.findById(id);
+			model.addAttribute(AccountViewConstants.USER, user);
+			model.addAttribute(AccountViewConstants.FOLLOWLIST, user.getFollowers());
+			model.addAttribute(AccountViewConstants.FOLLOW_NAME, AccountViewConstants.FOLLOWERS);
+			return ViewConstants.VIEW_FOLLOW_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Show user followed by user id.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/followed/{id}")
+	public String showUserFollowed(@PathVariable(value = "id") Integer id, Model model) {
+
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+
+			DefaultUserEntity user;
+			user = userService.findById(id);
+			model.addAttribute(AccountViewConstants.USER, user);
+			model.addAttribute(AccountViewConstants.FOLLOWLIST, user.getFollowed());
+			model.addAttribute(AccountViewConstants.FOLLOW_NAME, AccountViewConstants.FOLLOWED);
+			return ViewConstants.VIEW_FOLLOW_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Show user followers by id.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/{id}/advertisements")
+	public String showUserAdvertisements(@PathVariable(value = "id") Integer id, Model model) {
+
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+
+			DefaultUserEntity user;
+			user = userService.findById(id);
+			model.addAttribute(AccountViewConstants.USER, user);
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, user.getSaleAdvertisements());
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_ADVERTISEMENTS);
+			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Show user followed by user id.
+	 *
+	 * @param id    the id
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/{id}/likes")
+	public String showUserLikes(@PathVariable(value = "id") Integer id, Model model) {
+
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+
+			DefaultUserEntity user;
+			user = userService.findById(id);
+			model.addAttribute(AccountViewConstants.USER, user);
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, user.getLikes());
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_LIKES);
+			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
 	}
 
 	/**
@@ -187,7 +355,7 @@ public class AccountController {
 		try {
 			userService.findByEmail(signUpForm.getEmail());
 			model.addAttribute(AccountViewConstants.EMAIL_EXIST, AccountViewConstants.EMAIL_EXIST);
-		} catch (EmailNotFoundException e) {
+		} catch (UserEmailNotFoundException e) {
 			// If the exception jump, the email is not in use
 		}
 	}
@@ -202,7 +370,7 @@ public class AccountController {
 		try {
 			userService.findByEmail(signUpForm.getEmail());
 			model.addAttribute(AccountViewConstants.EMAIL_EXIST, AccountViewConstants.EMAIL_EXIST);
-		} catch (EmailNotFoundException e) {
+		} catch (UserEmailNotFoundException e) {
 			// If the exception jump, the email is not in use
 		}
 	}

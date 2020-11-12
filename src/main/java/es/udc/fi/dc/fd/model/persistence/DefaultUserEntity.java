@@ -35,11 +35,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import es.udc.fi.dc.fd.model.Role;
+import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
 
 /**
@@ -116,6 +120,22 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@OneToMany(mappedBy = "user")
 	private Set<DefaultSaleAdvertisementEntity> sale_advertisements;
+
+	/** The followers. */
+	@ManyToMany(mappedBy = "followed")
+	private Set<DefaultUserEntity> followers = new HashSet<>();
+
+	/** The followed. */
+	@ManyToMany
+	@JoinTable(name = "follow_users", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_follow_id"))
+	private Set<DefaultUserEntity> followed = new HashSet<>();
+
+	/**
+	 * The sale advertisements liked by the user
+	 */
+	@ManyToMany
+	@JoinTable(name = "likes", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "sale_advertisement_id"))
+	private Set<DefaultSaleAdvertisementEntity> likedSaleAdvertisements = new HashSet<DefaultSaleAdvertisementEntity>();
 
 	/**
 	 * Constructs an sale_advertisement entity.
@@ -216,9 +236,34 @@ public class DefaultUserEntity implements UserEntity {
 		return role;
 	}
 
+	/**
+	 * Gets the sale advertisements.
+	 *
+	 * @return the sale advertisements
+	 */
 	@Override
 	public Set<DefaultSaleAdvertisementEntity> getSaleAdvertisements() {
 		return sale_advertisements;
+	}
+
+	/**
+	 * Gets the followers.
+	 *
+	 * @return the followers
+	 */
+	@Override
+	public Set<DefaultUserEntity> getFollowers() {
+		return followers;
+	}
+
+	/**
+	 * Gets the followed.
+	 *
+	 * @return the followed
+	 */
+	@Override
+	public Set<DefaultUserEntity> getFollowed() {
+		return followed;
 	}
 
 	/**
@@ -301,9 +346,77 @@ public class DefaultUserEntity implements UserEntity {
 		role = checkNotNull(value, "Received a null pointer as role");
 	}
 
+	/**
+	 * Sets the sale advertisements.
+	 *
+	 * @param value the new sale advertisements
+	 */
 	@Override
 	public void setSale_advertisements(final Set<DefaultSaleAdvertisementEntity> value) {
 		sale_advertisements = checkNotNull(value, "Received a null pointer as images");
+	}
+
+	/**
+	 * Adds the follower user to the list of user followers.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowserUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followers.add(user);
+	}
+
+	/**
+	 * Removes the follower user from the list of used followers.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowserUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followers.remove(user);
+	}
+
+	/**
+	 * Adds the follow user to the list of user followed.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followed.add(user);
+	}
+
+	/**
+	 * Removes the follow user from the list of used followed.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowUser(DefaultUserEntity user) {
+		checkNotNull(user, "Received a null pointer as user");
+		followed.remove(user);
+	}
+
+	@Override
+	public String toString() {
+		return "UserEntityImplementation [id=" + id + ", login=" + login + ", password=" + password + ", name=" + name
+				+ ", lastName=" + lastName + ", email=" + email + ", city=" + city + ", role=" + role + "]";
+	}
+
+	@Override
+	public Set<DefaultSaleAdvertisementEntity> getLikes() {
+		return likedSaleAdvertisements;
+	}
+
+	@Override
+	public void addLike(SaleAdvertisementEntity saleAdvertisement) {
+		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+		likedSaleAdvertisements.add((DefaultSaleAdvertisementEntity) saleAdvertisement);
+	}
+
+	@Override
+	public void removeLike(SaleAdvertisementEntity saleAdvertisement) {
+		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+		likedSaleAdvertisements.remove((DefaultSaleAdvertisementEntity) saleAdvertisement);
 	}
 
 	@Override
@@ -324,12 +437,6 @@ public class DefaultUserEntity implements UserEntity {
 				&& Objects.equals(password, other.password) && Objects.equals(name, other.name)
 				&& Objects.equals(lastName, other.lastName) && role == other.role && Objects.equals(email, other.email)
 				&& Objects.equals(city, other.city);
-	}
-
-	@Override
-	public String toString() {
-		return "UserEntityImplementation [id=" + id + ", login=" + login + ", password=" + password + ", name=" + name
-				+ ", lastName=" + lastName + ", email=" + email + ", city=" + city + ", role=" + role + "]";
 	}
 
 }

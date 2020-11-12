@@ -24,13 +24,18 @@
 
 package es.udc.fi.dc.fd.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Pageable;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Service for the saleAdd domain.
@@ -118,4 +123,61 @@ public interface SaleAdvertisementService {
 	 */
 	public DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
 			throws SaleAdvertisementNotFoundException;
+
+	/**
+	 * Find sale advertisements by search criteria.
+	 *
+	 * @param city     the city of the sale advertisement
+	 * @param keywords the keywords that should be in the title or description
+	 * @param date1    the oldest date in the date range
+	 * @param date2    the most recent date in the date range
+	 * @param price1   the minimum price in the price range
+	 * @param price2   the maximum price in the price range
+	 * @return the sale advertisements that meet the search criteria order by date
+	 *         with the most recents first
+	 */
+	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsBySearchCriteria(String city, String keywords,
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
+
+	/**
+	 * Gets the maximum price of all sale advertisements.
+	 *
+	 * @return the maximum price
+	 */
+	public BigDecimal getMaximumPrice();
+
+	/**
+	 * Are hold advertisement.
+	 *
+	 * @param identifier the identifier
+	 * @return true, if successful
+	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
+	 *                                            exception
+	 */
+	public boolean areOnHoldAdvertisement(Integer identifier) throws SaleAdvertisementNotFoundException;
+
+	/**
+	 * Sets the advertisement on hold state.
+	 *
+	 * @param identifier the new on hold advertisement
+	 * @throws SaleAdvertisementNotFoundException      the sale advertisement not
+	 *                                                 found exception
+	 * @throws SaleAdvertisementAlreadyOnHoldException the sale advertisement
+	 *                                                 already on hold exception
+	 */
+	public void setOnHoldAdvertisement(Integer identifier)
+			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException;
+
+	/**
+	 * Sets the advertisement on sale state.
+	 *
+	 * @param identifier the new on sale advertisement
+	 * @throws SaleAdvertisementNotFoundException      the sale advertisement not
+	 *                                                 found exception
+	 * @throws SaleAdvertisementAlreadyOnSaleException the sale advertisement
+	 *                                                 already on sale exception
+	 */
+	public void setOnSaleAdvertisement(Integer identifier)
+			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnSaleException;
+
 }

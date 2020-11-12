@@ -1,6 +1,6 @@
 package es.udc.fi.dc.fd.service.user.exceptions;
 
-public class EmailNotFoundException extends Exception {
+public class UserEmailNotFoundException extends Exception {
 
 	/**
 	 * SERIAL UID for Serializable
@@ -12,7 +12,7 @@ public class EmailNotFoundException extends Exception {
 	 * 
 	 * @param userEmail the user email
 	 */
-	public EmailNotFoundException(String userEmail) {
+	public UserEmailNotFoundException(String userEmail) {
 		super("User with email: " + userEmail + " not found");
 	}
 

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.followList}"></title>
+<link
+	href="https://fonts.googleapis.com/css?family=Bentham|Playfair+Display|Raleway:400,500|Suranna|Trocchi"
+	rel="stylesheet">
+
+</head>
+<body>
+	<header class="header" th:include="fragments/menu :: menu"> </header>
+
+	<div class="container-fluid">
+		<div class="page-heading">
+			<div class="media clearfix">
+				<div class="media-left pr30">
+					<i class="fa fa-user-circle-o fa-5x" aria-hidden="true"></i>
+				</div>
+				<div class="media-body">
+					<h2 class="media-heading">
+						<a th:href="@{/profile/} + ${user.id}" th:text="${user.login}"></a>
+						<th:block th:if="${userLogged.id} != ${user.id}">
+							<a th:if="${userLogged.followed.contains(user)} == false"
+								type="button" th:href="@{/follow/} + ${user.id}"> <i
+								class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+							</a>
+							<a th:unless="${userLogged.followed.contains(user)} == false"
+								type="button" th:href="@{/unfollow/} + ${user.id}"> <i
+								class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+							</a>
+						</th:block>
+					</h2>
+					<div class="media-links">
+						<p class="small">
+							<i class="fa fa-user-circle" aria-hidden="true"
+								th:text="${user.name} + ' ' + ${user.lastName}"></i>
+						</p>
+						<p class="small">
+							<i class="fa fa-envelope" aria-hidden="true"
+								th:text="${user.email}"></i>
+						</p>
+						<p class="small">
+							<i class="fa fa-map-marker" aria-hidden="true"
+								th:text="${user.city}"></i>
+						</p>
+					</div>
+					<div class="media-links pull-right">
+						<ul class="list-inline">
+							
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${user.id} + @{/advertisements}"
+										th:text="${user.getSaleAdvertisements().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Adds}"></em></small>
+							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${user.id} + @{/likes}"
+										th:text="${user.getLikes().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Likes}"></em></small>
+							</li>
+							
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/followers/} + ${user.id}"
+										th:text="${user.followers.size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-user-circle"
+									th:text="#{label.Followers}"></em></small>
+							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/followed/} + ${user.id}"
+										th:text="${user.followed.size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-user-circle"
+									th:text="#{label.Following}"></em></small>
+							</li>
+
+						</ul>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="card bg-dark">
+			<div class="card-header">
+				<h3>
+					<span th:if="${followName == 'followers'}"
+						th:text="#{title.followersList}"></span> <span
+						th:if="${followName == 'followed'}"
+						th:text="#{title.followedList}"></span>
+				</h3>
+			</div>
+			<div class="page-heading" th:each="followUser : ${followList}">
+
+				<div class="media clearfix">
+					<div class="media-left pr30">
+						<i class="fa fa-user-circle-o fa-5x" aria-hidden="true"></i>
+					</div>
+					<div class="media-body">
+						<h2 class="media-heading">
+							<a th:href="@{/profile/} + ${followUser?.id}"
+								th:text="${followUser?.login}"></a>
+							<th:block th:if="${userLogged.id} != ${followUser?.id}">
+								<a th:if="${userLogged.followed.contains(followUser)} == false"
+									type="button" th:href="@{/follow/} + ${followUser?.id}"> <i
+									class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+								</a>
+								<a
+									th:unless="${userLogged.followed.contains(followUser)} == false"
+									type="button" th:href="@{/unfollow/} + ${followUser?.id}">
+									<i class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+								</a>
+							</th:block>
+						</h2>
+
+						<div class="media-links">
+							<p class="small">
+								<i class="fa fa-user-circle" aria-hidden="true"
+									th:text="${followUser?.name} + ' ' + ${followUser?.lastName}"></i>
+							</p>
+							<p class="small">
+								<i class="fa fa-envelope" aria-hidden="true"
+									th:text="${followUser?.email}"></i>
+							</p>
+							<p class="small">
+								<i class="fa fa-map-marker" aria-hidden="true"
+									th:text="${followUser?.city}"></i>
+							</p>
+						</div>
+						<div class="media-links pull-right">
+							<ul class="list-inline">											
+								<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${followUser?.id} + @{/advertisements}"
+										th:text="${followUser?.getSaleAdvertisements().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Adds}"></em></small>
+							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${followUser?.id} + @{/likes}"
+										th:text="${followUser?.getLikes().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Likes}"></em></small>
+							</li>
+								
+
+								<li class="list-inline-item">
+									<h5 class="text-center">
+										<a th:href="@{/profile/followers/} + ${followUser?.id}"
+											th:text="${followUser?.followers.size()}"></a>
+									</h5> <small class="text-muted"><em
+										class="fa fa-user-circle" th:text="#{label.Followers}"></em></small>
+								</li>
+
+								<li class="list-inline-item">
+									<h5 class="text-center">
+										<a th:href="@{/profile/followed/} + ${followUser?.id}"
+											th:text="${followUser?.followed.size()}"></a>
+									</h5> <small class="text-muted"><em
+										class="fa fa-user-circle" th:text="#{label.Following}"></em></small>
+								</li>
+
+							</ul>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<footer>
+		<div th:include="fragments/scripts :: general"></div>
+	</footer>
+</body>
+
+</html>

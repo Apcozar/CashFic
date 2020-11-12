@@ -1,4 +1,4 @@
-package es.udc.fi.dc.service.exceptions;
+package es.udc.fi.dc.fd.service.exceptions;
 
 /**
  * The ImageNotFoundException used when an image not by the service

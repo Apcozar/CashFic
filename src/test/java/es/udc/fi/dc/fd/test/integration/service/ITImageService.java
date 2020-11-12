@@ -27,6 +27,7 @@ package es.udc.fi.dc.fd.test.integration.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -37,18 +38,20 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.udc.fi.dc.fd.model.ImageEntity;
+import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
-import es.udc.fi.dc.service.exceptions.ImageAlreadyExistsException;
-import es.udc.fi.dc.service.exceptions.ImageNotFoundException;
-import es.udc.fi.dc.service.exceptions.ImageServiceException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
+import es.udc.fi.dc.fd.service.exceptions.ImageAlreadyExistsException;
+import es.udc.fi.dc.fd.service.exceptions.ImageNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.ImageServiceException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Integration tests for the {@link ImageService}.
@@ -57,6 +60,7 @@ import es.udc.fi.dc.service.exceptions.SaleAdvertisementServiceException;
  * the example entities repository, these tests are for verifying everything is
  * set up correctly and working.
  */
+@WebAppConfiguration
 @RunWith(JUnitPlatform.class)
 @SpringJUnitConfig
 @Transactional
@@ -155,36 +159,6 @@ public class ITImageService {
 		Assert.assertEquals(savedImage.getSale_advertisement(), saleService.findById(1));
 		// Sale advertisement has been updated and now owns the image
 		Assert.assertTrue(saleService.findById(1).getImages().contains(savedImage));
-	}
-
-	@Test
-	public void testAdd_Image_PathAttribute_Restriction_Fails() throws ImageServiceException,
-			SaleAdvertisementServiceException, ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
-		DefaultImageEntity image; // first image to add
-		DefaultImageEntity secondImage; // Second image to add with the same path
-		DefaultSaleAdvertisementEntity saleAdvertisement;
-
-		// Get sale advertisement for the image
-		saleAdvertisement = (DefaultSaleAdvertisementEntity) saleService.findById(1);
-
-		// Create a image
-		image = new DefaultImageEntity();
-		image.setImagePath("firstTestImagePath");
-		image.setTitle("firstTestImageTitle");
-		image.setSale_advertisement(saleAdvertisement);
-
-		secondImage = new DefaultImageEntity();
-		secondImage.setTitle("second image title");
-		secondImage.setImagePath(image.getImagePath());
-		secondImage.setSale_advertisement(saleAdvertisement);
-
-		// Save the first image
-		service.add((DefaultImageEntity) image);
-
-		// Expected exception, path must be unique
-		assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
-			service.add(secondImage);
-		});
 	}
 
 	@Test
@@ -287,21 +261,22 @@ public class ITImageService {
 	 * @throws SaleAdvertisementServiceException
 	 * @throws ImageAlreadyExistsException
 	 * @throws SaleAdvertisementNotFoundException
+	 * @throws ImageNotFoundException
 	 * 
 	 */
-//	 imageService UPDATE NOT WORK (CHANGE image's sale advertisement, no delete
-//	 first sale advertise's image from the first sale advertise list
-//	 it add new sale advertisement to image and add image to new sale
-//	 advertisement list
 	@Test
 	public void testUpdate_Existing_Image_Updated() throws ImageServiceException, SaleAdvertisementServiceException,
-			ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
+			ImageAlreadyExistsException, SaleAdvertisementNotFoundException, ImageNotFoundException {
 		DefaultSaleAdvertisementEntity saleAdvertisement; // Initial image's sale advertisement
-		DefaultSaleAdvertisementEntity changeSaleAdvertisement; // sale advertisement for update image
+		SaleAdvertisementEntity changeSaleAdvertisement; // sale advertisement for update image
 		DefaultImageEntity image; // image to add and update attributes
 
-		saleAdvertisement = (DefaultSaleAdvertisementEntity) saleService.findById(1);
-		changeSaleAdvertisement = (DefaultSaleAdvertisementEntity) saleService.findById(2);
+		// Get all sale advertisements
+		Iterable<DefaultSaleAdvertisementEntity> salesAdvertisementCollection = saleService.getAllSaleAdvertisements();
+		Iterator<DefaultSaleAdvertisementEntity> iterator = salesAdvertisementCollection.iterator();
+
+		saleAdvertisement = iterator.next();
+		changeSaleAdvertisement = iterator.next();
 
 		// Create image with attributes
 		image = new DefaultImageEntity();
@@ -311,25 +286,20 @@ public class ITImageService {
 		image.setSale_advertisement(saleAdvertisement);
 		// Save image
 		ImageEntity storedImage = service.add(image);
+
 		// Change saved image attributes and update image
-		storedImage.setTitle("change image title");
-		storedImage.setImagePath("change image path");
-		storedImage.setSale_advertisement(changeSaleAdvertisement);
+		ImageEntity changeImage = service.findById(storedImage.getId());
+		changeImage.setTitle("change image title");
+		changeImage.setImagePath("change image path");
+		changeImage.setSale_advertisement((DefaultSaleAdvertisementEntity) changeSaleAdvertisement);
 
-		DefaultImageEntity changeStoredImage = (DefaultImageEntity) service.update((DefaultImageEntity) storedImage);
+		// Update changed image
+		DefaultImageEntity updatedStoredImage = (DefaultImageEntity) service.update((DefaultImageEntity) changeImage);
 
-		Assert.assertEquals(changeStoredImage.getTitle(), "change image title");
-		Assert.assertEquals(changeStoredImage.getImagePath(), "change image path");
-		Assert.assertEquals(changeStoredImage.getSale_advertisement().getId(), changeSaleAdvertisement.getId());
+		Assert.assertEquals(updatedStoredImage.getTitle(), "change image title");
+		Assert.assertEquals(updatedStoredImage.getImagePath(), "change image path");
+		Assert.assertEquals(updatedStoredImage.getSale_advertisement().getId(), changeSaleAdvertisement.getId());
 
-// 		THIS PART DO NOT WORK PROPERTLY
-//		// Recover initial sale_advertisement and check that not have the first image
-//		// stored
-//		SaleAdvertisementEntity initialSaleAdvertisement = saleService.findById(saleAdvertisement.getId());
-//		Assert.assertFalse(initialSaleAdvertisement.getImages().contains(storedImage));
-//		// Check that change SaleAdvertisement have the updated image
-//		SaleAdvertisementEntity updateChangeSaleAdvertisement = saleService.findById(changeSaleAdvertisement.getId());
-//		Assert.assertTrue(updateChangeSaleAdvertisement.getImages().contains(changeStoredImage));
 	}
 
 	/**
@@ -354,7 +324,7 @@ public class ITImageService {
 		image.setImagePath("initial image path");
 		image.setSale_advertisement(saleAdvertisement);
 		// Update image returns exception
-		assertThrows(ImageServiceException.class, () -> {
+		assertThrows(ImageNotFoundException.class, () -> {
 			service.update(image);
 		});
 	}

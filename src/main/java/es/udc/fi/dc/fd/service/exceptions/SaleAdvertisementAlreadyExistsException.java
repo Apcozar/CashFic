@@ -1,4 +1,4 @@
-package es.udc.fi.dc.service.exceptions;
+package es.udc.fi.dc.fd.service.exceptions;
 
 /**
  * The ImageAlreadyExistsException used when add an image that already exists

@@ -21,30 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package es.udc.fi.dc.fd.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
-import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
-
 /**
- * Spring-JPA repository for {@link DefaultImageEntity}.
- * <p>
- * This is a simple repository just to allow the endpoints querying the images
- * they are asked for.
- *
- * @author Santiago
+ * Dto objects. These are DTOs mapping the data sent between the view and
+ * controllers.
  */
-public interface ImageRepository extends JpaRepository<DefaultImageEntity, Integer> {
 
-	/**
-	 * Exists image path.
-	 *
-	 * @param imagePath the image path
-	 * @return true, if successful
-	 */
-	@Query("select count(u)>0 from ImageEntity u where u.image_path = ?1")
-	boolean existsImagePath(String imagePath);
-}
+package es.udc.fi.dc.fd.model.dto;

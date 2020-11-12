@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 
 /**
  * A user entity.
@@ -103,6 +104,20 @@ public interface UserEntity extends Serializable {
 	public Set<DefaultSaleAdvertisementEntity> getSaleAdvertisements();
 
 	/**
+	 * Gets the followers.
+	 *
+	 * @return the followers
+	 */
+	public Set<DefaultUserEntity> getFollowers();
+
+	/**
+	 * Gets the followed.
+	 *
+	 * @return the followed
+	 */
+	public Set<DefaultUserEntity> getFollowed();
+
+	/**
 	 * Sets the identifier assigned to this user.
 	 *
 	 * @param identifier the identifier for the user
@@ -164,5 +179,56 @@ public interface UserEntity extends Serializable {
 	 * @param sale_advertisements the sale_advertisements to set on the user
 	 */
 	public void setSale_advertisements(final Set<DefaultSaleAdvertisementEntity> sale_advertisements);
+
+	/**
+	 * Returns the sale advertisements likes by user
+	 *
+	 * @return the sale advertisements set
+	 */
+	public Set<DefaultSaleAdvertisementEntity> getLikes();
+
+	/**
+	 * Add sale advertisement to user's like sale advertisement set
+	 *
+	 * @param saleAdvertisement the saleAdvertisement to add to user's like set
+	 */
+	public void addLike(SaleAdvertisementEntity saleAdvertisement);
+
+	/**
+	 * Remove sale advertisement from user's like sale advertisement set. The sale
+	 * advertisement must be in user's like set
+	 *
+	 * @param saleAdvertisement the sale advertisement to remove from user's like
+	 *                          set
+	 */
+	public void removeLike(SaleAdvertisementEntity saleAdvertisement);
+
+	/**
+	 * Adds the follower user to the list of user followers.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowserUser(DefaultUserEntity user);
+
+	/**
+	 * Removes the follower user from the list of used followers.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowserUser(DefaultUserEntity user);
+
+	/**
+	 * Adds the follow user to the list of user followed.
+	 *
+	 * @param user the user
+	 */
+	public void addFollowUser(DefaultUserEntity user);
+
+	/**
+	 * Removes the follow user from the list of used followed.
+	 *
+	 * @param user the user
+	 */
+	public void removeFollowUser(DefaultUserEntity user);
 
 }
