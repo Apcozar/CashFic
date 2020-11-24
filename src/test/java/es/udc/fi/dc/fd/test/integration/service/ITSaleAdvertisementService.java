@@ -304,32 +304,44 @@ public class ITSaleAdvertisementService {
 	 * @throws ImageNotFoundException
 	 * @throws ImageAlreadyExistsException
 	 * @throws SaleAdvertisementNotFoundException
+	 * @throws SaleAdvertisementAlreadyExistsException
 	 */
 	@Test
-	public void testRemove_ExistingWithImages_Removed()
-			throws SaleAdvertisementServiceException, UserNotFoundException, ImageServiceException,
-			ImageNotFoundException, ImageAlreadyExistsException, SaleAdvertisementNotFoundException {
-		final SaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
+	public void testRemove_ExistingWithImages_Removed() throws SaleAdvertisementServiceException, UserNotFoundException,
+			ImageServiceException, ImageNotFoundException, ImageAlreadyExistsException,
+			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyExistsException {
+		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
 
-		saleAdvertisement = service.findById(1);
+		// Get user for sale advertisement
+		DefaultUserEntity user = (DefaultUserEntity) userService.findById(1);
+
+		// Create new sale advertisement
+		saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setProductTitle("test product title");
+		saleAdvertisement.setProductDescription("Product description");
+		saleAdvertisement.setDate(LocalDateTime.of(2020, 4, 4, 21, 50));
+		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
+
+		SaleAdvertisementEntity savedSaleAdvertisement = service.add(saleAdvertisement);
 		// Create sale advertisement's images
 		// First image
 		ImageEntity firstImage = new DefaultImageEntity();
 		firstImage.setTitle("test image title");
 		firstImage.setImagePath("test image path");
-		firstImage.setSale_advertisement((DefaultSaleAdvertisementEntity) saleAdvertisement);
+		firstImage.setSale_advertisement((DefaultSaleAdvertisementEntity) savedSaleAdvertisement);
 
 		ImageEntity savedFirstImage = imageService.add((DefaultImageEntity) firstImage);
 		// Second image
 		ImageEntity secondImage = new DefaultImageEntity();
 		secondImage.setTitle("test image title");
 		secondImage.setImagePath("test second image path");
-		secondImage.setSale_advertisement((DefaultSaleAdvertisementEntity) saleAdvertisement);
+		secondImage.setSale_advertisement((DefaultSaleAdvertisementEntity) savedSaleAdvertisement);
 
 		ImageEntity savedSecondImage = imageService.add((DefaultImageEntity) secondImage);
 
 		// Get updated sale advertisement
-		SaleAdvertisementEntity updatedSaleAdvertisement = service.findById(1);
+		SaleAdvertisementEntity updatedSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
 
 		// Initial count of sale advertisements
 		int initialCount = ((Collection<DefaultSaleAdvertisementEntity>) service.getAllSaleAdvertisements()).size();

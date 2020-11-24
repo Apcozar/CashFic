@@ -102,6 +102,7 @@ public class SaleAdvertisementListViewController {
 			DefaultUserEntity user = userService.findByLogin(username);
 
 			model.addAttribute(ViewConstants.USER_ID, user.getId());
+			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
 
 			DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(id);
 
@@ -346,6 +347,12 @@ public class SaleAdvertisementListViewController {
 			}
 
 			deleteImages(saleAdvertisement.getImages());
+
+			Object[] likes = saleAdvertisement.getLikes().toArray();
+			for (int i = 0; i < likes.length; i++) {
+				userService.unlike((UserEntity) likes[i], saleAdvertisement);
+			}
+
 			saleAdvertisementService.remove((DefaultSaleAdvertisementEntity) saleAdvertisement);
 
 			model.addAttribute("addSaleAdvertisementRemove", "addSaleAdvertisementRemove");

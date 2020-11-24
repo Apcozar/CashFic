@@ -49,13 +49,23 @@
 					</div>
 					<div class="media-links pull-right">
 						<ul class="list-inline">
+							
 							<li class="list-inline-item">
 								<h5 class="text-center">
-									<a th:href="@{/profile/} + ${user.id}"
+									<a th:href="@{/profile/} + ${user.id} + @{/advertisements}"
 										th:text="${user.getSaleAdvertisements().size()}"></a>
 								</h5> <small class="text-muted"><em class="fa fa-picture-o"
 									th:text="#{label.Adds}"></em></small>
 							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${user.id} + @{/likes}"
+										th:text="${user.getLikes().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Likes}"></em></small>
+							</li>
+							
 
 							<li class="list-inline-item">
 								<h5 class="text-center">
@@ -129,14 +139,23 @@
 							</p>
 						</div>
 						<div class="media-links pull-right">
-							<ul class="list-inline">
+							<ul class="list-inline">											
 								<li class="list-inline-item">
-									<h5 class="text-center">
-										<a th:href="@{/profile/} + ${followUser?.id}"
-											th:text="${followUser?.getSaleAdvertisements().size()}"></a>
-									</h5> <small class="text-muted"><em class="fa fa-picture-o"
-										th:text="#{label.Adds}"></em></small>
-								</li>
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${followUser?.id} + @{/advertisements}"
+										th:text="${followUser?.getSaleAdvertisements().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Adds}"></em></small>
+							</li>
+
+							<li class="list-inline-item">
+								<h5 class="text-center">
+									<a th:href="@{/profile/} + ${followUser?.id} + @{/likes}"
+										th:text="${followUser?.getLikes().size()}"></a>
+								</h5> <small class="text-muted"><em class="fa fa-picture-o"
+									th:text="#{label.Likes}"></em></small>
+							</li>
+								
 
 								<li class="list-inline-item">
 									<h5 class="text-center">
