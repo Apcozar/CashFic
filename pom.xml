@@ -88,14 +88,6 @@
 							<artifactId>lifecycle-mapping</artifactId>
 							<version>${plugin.lifecycle.version}</version>
 							<configuration>
-								<!-- Sample fix for plugin executions -->
-								<!-- This is to be used in case a Maven plugins gives problems in 
-									Eclipse -->
-								<!-- <lifecycleMappingMetadata> <pluginExecutions> <pluginExecution> 
-									<pluginExecutionFilter> <groupId>org.jacoco</groupId> <artifactId>jacoco-maven-plugin</artifactId> 
-									<versionRange>[0.5,)</versionRange> <goals> <goal>prepare-agent</goal> </goals> 
-									</pluginExecutionFilter> <action> <ignore /> </action> </pluginExecution> 
-									</pluginExecutions> </lifecycleMappingMetadata> -->
 								<downloadSources>true</downloadSources>
 								<downloadJavadocs>true</downloadJavadocs>
 							</configuration>
@@ -1009,10 +1001,12 @@
 					<configuration>
 						<forkCount>1</forkCount>
 						<reuseForks>true</reuseForks>
-						<argLine>${jacoco.agent.argLine}</argLine>
+						<argLine>${jacoco.agent.ut.argLine}</argLine>
 					</configuration>
 				</plugin>
 				<plugin>
+					<!-- Jacoco -->
+					<!-- Jacoco plugin generates coverage unit tests and integration tests -->	
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<executions>
@@ -1023,7 +1017,9 @@
 								<goal>prepare-agent</goal>
 							</goals>
 							<configuration>
-								<propertyName>jacoco.agent.argLine</propertyName>
+								<!-- Sets the path to the file which contains the execution data. -->
+								<destFile>${project.reporting.outputDirectory}/jacoco-ut.exec</destFile>
+								<propertyName>jacoco.agent.ut.argLine</propertyName>
 							</configuration>
 						</execution>
 						<execution>
@@ -1032,23 +1028,36 @@
 							<goals>
 								<goal>report</goal>
 							</goals>
+							<configuration>
+								<!-- Sets the path to the file which contains the execution data. -->
+								<dataFile>${project.reporting.outputDirectory}/jacoco-ut.exec</dataFile>
+								<!-- Sets the output directory for the code coverage report. -->
+								<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut-report
+								</outputDirectory>
+							</configuration>
 						</execution>
 						<execution>
-							<id>prepare-agent-integration</id>
-							<phase>package</phase>
+							<id>before-integration-test-execution</id>
+							<phase>pre-integration-test</phase>
 							<goals>
 								<goal>prepare-agent-integration</goal>
 							</goals>
 							<configuration>
+								<destFile>${project.reporting.outputDirectory}/jacoco-it.exec</destFile>
 								<propertyName>jacoco.agent.itArgLine</propertyName>
 							</configuration>
 						</execution>
+
 						<execution>
-							<id>jacoco-integration-report</id>
-							<phase>verify</phase>
+							<id>after-integration-test-execution</id>
+							<phase>post-integration-test</phase>
 							<goals>
 								<goal>report-integration</goal>
 							</goals>
+							<configuration>
+								<dataFile>${project.reporting.outputDirectory}/jacoco-it.exec</dataFile>
+								<outputDirectory>${project.reporting.outputDirectory}/jacoco-it-report</outputDirectory>
+							</configuration>
 						</execution>
 					</executions>
 				</plugin>
@@ -1056,24 +1065,17 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>${plugin.failsafe.version}</version>
+					<configuration>
+						<argLine>${jacoco.agent.itArgLine}</argLine>
+					</configuration>
 					<executions>
-						<!-- Failsafe is bound to the integration-test and verify phases -->
 						<execution>
-							<id>failsafe-integration-tests</id>
 							<goals>
 								<goal>integration-test</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>failsafe-verify</id>
-							<goals>
 								<goal>verify</goal>
 							</goals>
 						</execution>
 					</executions>
-					<configuration>
-						<forkCount>0</forkCount>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.cargo</groupId>
