@@ -20,6 +20,7 @@ import es.udc.fi.dc.fd.model.form.account.SignUpForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
+import es.udc.fi.dc.fd.service.user.exceptions.AlreadyPremiumUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
@@ -39,6 +40,10 @@ public class AccountController {
 	 * The Security service.
 	 */
 	private SecurityService securityService;
+
+	private String redirect = "redirect:";
+
+	private String referer = "Referer";
 
 	/**
 	 * Constructs a controller with the specified dependencies.
@@ -194,9 +199,9 @@ public class AccountController {
 
 			userService.followUser(user, userToFollow);
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(referer);
 
-			return "redirect:" + previousPage;
+			return redirect + previousPage;
 
 		} catch (UserNotFoundException | UserToFollowExistsException e) {
 			return ViewConstants.WELCOME;
@@ -221,9 +226,9 @@ public class AccountController {
 
 			userService.unfollowUser(user, userToFollow);
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(referer);
 
-			return "redirect:" + previousPage;
+			return redirect + previousPage;
 
 		} catch (UserNotFoundException | UserToUnfollowNotFoundException e) {
 			return ViewConstants.WELCOME;
@@ -372,6 +377,24 @@ public class AccountController {
 			model.addAttribute(AccountViewConstants.EMAIL_EXIST, AccountViewConstants.EMAIL_EXIST);
 		} catch (UserEmailNotFoundException e) {
 			// If the exception jump, the email is not in use
+		}
+	}
+
+	@GetMapping(path = "/premium/{id}")
+	public String becomePremium(@PathVariable(value = "id") Integer id, Model model, HttpServletRequest request) {
+		try {
+
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			userService.premiumUser(user);
+
+			String previousPage = request.getHeader(referer);
+
+			return redirect + previousPage;
+
+		} catch (UserNotFoundException | AlreadyPremiumUserException e) {
+			return ViewConstants.WELCOME;
 		}
 	}
 

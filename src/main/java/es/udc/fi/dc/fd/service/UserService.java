@@ -28,6 +28,7 @@ import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.AlreadyPremiumUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -149,4 +150,7 @@ public interface UserService {
 	 */
 	UserEntity unfollowUser(UserEntity user, UserEntity userToUnfollow)
 			throws UserNotFoundException, UserToUnfollowNotFoundException;
+
+	public UserEntity premiumUser(UserEntity user) throws UserNotFoundException, AlreadyPremiumUserException;
+
 }

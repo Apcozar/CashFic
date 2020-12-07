@@ -1,4 +1,5 @@
 /**
+ /**
  * The MIT License (MIT)
  * <p>
  * Copyright (c) 2020 the original author or authors.
@@ -41,6 +42,7 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
 import es.udc.fi.dc.fd.repository.UserRepository;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.AlreadyPremiumUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -225,4 +227,20 @@ public class DefaultUserService implements UserService {
 		userDao.save((DefaultUserEntity) userToUnfollow);
 		return userDao.save((DefaultUserEntity) user);
 	}
+
+	@Override
+	public UserEntity premiumUser(UserEntity user) throws UserNotFoundException, AlreadyPremiumUserException {
+
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		} else if (user.getRole() == Role.ROLE_PREMIUM) {
+			throw new AlreadyPremiumUserException(user);
+		} else {
+
+			user.setRole(Role.ROLE_PREMIUM);
+			return userDao.save((DefaultUserEntity) user);
+
+		}
+	}
+
 }
