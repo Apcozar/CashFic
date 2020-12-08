@@ -41,6 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.udc.fi.dc.fd.model.Role;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
@@ -49,6 +50,7 @@ import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.AlreadyPremiumUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -69,7 +71,7 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 @Rollback
 @ContextConfiguration(locations = { "classpath:context/application-context.xml" })
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
-public class ITUserService {
+class ITUserService {
 
 	/** The non existent id. */
 	private final Integer NON_EXISTENT_ID = -1;
@@ -126,6 +128,22 @@ public class ITUserService {
 	}
 
 	/**
+	 * Creates the sale advertisement.
+	 *
+	 * @param user the user
+	 * @return the default sale advertisement entity
+	 */
+	private DefaultSaleAdvertisementEntity createSaleAdvertisement(DefaultUserEntity user) {
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
+		saleAdvertisement.setProductDescription("sale advertisement product description test");
+		saleAdvertisement.setProductTitle("sale advertisement title test");
+		saleAdvertisement.setUser(user);
+		saleAdvertisement.setPrice(BigDecimal.valueOf(10));
+		return saleAdvertisement;
+	}
+
+	/**
 	 * Sign up and find by login name test.
 	 *
 	 * @throws UserLoginExistsException         the user login exists exception
@@ -135,7 +153,7 @@ public class ITUserService {
 	 * @throws UserNotFoundException            the user not found exception
 	 */
 	@Test
-	public void signUpAndFindByLoginNameTest() throws UserLoginExistsException, UserEmailExistsException,
+	void signUpAndFindByLoginNameTest() throws UserLoginExistsException, UserEmailExistsException,
 			UserLoginAndEmailExistsException, UserNotFoundException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
@@ -156,7 +174,7 @@ public class ITUserService {
 	 * @throws UserNotFoundException            the user not found exception
 	 */
 	@Test
-	public void signUpAndFindByIdTest() throws UserLoginExistsException, UserEmailExistsException,
+	void signUpAndFindByIdTest() throws UserLoginExistsException, UserEmailExistsException,
 			UserLoginAndEmailExistsException, UserNotFoundException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
@@ -178,7 +196,7 @@ public class ITUserService {
 	 * @throws UserEmailNotFoundException       the email not found exception
 	 */
 	@Test
-	public void signUpAndFindByEmailTest() throws UserLoginExistsException, UserEmailExistsException,
+	void signUpAndFindByEmailTest() throws UserLoginExistsException, UserEmailExistsException,
 			UserLoginAndEmailExistsException, UserNotFoundException, UserEmailNotFoundException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
@@ -201,7 +219,7 @@ public class ITUserService {
 	 * @throws UserIncorrectLoginException      the incorrect login exception
 	 */
 	@Test
-	public void signUpAndLoginTest()
+	void signUpAndLoginTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, UserEmailNotFoundException, UserIncorrectLoginException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
@@ -222,7 +240,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void signUpExistentLoginTest()
+	void signUpExistentLoginTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
@@ -242,7 +260,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void signUpExistentEmailTest()
+	void signUpExistentEmailTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
@@ -262,7 +280,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void signUpExistentLoginAndEmailTest()
+	void signUpExistentLoginAndEmailTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
@@ -279,7 +297,7 @@ public class ITUserService {
 	 * @throws UserNotFoundException the user not found exception
 	 */
 	@Test
-	public void FindByNonExistentIdTest() throws UserNotFoundException {
+	void FindByNonExistentIdTest() throws UserNotFoundException {
 		Assertions.assertThrows(UserNotFoundException.class, () -> {
 			userService.findById(NON_EXISTENT_ID);
 		});
@@ -291,7 +309,7 @@ public class ITUserService {
 	 * @throws UserNotFoundException the user not found exception
 	 */
 	@Test
-	public void FindByNonExistentLoginTest() throws UserNotFoundException {
+	void FindByNonExistentLoginTest() throws UserNotFoundException {
 		Assertions.assertThrows(UserNotFoundException.class, () -> {
 			userService.findByLogin(NON_EXISTENT_LOGIN);
 		});
@@ -303,7 +321,7 @@ public class ITUserService {
 	 * @throws UserEmailNotFoundException the email not found exception
 	 */
 	@Test
-	public void FindByNonExistentEMAILTest() throws UserEmailNotFoundException {
+	void FindByNonExistentEMAILTest() throws UserEmailNotFoundException {
 		Assertions.assertThrows(UserEmailNotFoundException.class, () -> {
 			userService.findByEmail(NON_EXISTENT_EMAIL);
 		});
@@ -320,7 +338,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void signUpAndLoginNonExistentLoginTest() throws UserNotFoundException, UserIncorrectLoginException,
+	void signUpAndLoginNonExistentLoginTest() throws UserNotFoundException, UserIncorrectLoginException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		Assertions.assertThrows(UserNotFoundException.class, () -> {
 			userService.login(NON_EXISTENT_LOGIN, PASSWORD);
@@ -338,7 +356,7 @@ public class ITUserService {
 	 * @throws UserIncorrectLoginException      the incorrect login exception
 	 */
 	@Test
-	public void signUpAndLoginIncorrectPasswordTest() throws UserLoginExistsException, UserEmailExistsException,
+	void signUpAndLoginIncorrectPasswordTest() throws UserLoginExistsException, UserEmailExistsException,
 			UserLoginAndEmailExistsException, UserNotFoundException, UserIncorrectLoginException {
 		DefaultUserEntity expected = createUser(LOGIN, EMAIL);
 
@@ -350,12 +368,12 @@ public class ITUserService {
 	}
 
 	/**
-	 * <<<<<<< HEAD Check service updates user entity with sale advertisement added
-	 * to likes list persist it and adds in sale advertisement entity the user in
-	 * likes list Check both sides of relationship
+	 * Check service updates user entity with sale advertisement added to likes list
+	 * persist it and adds in sale advertisement entity the user in likes list Check
+	 * both sides of relationship
 	 */
 	@Test
-	public void userAddLikeSaleAdvertisementsTest()
+	void userAddLikeSaleAdvertisementsTest()
 			throws UserNotFoundException, SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException {
 		// Get user
 		DefaultUserEntity user = userService.findById(1);
@@ -385,11 +403,64 @@ public class ITUserService {
 	}
 
 	/**
+	 * Not existent user add like sale advertisements test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	void notExistentUserAddLikeSaleAdvertisementsTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		// Create users
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
+
+		// Sign up first user
+		userService.signUp(user);
+
+		// Assign non existent id to second user
+		user2.setId(NON_EXISTENT_ID);
+
+		// Create sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = createSaleAdvertisement(user);
+
+		// Non existent user likes the sale advertisement
+		Assertions.assertThrows(UserNotFoundException.class, () -> userService.like(user2, saleAdvertisement));
+	}
+
+	/**
+	 * User add like not existent sale advertisements test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	void userAddLikeNotExistentSaleAdvertisementsTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		// Create users
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Sign up user
+		userService.signUp(user);
+
+		// Create sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = createSaleAdvertisement(user);
+
+		// User likes the non stored sale advertisement
+		Assertions.assertThrows(SaleAdvertisementNotFoundException.class,
+				() -> userService.like(user, saleAdvertisement));
+	}
+
+	/**
 	 * Check service updates user entity with sale advertisement added to likes list
 	 * and removed from, check if remove the relationship from both sides
 	 */
 	@Test
-	public void userRemoveLikeSaleAdvertisementsTest()
+	void userRemoveLikeSaleAdvertisementsTest()
 			throws UserNotFoundException, SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException {
 		// Get user
 		DefaultUserEntity user = userService.findById(1);
@@ -424,13 +495,58 @@ public class ITUserService {
 	}
 
 	/**
+	 * Not existent user remove like sale advertisements test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 */
+	@Test
+	void notExistentUserRemoveLikeSaleAdvertisementsTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		// Create users
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
+
+		// Sign up first user
+		userService.signUp(user);
+
+		// Assign non existent id to second user
+		user2.setId(NON_EXISTENT_ID);
+
+		// Create sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = createSaleAdvertisement(user);
+
+		// Non existent user likes the sale advertisement
+		Assertions.assertThrows(UserNotFoundException.class, () -> userService.unlike(user2, saleAdvertisement));
+	}
+
+	@Test
+	void userRemoveLikeNotExistentSaleAdvertisementsTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		// Create users
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Sign up user
+		userService.signUp(user);
+
+		// Create sale advertisement
+		DefaultSaleAdvertisementEntity saleAdvertisement = createSaleAdvertisement(user);
+
+		// User likes the non stored sale advertisement
+		Assertions.assertThrows(SaleAdvertisementNotFoundException.class,
+				() -> userService.unlike(user, saleAdvertisement));
+	}
+
+	/**
 	 * Create two users and three sale advertisements. First user likes all sale
 	 * advertisements second user only like second sale advertisement Check that can
 	 * store several sale advertisement liked by user and a sale advertisement can
 	 * store several users who liked it
 	 */
 	@Test
-	public void usersLikeSeveralSaleAdvertisements()
+	void usersLikeSeveralSaleAdvertisements()
 			throws UserNotFoundException, SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException {
 		// Get users
 		DefaultUserEntity firstUser = userService.findById(1);
@@ -501,7 +617,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void followUserUserNotFoundTest() throws UserNotFoundException, UserToFollowExistsException,
+	void followUserUserNotFoundTest() throws UserNotFoundException, UserToFollowExistsException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity userToFollow = createUser(LOGIN2, EMAIL2);
@@ -526,7 +642,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void followUserUserToFollowNotFoundTest() throws UserNotFoundException, UserToFollowExistsException,
+	void followUserUserToFollowNotFoundTest() throws UserNotFoundException, UserToFollowExistsException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity userToFollow = createUser(LOGIN2, EMAIL2);
@@ -551,7 +667,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void followUserUserToFollowExistsTest() throws UserNotFoundException, UserToFollowExistsException,
+	void followUserUserToFollowExistsTest() throws UserNotFoundException, UserToFollowExistsException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity userToFollow = createUser(LOGIN2, EMAIL2);
@@ -577,7 +693,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void followUserTest() throws UserNotFoundException, UserToFollowExistsException, UserLoginExistsException,
+	void followUserTest() throws UserNotFoundException, UserToFollowExistsException, UserLoginExistsException,
 			UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
@@ -590,22 +706,22 @@ public class ITUserService {
 		userService.signUp(user4);
 
 		// Check if one user follows only one user in both directions
-		Assert.assertEquals(user.getFollowed().size(), 0);
+		Assert.assertEquals(0, user.getFollowed().size());
 		userService.followUser(user, user2);
 		Assert.assertTrue(user.getFollowed().contains(user2));
 		Assert.assertTrue(user2.getFollowers().contains(user));
-		Assert.assertEquals(user2.getFollowers().size(), 1);
+		Assert.assertEquals(1, user2.getFollowers().size());
 
 		// Check if one user follows many users in both directions
 		userService.followUser(user, user3);
 		userService.followUser(user, user4);
-		Assert.assertEquals(user.getFollowed().size(), 3);
+		Assert.assertEquals(3, user.getFollowed().size());
 		Assert.assertTrue(user.getFollowed().contains(user3));
 		Assert.assertTrue(user3.getFollowers().contains(user));
-		Assert.assertEquals(user3.getFollowers().size(), 1);
+		Assert.assertEquals(1, user3.getFollowers().size());
 		Assert.assertTrue(user.getFollowed().contains(user4));
 		Assert.assertTrue(user4.getFollowers().contains(user));
-		Assert.assertEquals(user4.getFollowers().size(), 1);
+		Assert.assertEquals(1, user4.getFollowers().size());
 	}
 
 	/**
@@ -620,7 +736,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void unfollowUserUserNotFoundTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
+	void unfollowUserUserNotFoundTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity userToUnfollow = createUser(LOGIN2, EMAIL2);
@@ -646,7 +762,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void unfollowUserUserToUnfollowNotFoundTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
+	void unfollowUserUserToUnfollowNotFoundTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity userToUnfollow = createUser(LOGIN2, EMAIL2);
@@ -672,7 +788,7 @@ public class ITUserService {
 	 *                                          exception
 	 */
 	@Test
-	public void unfollowUserUserToFollowNotExistsTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
+	void unfollowUserUserToFollowNotExistsTest() throws UserNotFoundException, UserToUnfollowNotFoundException,
 			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity userToUnfollow = createUser(LOGIN2, EMAIL2);
@@ -698,8 +814,7 @@ public class ITUserService {
 	 * @throws UserToFollowExistsException      the user to follow exists exception
 	 */
 	@Test
-	public void unfollowUserTest()
-			throws UserNotFoundException, UserToUnfollowNotFoundException, UserLoginExistsException,
+	void unfollowUserTest() throws UserNotFoundException, UserToUnfollowNotFoundException, UserLoginExistsException,
 			UserEmailExistsException, UserLoginAndEmailExistsException, UserToFollowExistsException {
 		DefaultUserEntity user = createUser(LOGIN, EMAIL);
 		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
@@ -714,7 +829,7 @@ public class ITUserService {
 		// Check if one user unfollows only one user in both directions
 		userService.followUser(user, user2);
 		userService.unfollowUser(user, user2);
-		Assert.assertEquals(user.getFollowed().size(), 0);
+		Assert.assertEquals(0, user.getFollowed().size());
 		Assert.assertFalse(user.getFollowed().contains(user2));
 		Assert.assertFalse(user2.getFollowers().contains(user));
 
@@ -723,19 +838,87 @@ public class ITUserService {
 		userService.followUser(user, user3);
 		userService.followUser(user, user4);
 		userService.unfollowUser(user, user2);
-		Assert.assertEquals(user.getFollowed().size(), 2);
+		Assert.assertEquals(2, user.getFollowed().size());
 		Assert.assertFalse(user.getFollowed().contains(user2));
 		Assert.assertFalse(user2.getFollowers().contains(user));
-		Assert.assertEquals(user2.getFollowers().size(), 0);
+		Assert.assertEquals(0, user2.getFollowers().size());
 		userService.unfollowUser(user, user3);
-		Assert.assertEquals(user.getFollowed().size(), 1);
+		Assert.assertEquals(1, user.getFollowed().size());
 		Assert.assertFalse(user.getFollowed().contains(user3));
 		Assert.assertFalse(user3.getFollowers().contains(user));
-		Assert.assertEquals(user3.getFollowers().size(), 0);
+		Assert.assertEquals(0, user3.getFollowers().size());
 		userService.unfollowUser(user, user4);
-		Assert.assertEquals(user.getFollowed().size(), 0);
+		Assert.assertEquals(0, user.getFollowed().size());
 		Assert.assertFalse(user.getFollowed().contains(user3));
 		Assert.assertFalse(user4.getFollowers().contains(user));
-		Assert.assertEquals(user4.getFollowers().size(), 0);
+		Assert.assertEquals(0, user4.getFollowers().size());
 	}
+
+	/**
+	 * Become premium test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws AlreadyPremiumUserException      the already premium user exception
+	 */
+	@Test
+	void becomePremiumTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, AlreadyPremiumUserException {
+		// Create user
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Sign up user
+		userService.signUp(user);
+
+		// Become premium user
+		userService.premiumUser(user);
+
+		// Check data
+		Assert.assertEquals(Role.ROLE_PREMIUM, user.getRole());
+	}
+
+	/**
+	 * Become premium being premium test.
+	 *
+	 * @throws UserLoginExistsException         the user login exists exception
+	 * @throws UserEmailExistsException         the user email exists exception
+	 * @throws UserLoginAndEmailExistsException the user login and email exists
+	 *                                          exception
+	 * @throws UserNotFoundException            the user not found exception
+	 * @throws AlreadyPremiumUserException      the already premium user exception
+	 */
+	@Test
+	void becomePremiumBeingPremiumTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, AlreadyPremiumUserException {
+		// Create user
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Sign up user
+		userService.signUp(user);
+
+		// Become premium user
+		userService.premiumUser(user);
+
+		// Become premium again
+		Assertions.assertThrows(AlreadyPremiumUserException.class, () -> userService.premiumUser(user));
+	}
+
+	/**
+	 * Become premium not existent user test.
+	 */
+	@Test
+	void becomePremiumNotExistentUserTest() {
+		// Create user
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Assign non existent id
+		user.setId(NON_EXISTENT_ID);
+
+		// Become premium without sign up
+		Assertions.assertThrows(UserNotFoundException.class, () -> userService.premiumUser(user));
+	}
+
 }
