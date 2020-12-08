@@ -42,7 +42,7 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
 import es.udc.fi.dc.fd.repository.UserRepository;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.fd.service.user.exceptions.AlreadyPremiumUserException;
+import es.udc.fi.dc.fd.service.user.exceptions.NotLoggedUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -229,17 +229,25 @@ public class DefaultUserService implements UserService {
 	}
 
 	@Override
-	public UserEntity premiumUser(UserEntity user) throws UserNotFoundException, AlreadyPremiumUserException {
+	public UserEntity premiumUser(UserEntity user, Integer id) throws UserNotFoundException, NotLoggedUserException {
 
 		if (!userDao.existsById(user.getId())) {
+
 			throw new UserNotFoundException(user.getId());
-		} else if (user.getRole() == Role.ROLE_PREMIUM) {
-			throw new AlreadyPremiumUserException(user);
-		} else {
+
+		} else if (!user.getId().equals(id)) {
+
+			throw new NotLoggedUserException(user);
+
+		} else if (user.getRole() != Role.ROLE_PREMIUM) {
 
 			user.setRole(Role.ROLE_PREMIUM);
 			return userDao.save((DefaultUserEntity) user);
 
+		} else {
+
+			user.setRole(Role.ROLE_USER);
+			return userDao.save((DefaultUserEntity) user);
 		}
 	}
 
