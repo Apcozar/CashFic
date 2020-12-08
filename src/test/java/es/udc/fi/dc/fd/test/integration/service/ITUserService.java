@@ -45,15 +45,19 @@ import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.service.HighRatingException;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNoRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
@@ -737,5 +741,269 @@ public class ITUserService {
 		Assert.assertFalse(user.getFollowed().contains(user3));
 		Assert.assertFalse(user4.getFollowers().contains(user));
 		Assert.assertEquals(user4.getFollowers().size(), 0);
+	}
+
+	@Test
+	public void existsRatingFromUserToRateUserUserNotFoundTest() throws UserNotFoundException, UserLoginExistsException,
+			UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity ratedUser = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(ratedUser);
+
+		user.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.existsRatingFromUserToRateUser(user, ratedUser);
+		});
+	}
+
+	@Test
+	public void existsRatingFromUserToRateUserRatedUserNotFoundTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity ratedUser = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+
+		ratedUser.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.existsRatingFromUserToRateUser(user, ratedUser);
+		});
+	}
+
+	@Test
+	public void existsRatingFromUserToRateUserTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
+			UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
+		DefaultUserEntity user3 = createUser("login3", "user3@udc.es");
+		DefaultUserEntity user4 = createUser("login4", "user4@udc.es");
+
+		userService.signUp(user);
+		userService.signUp(user2);
+		userService.signUp(user3);
+		userService.signUp(user4);
+
+		// Check if there is rating given from user to user2
+		userService.rateUser(user, user2, 3);
+		Assert.assertTrue(userService.existsRatingFromUserToRateUser(user, user2));
+
+		// Check if there is not rating given from user3 to user4
+		Assert.assertFalse(userService.existsRatingFromUserToRateUser(user3, user4));
+	}
+
+	@Test
+	public void rateUserUserNotFoundExceptionTest()
+			throws UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(userToRate);
+
+		user.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.rateUser(user, userToRate, 3);
+		});
+	}
+
+	@Test
+	public void rateUserUserToRateNotFoundExceptionTest()
+			throws UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+
+		userToRate.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.rateUser(user, userToRate, 3);
+		});
+	}
+
+	@Test
+	public void rateUserUserAlreadyGiveRatingToUserToRateTest()
+			throws UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException,
+			UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToRate);
+		userService.rateUser(user, userToRate, 3);
+
+		Assertions.assertThrows(UserAlreadyGiveRatingToUserToRate.class, () -> {
+			userService.rateUser(user, userToRate, 3);
+		});
+	}
+
+	@Test
+	public void rateUserLowRatingExceptionTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToRate);
+
+		Assertions.assertThrows(LowRatingException.class, () -> {
+			userService.rateUser(user, userToRate, -1);
+		});
+	}
+
+	@Test
+	public void rateUserHighRatingExceptionTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToRate);
+
+		Assertions.assertThrows(HighRatingException.class, () -> {
+			userService.rateUser(user, userToRate, 7);
+		});
+	}
+
+	@Test
+	public void rateUserTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, UserAlreadyGiveRatingToUserToRate,
+			LowRatingException, HighRatingException, UserNoRatingException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToRate);
+		userService.rateUser(user, userToRate, 3);
+		Assert.assertTrue(userService.existsRatingFromUserToRateUser(user, userToRate));
+		Assert.assertEquals(userService.givenRatingFromUserToRatedUser(user, userToRate), 3);
+		Assert.assertEquals(userService.averageRating(userToRate), (Double.valueOf(3)));
+		Assert.assertTrue(userService.existsRatingForUser(userToRate));
+		Assert.assertFalse(userService.existsRatingForUser(user));
+	}
+
+	@Test
+	public void existsRatingForUserUserNotFoundExceptionTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		user.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.existsRatingForUser(user);
+		});
+	}
+
+	@Test
+	public void existsRatingForUserTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
+			UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToRate);
+
+		userService.rateUser(user, userToRate, 3);
+
+		Assert.assertTrue(userService.existsRatingForUser(userToRate));
+	}
+
+	@Test
+	public void averageRatingUserNotFoundExceptionTest() {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		user.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.averageRating(user);
+		});
+	}
+
+	@Test
+	public void averageRatingUserNoRatingExceptionTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		userService.signUp(user);
+
+		Assertions.assertThrows(UserNoRatingException.class, () -> {
+			userService.averageRating(user);
+		});
+	}
+
+	@Test
+	public void averageRatingTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, UserAlreadyGiveRatingToUserToRate,
+			LowRatingException, HighRatingException, UserNoRatingException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity user2 = createUser(LOGIN2, EMAIL2);
+		DefaultUserEntity user3 = createUser("login3", "user3@udc.es");
+		DefaultUserEntity user4 = createUser("login4", "user4@udc.es");
+
+		userService.signUp(user);
+		userService.signUp(user2);
+		userService.signUp(user3);
+		userService.signUp(user4);
+
+		// Check the average with only one vote
+		userService.rateUser(user, user4, 3);
+		Assert.assertEquals(userService.averageRating(user4), (Double.valueOf(3)));
+
+		// Add more ratings for user 4 and check if the average is right
+		userService.rateUser(user2, user4, 2);
+		userService.rateUser(user3, user4, 4);
+		Assert.assertEquals(userService.averageRating(user4), (Double.valueOf(3)));
+	}
+
+	@Test
+	public void givenRatingFromUserToRatedUserUserNotFoundExceptionTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(userToRate);
+
+		user.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.givenRatingFromUserToRatedUser(user, userToRate);
+		});
+	}
+
+	@Test
+	public void givenRatingFromUserToRatedUserUserToRateNotFoundExceptionTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+
+		userToRate.setId(NON_EXISTENT_ID);
+
+		Assertions.assertThrows(UserNotFoundException.class, () -> {
+			userService.givenRatingFromUserToRatedUser(user, userToRate);
+		});
+	}
+
+	@Test
+	public void givenRatingFromUserToRatedTest()
+			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
+			UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException {
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+		DefaultUserEntity userToRate = createUser(LOGIN2, EMAIL2);
+
+		userService.signUp(user);
+		userService.signUp(userToRate);
+
+		userService.rateUser(user, userToRate, 3);
+
+		Assert.assertEquals(userService.givenRatingFromUserToRatedUser(user, userToRate), 3);
 	}
 }
