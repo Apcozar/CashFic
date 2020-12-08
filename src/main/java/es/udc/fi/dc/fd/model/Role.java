@@ -2,7 +2,7 @@ package es.udc.fi.dc.fd.model;
 
 public enum Role {
 	/** The role user. */
-	ROLE_USER("ROLE_USER");
+	ROLE_USER("ROLE_USER"), ROLE_PREMIUM("ROLE_PREMIUM");
 
 	/** The role. */
 	private String userRole;
@@ -24,4 +24,5 @@ public enum Role {
 	public String getRole() {
 		return this.userRole;
 	}
+
 }
