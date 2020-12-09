@@ -20,6 +20,9 @@ public class AccountViewConstants {
 	/** The Constant USER. */
 	public static final String USER = "user";
 
+	/** The Constant IS_RATED. */
+	public static final String IS_RATED = "isRated";
+
 	/** The Constant FOLLOWLIST. */
 	public static final String FOLLOWLIST = "followList";
 
