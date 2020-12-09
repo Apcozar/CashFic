@@ -78,5 +78,33 @@
 			referencedTableName="chat_room"/>
 	</changeSet>
 	
+	<changeSet author="Juan" id="rateUser" >
+		<createTable tableName="rate_user">
+			<column name="user_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_rated_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="rating" type="INT"></column>
+		</createTable>
+	</changeSet>
+	
+	
+	<changeSet author="Juan" id="rateUserRelation">
+		<addPrimaryKey columnNames="user_id,user_rated_id" tableName="rate_user"/>
+		<addForeignKeyConstraint
+			baseTableName="rate_user"
+			baseColumnNames="user_id"
+			constraintName="FK_rate_vendor_id"
+			referencedColumnNames="id"
+			referencedTableName="users"/>				
+		<addForeignKeyConstraint
+			baseTableName="rate_user"
+			baseColumnNames="user_rated_id"
+			constraintName="FK_rate_vendor_rated_user_id"
+			referencedColumnNames="id"
+			referencedTableName="users"/>	
+	</changeSet>	
 	
 </databaseChangeLog>

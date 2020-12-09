@@ -1,4 +1,5 @@
 /**
+ /**
  * The MIT License (MIT)
  * <p>
  * Copyright (c) 2020 the original author or authors.
@@ -36,16 +37,22 @@ import org.springframework.transaction.annotation.Transactional;
 import es.udc.fi.dc.fd.model.Role;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultRateUserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.repository.RateUserRepository;
 import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
 import es.udc.fi.dc.fd.repository.UserRepository;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
+import es.udc.fi.dc.fd.service.user.exceptions.NotLoggedUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNoRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
@@ -59,6 +66,9 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 @Service
 public class DefaultUserService implements UserService {
 
+	static final int MAX_RATING = 5;
+	static final int MIN_RATING = 0;
+
 	/**
 	 * Repository for the domain entities handled by the service.
 	 */
@@ -70,6 +80,11 @@ public class DefaultUserService implements UserService {
 	private final SaleAdvertisementRepository saleAdvertisementRepository;
 
 	/**
+	 * Repository for the domain entities handled by the service.
+	 */
+	private final RateUserRepository rateUserDao;
+
+	/**
 	 * Constructs an user service with the specified repository.
 	 * 
 	 * @param repository                  the repository for the user instances
@@ -77,12 +92,14 @@ public class DefaultUserService implements UserService {
 	 */
 	@Autowired
 	public DefaultUserService(final UserRepository repository,
-			final SaleAdvertisementRepository saleAdvertisementRepository) {
+			final SaleAdvertisementRepository saleAdvertisementRepository,
+			final RateUserRepository rateUserRepository) {
 		super();
 
 		userDao = checkNotNull(repository, "Received a null pointer as repository");
 		this.saleAdvertisementRepository = checkNotNull(saleAdvertisementRepository,
 				"Received a null pointer as saleAdvertisementRepository");
+		rateUserDao = checkNotNull(rateUserRepository, "Received a null pointer as repository");
 	}
 
 	@Override
@@ -225,4 +242,103 @@ public class DefaultUserService implements UserService {
 		userDao.save((DefaultUserEntity) userToUnfollow);
 		return userDao.save((DefaultUserEntity) user);
 	}
+
+	@Override
+	public int getMaxRating() {
+		return MAX_RATING;
+	}
+
+	@Override
+	public int getMinRating() {
+		return MIN_RATING;
+	}
+
+	@Override
+	public boolean existsRatingFromUserToRateUser(UserEntity user, UserEntity ratedUser) throws UserNotFoundException {
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		if (!userDao.existsById(ratedUser.getId())) {
+			throw new UserNotFoundException(ratedUser.getId());
+		}
+		return rateUserDao.existsRatingFromUserToRatedUser(user.getId(), ratedUser.getId());
+	}
+
+	@Override
+	public boolean existsRatingForUser(UserEntity user) throws UserNotFoundException {
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		return rateUserDao.existsRatedUser(user.getId());
+	}
+
+	@Override
+	public void rateUser(UserEntity user, UserEntity userToRate, Integer rating)
+			throws UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException {
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		if (!userDao.existsById(userToRate.getId())) {
+			throw new UserNotFoundException(userToRate.getId());
+		}
+		if (rateUserDao.existsRatingFromUserToRatedUser(user.getId(), userToRate.getId())) {
+			throw new UserAlreadyGiveRatingToUserToRate(user.getId(), userToRate.getId());
+		}
+		if (rating < getMinRating()) {
+			throw new LowRatingException(rating, getMinRating());
+		}
+		if (rating > getMaxRating()) {
+			throw new HighRatingException(rating, getMaxRating());
+		}
+		DefaultRateUserEntity rateEntity = new DefaultRateUserEntity((DefaultUserEntity) user,
+				(DefaultUserEntity) userToRate, rating);
+
+		rateUserDao.save(rateEntity);
+	}
+
+	@Override
+	public Double averageRating(UserEntity user) throws UserNotFoundException, UserNoRatingException {
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		Double average = rateUserDao.findAverageRating(user.getId());
+		if (!existsRatingForUser(user)) {
+			throw new UserNoRatingException(user.getId());
+		}
+		return average;
+	}
+
+	@Override
+	public int givenRatingFromUserToRatedUser(UserEntity user, UserEntity ratedUser) throws UserNotFoundException {
+		if (!userDao.existsById(user.getId())) {
+			throw new UserNotFoundException(user.getId());
+		}
+		if (!userDao.existsById(ratedUser.getId())) {
+			throw new UserNotFoundException(ratedUser.getId());
+		}
+		return rateUserDao.givenRatingFromUserToRatedUser(user.getId(), ratedUser.getId());
+	}
+
+	public UserEntity premiumUser(UserEntity user, Integer id) throws UserNotFoundException, NotLoggedUserException {
+
+		if (!userDao.existsById(user.getId())) {
+
+			throw new UserNotFoundException(user.getId());
+
+		} else if (!user.getId().equals(id)) {
+
+			throw new NotLoggedUserException(user);
+
+		} else if (user.getRole() != Role.ROLE_PREMIUM) {
+
+			user.setRole(Role.ROLE_PREMIUM);
+			return userDao.save((DefaultUserEntity) user);
+
+		} else {
+
+			user.setRole(Role.ROLE_USER);
+			return userDao.save((DefaultUserEntity) user);
+		}
+	}
+
 }

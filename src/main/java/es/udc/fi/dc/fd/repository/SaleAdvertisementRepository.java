@@ -64,7 +64,7 @@ public interface SaleAdvertisementRepository extends JpaRepository<DefaultSaleAd
 	 */
 	@Query("SELECT s FROM SaleAdvertisementEntity s JOIN UserEntity u ON s.user = u WHERE u.city LIKE ?1 "
 			+ "AND (s.product_title LIKE %?2% OR s.product_description LIKE %?2%) AND s.date BETWEEN ?3 AND ?4 "
-			+ "AND (s.price BETWEEN ?5 AND ?6 OR s.price is null) ORDER BY s.date DESC")
+			+ "AND (s.price BETWEEN ?5 AND ?6 OR s.price is null) ORDER BY u.role DESC, s.date DESC")
 	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByCriteria(String city, String keywords,
 			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
 

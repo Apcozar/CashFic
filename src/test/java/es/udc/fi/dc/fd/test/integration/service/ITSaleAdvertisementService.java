@@ -77,7 +77,7 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 @Rollback
 @ContextConfiguration(locations = { "classpath:context/application-context.xml" })
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
-public class ITSaleAdvertisementService {
+class ITSaleAdvertisementService {
 
 	/**
 	 * Service being tested.
@@ -106,8 +106,7 @@ public class ITSaleAdvertisementService {
 	 * @throws SaleAdvertisementNotFoundException
 	 */
 	@Test
-	public void testFindById_Existing_Valid()
-			throws SaleAdvertisementServiceException, SaleAdvertisementNotFoundException {
+	void testFindById_Existing_Valid() throws SaleAdvertisementServiceException, SaleAdvertisementNotFoundException {
 		final SaleAdvertisementEntity sale_advertisement; // Found entity
 
 		sale_advertisement = service.findById(1);
@@ -122,7 +121,7 @@ public class ITSaleAdvertisementService {
 	 * @throws SaleAdvertisementServiceException
 	 */
 	@Test
-	public void testFindById_NotExisting_Invalid() throws SaleAdvertisementNotFoundException {
+	void testFindById_NotExisting_Invalid() throws SaleAdvertisementNotFoundException {
 
 		Assertions.assertThrows(SaleAdvertisementNotFoundException.class, () -> service.findById(-1));
 	}
@@ -133,7 +132,7 @@ public class ITSaleAdvertisementService {
 	 * @throws SaleAdvertisementAlreadyExistsException
 	 */
 	@Test
-	public void testAdd_NotExisting_Added()
+	void testAdd_NotExisting_Added()
 			throws SaleAdvertisementServiceException, UserNotFoundException, SaleAdvertisementAlreadyExistsException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement to add
 		final Integer entitiesCount; // Original number of sale advertisements
@@ -158,8 +157,8 @@ public class ITSaleAdvertisementService {
 		// Check if size increase
 		Assert.assertEquals(finalEntitiesCount, Integer.valueOf(entitiesCount + 1));
 		// Check saved data
-		Assert.assertEquals(savedSaleAdvertisement.getProductTitle(), "ExampleProductTittle");
-		Assert.assertEquals(savedSaleAdvertisement.getProductDescription(), "ExampleProductDescription");
+		Assert.assertEquals("ExampleProductTittle", savedSaleAdvertisement.getProductTitle());
+		Assert.assertEquals("ExampleProductDescription", savedSaleAdvertisement.getProductDescription());
 		Assert.assertEquals(savedSaleAdvertisement.getDate(), LocalDateTime.of(2020, 3, 2, 20, 50));
 
 		// Check if user have sale advertisement
@@ -173,7 +172,7 @@ public class ITSaleAdvertisementService {
 	 * @throws SaleAdvertisementNotFoundException
 	 */
 	@Test
-	public void testAdd_Existing_Fail()
+	void testAdd_Existing_Fail()
 			throws SaleAdvertisementServiceException, UserNotFoundException, SaleAdvertisementNotFoundException {
 		final SaleAdvertisementEntity saleAdvertisement; // Sale advertisement to add
 
@@ -191,7 +190,7 @@ public class ITSaleAdvertisementService {
 	 */
 	// NOT CHECKED WHAT HAPPEN IF UPDATE SET OF IMAGES OR USER
 	@Test
-	public void testUpdate_Existing_Updated()
+	void testUpdate_Existing_Updated()
 			throws SaleAdvertisementServiceException, UserNotFoundException, SaleAdvertisementAlreadyExistsException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for update
 		final DefaultUserEntity user; // User for sale Advertisement
@@ -220,8 +219,8 @@ public class ITSaleAdvertisementService {
 				.update((DefaultSaleAdvertisementEntity) savedSaleAdvertisement);
 
 		// Check updated attributes
-		Assert.assertEquals(updatedSaleAdvertisement.getProductTitle(), "updated test product title");
-		Assert.assertEquals(updatedSaleAdvertisement.getProductDescription(), "updated test product description");
+		Assert.assertEquals("updated test product title", updatedSaleAdvertisement.getProductTitle());
+		Assert.assertEquals("updated test product description", updatedSaleAdvertisement.getProductDescription());
 		Assert.assertEquals(updatedSaleAdvertisement.getDate(), LocalDateTime.of(2020, 6, 2, 10, 50));
 		Assert.assertEquals(updatedSaleAdvertisement.getUser(), userService.findById(2));
 
@@ -237,7 +236,7 @@ public class ITSaleAdvertisementService {
 	 * @throws UserNotFoundException
 	 */
 	@Test
-	public void testUpdate_NotExisting_Fail() throws SaleAdvertisementServiceException, UserNotFoundException {
+	void testUpdate_NotExisting_Fail() throws SaleAdvertisementServiceException, UserNotFoundException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for update
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -265,7 +264,7 @@ public class ITSaleAdvertisementService {
 	 * @throws SaleAdvertisementNotFoundException
 	 */
 	@Test
-	public void testRemove_Existing_Removed() throws SaleAdvertisementServiceException, UserNotFoundException,
+	void testRemove_Existing_Removed() throws SaleAdvertisementServiceException, UserNotFoundException,
 			SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
 		final DefaultUserEntity user; // User for sale Advertisement
@@ -307,7 +306,7 @@ public class ITSaleAdvertisementService {
 	 * @throws SaleAdvertisementAlreadyExistsException
 	 */
 	@Test
-	public void testRemove_ExistingWithImages_Removed() throws SaleAdvertisementServiceException, UserNotFoundException,
+	void testRemove_ExistingWithImages_Removed() throws SaleAdvertisementServiceException, UserNotFoundException,
 			ImageServiceException, ImageNotFoundException, ImageAlreadyExistsException,
 			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyExistsException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for add and remove
@@ -360,7 +359,7 @@ public class ITSaleAdvertisementService {
 	}
 
 	@Test
-	public void testRemove_NotExisting_Fails() throws UserNotFoundException, SaleAdvertisementServiceException {
+	void testRemove_NotExisting_Fails() throws UserNotFoundException, SaleAdvertisementServiceException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement to remove
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -379,7 +378,7 @@ public class ITSaleAdvertisementService {
 	}
 
 	@Test
-	public void testCreate_Remove_Images() throws UserNotFoundException, SaleAdvertisementServiceException,
+	void testCreate_Remove_Images() throws UserNotFoundException, SaleAdvertisementServiceException,
 			ImageServiceException, ImageNotFoundException, ImageAlreadyExistsException,
 			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyExistsException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // add sale advertisement
@@ -453,7 +452,7 @@ public class ITSaleAdvertisementService {
 	}
 
 	@Test
-	public void testSetOnHoldAdvertisement() throws UserLoginExistsException, UserEmailExistsException,
+	void testSetOnHoldAdvertisement() throws UserLoginExistsException, UserEmailExistsException,
 			UserLoginAndEmailExistsException, SaleAdvertisementAlreadyExistsException,
 			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException {
 		DefaultUserEntity user = new DefaultUserEntity("login", "1234", "userName", "userLastName", "user@email",
@@ -479,11 +478,11 @@ public class ITSaleAdvertisementService {
 		SaleAdvertisementEntity foundSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
 
 		Assert.assertTrue(service.areOnHoldAdvertisement(foundSaleAdvertisement.getId()));
-		Assert.assertTrue(foundSaleAdvertisement.getState().equals(State.STATE_ON_HOLD));
+		Assert.assertEquals(State.STATE_ON_HOLD, foundSaleAdvertisement.getState());
 	}
 
 	@Test
-	public void testSetOnSaleAdvertisement()
+	void testSetOnSaleAdvertisement()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			SaleAdvertisementAlreadyExistsException, SaleAdvertisementNotFoundException,
 			SaleAdvertisementAlreadyOnHoldException, SaleAdvertisementAlreadyOnSaleException {
@@ -510,18 +509,18 @@ public class ITSaleAdvertisementService {
 		SaleAdvertisementEntity foundSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
 
 		Assert.assertTrue(service.areOnHoldAdvertisement(foundSaleAdvertisement.getId()));
-		Assert.assertTrue(foundSaleAdvertisement.getState().equals(State.STATE_ON_HOLD));
+		Assert.assertEquals(State.STATE_ON_HOLD, foundSaleAdvertisement.getState());
 
 		service.setOnSaleAdvertisement(savedSaleAdvertisement.getId());
 
 		foundSaleAdvertisement = service.findById(savedSaleAdvertisement.getId());
 
 		Assert.assertFalse(service.areOnHoldAdvertisement(foundSaleAdvertisement.getId()));
-		Assert.assertTrue(foundSaleAdvertisement.getState().equals(State.STATE_ON_SALE));
+		Assert.assertEquals(State.STATE_ON_SALE, foundSaleAdvertisement.getState());
 	}
 
 	@Test
-	public void testSaleAdvertisementAlreadyOnSaleException() throws UserLoginExistsException, UserEmailExistsException,
+	void testSaleAdvertisementAlreadyOnSaleException() throws UserLoginExistsException, UserEmailExistsException,
 			UserLoginAndEmailExistsException, SaleAdvertisementAlreadyExistsException {
 		DefaultUserEntity user = new DefaultUserEntity("login", "1234", "userName", "userLastName", "user@email",
 				"city");
@@ -545,7 +544,7 @@ public class ITSaleAdvertisementService {
 	}
 
 	@Test
-	public void testSaleAdvertisementAlreadyOnHoldException() throws UserLoginExistsException, UserEmailExistsException,
+	void testSaleAdvertisementAlreadyOnHoldException() throws UserLoginExistsException, UserEmailExistsException,
 			UserLoginAndEmailExistsException, SaleAdvertisementAlreadyExistsException,
 			SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException {
 		DefaultUserEntity user = new DefaultUserEntity("login", "1234", "userName", "userLastName", "user@email",
@@ -572,7 +571,7 @@ public class ITSaleAdvertisementService {
 	}
 
 	@Test
-	public void testSaleAdvertisementSetOnSaleNotFoundException() {
+	void testSaleAdvertisementSetOnSaleNotFoundException() {
 
 		Assertions.assertThrows(SaleAdvertisementNotFoundException.class, () -> {
 			service.setOnSaleAdvertisement(-1);
@@ -580,7 +579,7 @@ public class ITSaleAdvertisementService {
 	}
 
 	@Test
-	public void testSaleAdvertisementSetOnHoldNotFoundException() {
+	void testSaleAdvertisementSetOnHoldNotFoundException() {
 
 		Assertions.assertThrows(SaleAdvertisementNotFoundException.class, () -> {
 			service.setOnHoldAdvertisement(-1);
