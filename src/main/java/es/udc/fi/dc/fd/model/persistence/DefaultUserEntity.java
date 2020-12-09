@@ -361,6 +361,7 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void addFollowserUser(DefaultUserEntity user) {
 		checkNotNull(user, "Received a null pointer as user");
 		followers.add(user);
@@ -371,6 +372,7 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void removeFollowserUser(DefaultUserEntity user) {
 		checkNotNull(user, "Received a null pointer as user");
 		followers.remove(user);
@@ -381,6 +383,7 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void addFollowUser(DefaultUserEntity user) {
 		checkNotNull(user, "Received a null pointer as user");
 		followed.add(user);
@@ -391,6 +394,7 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void removeFollowUser(DefaultUserEntity user) {
 		checkNotNull(user, "Received a null pointer as user");
 		followed.remove(user);
