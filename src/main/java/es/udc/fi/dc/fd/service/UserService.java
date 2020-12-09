@@ -30,6 +30,8 @@ import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
+import es.udc.fi.dc.fd.service.user.exceptions.AlreadyPremiumUserException;
+import es.udc.fi.dc.fd.service.user.exceptions.NotLoggedUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -220,4 +222,8 @@ public interface UserService {
 	 * @throws UserNotFoundException the user not found exception
 	 */
 	int givenRatingFromUserToRatedUser(UserEntity user, UserEntity ratedUser) throws UserNotFoundException;
+
+	public UserEntity premiumUser(UserEntity user, Integer id)
+			throws UserNotFoundException, AlreadyPremiumUserException, NotLoggedUserException;
+
 }

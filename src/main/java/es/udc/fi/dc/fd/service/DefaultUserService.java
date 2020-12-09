@@ -1,4 +1,5 @@
 /**
+ /**
  * The MIT License (MIT)
  * <p>
  * Copyright (c) 2020 the original author or authors.
@@ -45,6 +46,7 @@ import es.udc.fi.dc.fd.repository.UserRepository;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
+import es.udc.fi.dc.fd.service.user.exceptions.NotLoggedUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -316,4 +318,27 @@ public class DefaultUserService implements UserService {
 		}
 		return rateUserDao.givenRatingFromUserToRatedUser(user.getId(), ratedUser.getId());
 	}
+
+	public UserEntity premiumUser(UserEntity user, Integer id) throws UserNotFoundException, NotLoggedUserException {
+
+		if (!userDao.existsById(user.getId())) {
+
+			throw new UserNotFoundException(user.getId());
+
+		} else if (!user.getId().equals(id)) {
+
+			throw new NotLoggedUserException(user);
+
+		} else if (user.getRole() != Role.ROLE_PREMIUM) {
+
+			user.setRole(Role.ROLE_PREMIUM);
+			return userDao.save((DefaultUserEntity) user);
+
+		} else {
+
+			user.setRole(Role.ROLE_USER);
+			return userDao.save((DefaultUserEntity) user);
+		}
+	}
+
 }
