@@ -225,9 +225,19 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	 */
 	@Override
 	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsBySearchCriteria(String city, String keywords,
-			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2) {
-		return saleAdvertisementRepository.findSaleAdvertisementsByCriteria(city, keywords, date1, date2, price1,
-				price2);
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2, Double rating) {
+		if (rating == null)
+			return saleAdvertisementRepository.findSaleAdvertisementsByCriteria(city, keywords, date1, date2, price1,
+					price2);
+
+		if (rating < DefaultUserService.MIN_RATING)
+			rating = Double.valueOf(DefaultUserService.MIN_RATING);
+		
+		if (rating > DefaultUserService.MAX_RATING)
+			rating = Double.valueOf(DefaultUserService.MAX_RATING);
+
+		return saleAdvertisementRepository.findSaleAdvertisementsByCriteriaAndRating(city, keywords, date1, date2,
+				price1, price2, rating);
 	}
 
 	/**
