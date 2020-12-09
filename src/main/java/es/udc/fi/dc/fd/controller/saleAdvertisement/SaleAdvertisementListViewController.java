@@ -46,6 +46,10 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 @RequestMapping("/saleAdvertisement")
 public class SaleAdvertisementListViewController {
 
+	private static final String REDIRECT = "redirect:";
+
+	private static final String REFERER = "Referer";
+
 	/** The sale advertisement service. */
 	private final SaleAdvertisementService saleAdvertisementService;
 
@@ -128,13 +132,13 @@ public class SaleAdvertisementListViewController {
 	public String showSaleAdvertisementList(final ModelMap model, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String keywords, @RequestParam(required = false) String minDate,
 			@RequestParam(required = false) String maxDate, @RequestParam(required = false) BigDecimal minPrice,
-			@RequestParam(required = false) BigDecimal maxPrice) {
+			@RequestParam(required = false) BigDecimal maxPrice, @RequestParam(required = false) Double rating) {
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity user;
 			user = userService.findByLogin(username);
 			model.addAttribute(AccountViewConstants.USER, user);
-			loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice, user);
+			loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice, user, rating);
 			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME, SaleAdvertisementViewConstants.VIEW_LIST);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 		} catch (UserNotFoundException e) {
@@ -146,7 +150,7 @@ public class SaleAdvertisementListViewController {
 	public String showFollowedSaleAdvertisementList(final ModelMap model, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String keywords, @RequestParam(required = false) String minDate,
 			@RequestParam(required = false) String maxDate, @RequestParam(required = false) BigDecimal minPrice,
-			@RequestParam(required = false) BigDecimal maxPrice) {
+			@RequestParam(required = false) BigDecimal maxPrice, @RequestParam(required = false) Double rating) {
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity user;
@@ -156,7 +160,7 @@ public class SaleAdvertisementListViewController {
 			followed = user.getFollowed();
 
 			model.addAttribute(AccountViewConstants.USER, user);
-			loadViewModelFollow(model, city, keywords, minDate, maxDate, minPrice, maxPrice, followed, user);
+			loadViewModelFollow(model, city, keywords, minDate, maxDate, minPrice, maxPrice, followed, user, rating);
 			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME,
 					SaleAdvertisementViewConstants.VIEW_FILTERED_LIST);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
@@ -184,9 +188,9 @@ public class SaleAdvertisementListViewController {
 
 			userService.like(user, saleAdvertisementToLike);
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(REFERER);
 
-			return "redirect:" + previousPage;
+			return REDIRECT + previousPage;
 
 		} catch (UserNotFoundException | SaleAdvertisementNotFoundException e) {
 			return ViewConstants.WELCOME;
@@ -212,9 +216,9 @@ public class SaleAdvertisementListViewController {
 
 			userService.unlike(user, saleAdvertisementToLike);
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(REFERER);
 
-			return "redirect:" + previousPage;
+			return REDIRECT + previousPage;
 
 		} catch (UserNotFoundException | SaleAdvertisementNotFoundException e) {
 			return ViewConstants.WELCOME;
@@ -233,7 +237,7 @@ public class SaleAdvertisementListViewController {
 	 * @param maxPrice the max price
 	 */
 	private final void loadViewModel(final ModelMap model, String city, String keywords, String minDate, String maxDate,
-			BigDecimal minPrice, BigDecimal maxPrice, UserEntity user) {
+			BigDecimal minPrice, BigDecimal maxPrice, UserEntity user, Double rating) {
 
 		LocalDate minimumDate;
 		LocalDate maximumDate;
@@ -265,22 +269,21 @@ public class SaleAdvertisementListViewController {
 		Iterable<DefaultSaleAdvertisementEntity> saleAdvertisementsList = saleAdvertisementService
 				.getSaleAdvertisementsBySearchCriteria(city, keywords,
 						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
-						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice);
+						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice, rating);
 		ArrayList<SaleAdvertisementWithLoggedUserInfoDTO> list = new ArrayList<>();
 
-		saleAdvertisementsList.forEach((saleAdvertisement) -> {
-			list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
-					user.getLikes().contains(saleAdvertisement),
-					user.getFollowed().contains(saleAdvertisement.getUser())));
-		});
+		saleAdvertisementsList
+				.forEach(saleAdvertisement -> list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+						user.getLikes().contains(saleAdvertisement),
+						user.getFollowed().contains(saleAdvertisement.getUser()))));
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, list);
 
 	}
 
 	private final void loadViewModelFollow(final ModelMap model, String city, String keywords, String minDate,
-			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed,
-			UserEntity user) {
+			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed, UserEntity user,
+			Double rating) {
 
 		LocalDate minimumDate;
 		LocalDate maximumDate;
@@ -312,7 +315,7 @@ public class SaleAdvertisementListViewController {
 		Iterable<DefaultSaleAdvertisementEntity> unfiltered = saleAdvertisementService
 				.getSaleAdvertisementsBySearchCriteria(city, keywords,
 						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
-						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice);
+						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice, rating);
 
 		List<SaleAdvertisementWithLoggedUserInfoDTO> filtered = new ArrayList<>();
 
@@ -406,9 +409,9 @@ public class SaleAdvertisementListViewController {
 
 			saleAdvertisementService.setOnHoldAdvertisement(saleAdvertisement.getId());
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(REFERER);
 
-			return "redirect:" + previousPage;
+			return REDIRECT + previousPage;
 
 		} catch (SaleAdvertisementNotFoundException | UserNotFoundException
 				| SaleAdvertisementAlreadyOnHoldException e) {
@@ -440,9 +443,9 @@ public class SaleAdvertisementListViewController {
 
 			saleAdvertisementService.setOnSaleAdvertisement(saleAdvertisement.getId());
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(REFERER);
 
-			return "redirect:" + previousPage;
+			return REDIRECT + previousPage;
 
 		} catch (SaleAdvertisementNotFoundException | UserNotFoundException
 				| SaleAdvertisementAlreadyOnSaleException e) {

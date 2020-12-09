@@ -45,8 +45,8 @@ import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
 import es.udc.fi.dc.fd.repository.UserRepository;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
-import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
 import es.udc.fi.dc.fd.service.user.exceptions.NotLoggedUserException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
@@ -67,7 +67,7 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 public class DefaultUserService implements UserService {
 
 	static final int MAX_RATING = 5;
-	static final int MIN_RATING = 0;
+	static final int MIN_RATING = 1;
 
 	/**
 	 * Repository for the domain entities handled by the service.
