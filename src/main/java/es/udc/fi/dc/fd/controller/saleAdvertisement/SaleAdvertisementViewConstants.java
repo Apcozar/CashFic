@@ -47,6 +47,9 @@ public class SaleAdvertisementViewConstants {
 	/** The Constant VIEW_FILTERED_LIST. */
 	public static final String VIEW_FILTERED_LIST = "viewFilteredList";
 
+	/** The Constant AVERAGE_RATING. */
+	public static final String AVERAGE_RATING = "averageRating";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

@@ -113,12 +113,15 @@ public class SaleAdvertisementListViewController {
 
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
 
+			if (userService.existsRatingForUser(saleAdvertisement.getUser()))
+				model.addAttribute(SaleAdvertisementViewConstants.AVERAGE_RATING,
+						userService.averageRating(saleAdvertisement.getUser()));
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT;
 		} catch (SaleAdvertisementNotFoundException e) {
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
 					SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT;
-		} catch (UserNotFoundException e) {
+		} catch (UserNotFoundException | UserNoRatingException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -144,7 +147,7 @@ public class SaleAdvertisementListViewController {
 			Boolean isRated = userService.existsRatingForUser(user);
 			model.addAttribute(AccountViewConstants.IS_RATED, isRated);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
-		} catch (UserNotFoundException e) {
+		} catch (UserNotFoundException | UserNoRatingException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -240,9 +243,12 @@ public class SaleAdvertisementListViewController {
 	 * @param maxDate  the max date
 	 * @param minPrice the min price
 	 * @param maxPrice the max price
+	 * @throws UserNotFoundException
+	 * @throws UserNoRatingException
 	 */
 	private final void loadViewModel(final ModelMap model, String city, String keywords, String minDate, String maxDate,
-			BigDecimal minPrice, BigDecimal maxPrice, UserEntity user, Double rating) {
+			BigDecimal minPrice, BigDecimal maxPrice, UserEntity user, Double rating)
+			throws UserNotFoundException, UserNoRatingException {
 
 		LocalDate minimumDate;
 		LocalDate maximumDate;
@@ -277,17 +283,17 @@ public class SaleAdvertisementListViewController {
 						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice, rating);
 		ArrayList<SaleAdvertisementWithLoggedUserInfoDTO> list = new ArrayList<>();
 
-		saleAdvertisementsList.forEach((saleAdvertisement) -> {
-			try {
-				list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
-						user.getLikes().contains(saleAdvertisement),
-						user.getFollowed().contains(saleAdvertisement.getUser()),
-						userService.existsRatingForUser(saleAdvertisement.getUser()),
-						userService.averageRating(saleAdvertisement.getUser())));
-			} catch (UserNotFoundException | UserNoRatingException e) {
-				e.printStackTrace();
-			}
-		});
+		for (DefaultSaleAdvertisementEntity saleAdvertisement : saleAdvertisementsList) {
+			boolean isRated = userService.existsRatingForUser(saleAdvertisement.getUser());
+			Double averageRating;
+			if (isRated)
+				averageRating = userService.averageRating(saleAdvertisement.getUser());
+			else
+				averageRating = null;
+			list.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+					user.getLikes().contains(saleAdvertisement),
+					user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating)));
+		}
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, list);
 
@@ -332,12 +338,16 @@ public class SaleAdvertisementListViewController {
 		List<SaleAdvertisementWithLoggedUserInfoDTO> filtered = new ArrayList<>();
 
 		for (DefaultSaleAdvertisementEntity saleAdvertisement : unfiltered) {
+			boolean isRated = userService.existsRatingForUser(saleAdvertisement.getUser());
+			Double averageRating;
+			if (isRated)
+				averageRating = userService.averageRating(saleAdvertisement.getUser());
+			else
+				averageRating = null;
 			if (followed.contains(saleAdvertisement.getUser()))
 				filtered.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
 						user.getLikes().contains(saleAdvertisement),
-						user.getFollowed().contains(saleAdvertisement.getUser()),
-						userService.existsRatingForUser(saleAdvertisement.getUser()),
-						userService.averageRating(saleAdvertisement.getUser()))));
+						user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating)));
 		}
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, filtered);

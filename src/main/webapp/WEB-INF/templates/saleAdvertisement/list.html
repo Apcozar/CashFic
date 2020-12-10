@@ -169,8 +169,9 @@
 							</a>
 						</h1>
 						<h2>
-							<span th:remove="tag"
-								th:text="${saleAdvertisement?.ownerUserLogin}"></span>
+								<a th:href="@{/profile/} + ${saleAdvertisement?.ownerUserId}" class="login-link" style="font-size:13px;">
+								<span th:remove="tag" th:text="${saleAdvertisement?.ownerUserLogin}"></span>
+								</a>
 							<th:block th:if="${user.id} != ${saleAdvertisement?.ownerUserId}">
 								<a
 									th:if="${saleAdvertisement?.loggedUserFollowsSaleAdvertisementUser} == false"
@@ -199,7 +200,7 @@
 					<div class="product-price-btn"
 						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>ï¿½
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
 						</p>
 						<p>
 							<span th:remove="tag"
