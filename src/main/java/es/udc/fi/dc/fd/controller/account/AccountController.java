@@ -20,8 +20,6 @@ import es.udc.fi.dc.fd.model.form.account.SignUpForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
-import es.udc.fi.dc.fd.service.user.exceptions.AlreadyPremiumUserException;
-import es.udc.fi.dc.fd.service.user.exceptions.NotLoggedUserException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
@@ -381,8 +379,8 @@ public class AccountController {
 		}
 	}
 
-	@GetMapping(path = "/premium/{id}")
-	public String becomePremium(@PathVariable(value = "id") Integer id, Model model, HttpServletRequest request) {
+	@GetMapping(path = "/premium")
+	public String becomePremium(Model model, HttpServletRequest request) {
 
 		try {
 
@@ -391,10 +389,10 @@ public class AccountController {
 
 			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
 
-			userService.premiumUser(user, id);
+			userService.premiumUser(user);
 			model.addAttribute(AccountViewConstants.USER, user);
 			return ViewConstants.VIEW_PROFILE;
-		} catch (UserNotFoundException | AlreadyPremiumUserException | NotLoggedUserException e) {
+		} catch (UserNotFoundException e) {
 			return ViewConstants.WELCOME;
 		}
 	}

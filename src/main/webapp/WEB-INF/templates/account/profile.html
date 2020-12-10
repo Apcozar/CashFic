@@ -45,9 +45,9 @@
 								aria-hidden="true"></i>
 							</a>
 						</th:block>
-						<a type="button" th:href="@{/premium/} + ${user.id}"> <em
-							class="fa fa-diamond" style="color: rgb(222, 217, 12);"
-							aria-hidden="true"></em>
+						<a	th:if="${userLogged.id} == ${user.id}"
+							type="button" th:href="@{/premium}"> <em
+							class="fa fa-diamond" style="color: rgb(222, 217, 12);"aria-hidden="true"></em>	
 						</a>
 					</h2>
 					<div class="media-links">
