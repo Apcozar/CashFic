@@ -10,6 +10,6 @@ import es.udc.fi.dc.fd.model.persistence.DefaultChatMessageEntity;
 
 public interface ChatMessageRepository extends JpaRepository<DefaultChatMessageEntity, Integer> {
 
-	@Query("SELECT s from ChatMessageEntity s WHERE s.chatId  = :chatId ORDER BY s.timeSent DESC")
+	@Query("SELECT s from ChatMessageEntity s WHERE s.chatId  = :chatId ORDER BY s.timeSent ASC")
 	List<DefaultChatMessageEntity> findByChatId(@Param("chatId") Integer chatId);
 }

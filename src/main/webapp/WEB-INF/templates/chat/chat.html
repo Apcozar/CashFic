@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.chat}"></title>
+</head>
+
+<body>
+	<header class="header" th:include="fragments/menu :: menu"></header>
+	<div class="container-fluid">
+		<div class="messaging">
+			<div class="inbox_msg">
+				<div class="inbox_people">
+					<div class="headind_srch">
+						<div class="recent_heading">
+							<h4 th:text="#{title.chat}"></h4>
+						</div>
+					</div>
+				
+					<div class="inbox_chat">
+						<th:block th:each="chat : ${chatList}">
+							<div th:if="${chat?.userOne.id} != ${user.id}" class="chat_list" th:classappend="${chat?.id} == ${chatActive} ? active_chat">
+								<div class="chat_people">
+									<div class="chat_img">
+										<img src="https://ptetutorials.com/images/user-profile.png"
+											alt="sunil">
+									</div>
+									<div class="chat_ib">
+										<a th:text="${chat?.userOne.login}"
+											th:href="@{/chat/} + ${chat?.userOne.id} "></a>
+									</div>
+								</div>
+							</div>
+							<div th:unless="${chat?.userOne.id} != ${user.id}" class="chat_list" th:classappend="${chat?.id} == ${chatActive} ? active_chat">
+								<div class="chat_people">
+									<div class="chat_img">
+										<img src="https://ptetutorials.com/images/user-profile.png"
+											alt="sunil">
+									</div>
+									<div class="chat_ib">
+										<a th:text="${chat?.userTwo.login}"
+											th:href="@{/chat/} + ${chat?.userTwo.id} "></a>
+									</div>
+								</div>
+							</div>
+						</th:block>
+					</div>
+				</div>
+				
+				<div class="mesgs" >
+					<div class="msg_history" id="messages_history">
+						<input type="hidden" id="messagesSizeId" th:value="${messagesSize}"/>
+						<th:block th:each="message: ${messages}" >
+							<div th:if="${message?.authorUser.id} != ${user.id}"
+								class="incoming_msg">
+								<div class="incoming_msg_img">
+									<img src="https://ptetutorials.com/images/user-profile.png"
+										alt="sunil">
+								</div>
+								<div class="received_msg">
+									<div class="received_withd_msg">
+										<p th:text="${message?.contents}"></p>
+									</div>
+								</div>
+							</div>
+							<div th:unless="${message?.authorUser.id} != ${user.id}"
+								class="outgoing_msg">
+								<div class="sent_msg">
+									<p th:text="${message?.contents}"></p>
+								</div>
+							</div>
+						</th:block>
+					</div>
+					
+					<form th:action="@{/chat/} + ${recipientUserId} " method="POST"
+						class="input_msg_write" th:object="${chatForm}">
+						<div class="type_msg"
+							th:classappend="${#fields.hasErrors('messageText')} ? 'error'">
+							<input type="text" id="message" name="message" required="required"
+								th:placeholder="message" class="write_msg" th:field="*{messageText}"
+								th:disabled="${chatActive} == null" autofocus /> <span class="text-danger"
+								th:if="${#fields.hasErrors('messageText')}" th:errors="*{message}"></span>
+
+							<button  class="msg_send_btn"
+								autofocus="autofocus" name="Submit" value="Send" type="Submit"
+								th:disabled="${chatActive} == null">
+								<i th:if="${chatActive} != null" class="fa fa-comment" aria-hidden="true"></i>
+								<i th:unless="${chatActive} != null" class="fa fa-comment-slash" aria-hidden="true"></i>
+							</button>
+
+						</div>
+					</form>
+					
+				</div>
+			</div>
+	
+		</div>
+	</div>
+</body>
+<script th:inline="javascript">
+
+	function updateMessages(){
+		var id = /*[[${recipientUserId}]]*/ null;
+		var url = "/chat/messages/" + id;
+				
+		if(id != null){	
+			$.get(url).done(function(fragment) { // get from controller
+		        $("#messages_history").replaceWith(fragment); // update snippet of page
+		        var d = document.getElementById("messages_history"); 
+				d.scrollTop = d.scrollHeight;
+		    });
+		}	
+	}
+</script>
+<script th:inline="javascript">
+	function areChanges() {
+		var id = /*[[${recipientUserId}]]*/ null;
+		var size = $("#messagesSizeId").val();
+		var consult = "/chat/" + id + "/" + size
+		
+		
+		if((id != null) && (size != null)){	
+			$.ajax({
+			    type: "GET",
+			    url: consult,
+			    success: function (result) {
+			    	if(result == true){
+			    		updateMessages();
+			    	}
+			    }
+			});
+		}
+	}
+</script>
+<script th:inline="javascript">
+	setInterval( function() { areChanges(); }, 2000) /* time in milliseconds (ie 2 seconds)*/
+</script>
+<script th:inline="javascript">
+	var d = document.getElementById("messages_history"); 
+	d.scrollTop = d.scrollHeight;
+</script>
+<footer>
+	<div th:include="fragments/scripts :: general"></div>
+</footer>
+</html>

@@ -38,7 +38,7 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 @Rollback
 @ContextConfiguration(locations = { "classpath:context/application-context.xml" })
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
-public class ITChatMessageService {
+class ITChatMessageService {
 	/** The non existent id. */
 	private final Integer NON_EXISTENT_ID = -1;
 
@@ -78,7 +78,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void sendChatMessageTest()
+	void sendChatMessageTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 		DefaultUserEntity userOne = createUser(LOGIN, EMAIL);
@@ -128,7 +128,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void sendChatMessageUserOneNonExistsTest()
+	void sendChatMessageUserOneNonExistsTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 
@@ -141,7 +141,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void sendChatMessageUserTwoNonExistsTest()
+	void sendChatMessageUserTwoNonExistsTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 
@@ -154,7 +154,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void sendChatMessageIncorrectChatMessageTest()
+	void sendChatMessageIncorrectChatMessageTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 
@@ -170,7 +170,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void sendChatMessageIncorrectChatMessage2Test()
+	void sendChatMessageIncorrectChatMessage2Test()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 
@@ -186,7 +186,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void sendChatMessageIncorrectChatMessage3Test()
+	void sendChatMessageIncorrectChatMessage3Test()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 
@@ -202,7 +202,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void findChatMessagesUserOneNotExistsTest()
+	void findChatMessagesUserOneNotExistsTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 
@@ -216,7 +216,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void findChatMessagesUserTwoNotExistsTest()
+	void findChatMessagesUserTwoNotExistsTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
 
@@ -229,8 +229,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void findByIdTest()
-			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
+	void findByIdTest() throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException, ChatMessageNotFound {
 		DefaultUserEntity userOne = createUser(LOGIN, EMAIL);
 		DefaultUserEntity userTwo = createUser(LOGIN2, EMAIL2);
@@ -250,7 +249,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void findfindChatMessagesTest()
+	void findfindChatMessagesTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException, ChatMessageNotFound {
 		DefaultUserEntity userOne = createUser(LOGIN, EMAIL);
@@ -265,7 +264,7 @@ public class ITChatMessageService {
 	}
 
 	@Test
-	public void findByIdNonExistentTest()
+	void findByIdNonExistentTest()
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
 			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException, ChatMessageNotFound {
 
