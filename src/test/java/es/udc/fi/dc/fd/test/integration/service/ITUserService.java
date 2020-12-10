@@ -41,6 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.udc.fi.dc.fd.model.Role;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
@@ -1154,33 +1155,35 @@ class ITUserService {
 	 * @throws UserNotFoundException            the user not found exception
 	 * @throws AlreadyPremiumUserException      the already premium user exception
 	 */
-	/*
-	 * @Test void becomePremiumBeingPremiumTest() throws UserLoginExistsException,
-	 * UserEmailExistsException, UserLoginAndEmailExistsException,
-	 * UserNotFoundException, AlreadyPremiumUserException { // Create user
-	 * DefaultUserEntity user = createUser(LOGIN, EMAIL);
-	 * 
-	 * // Sign up user userService.signUp(user);
-	 * 
-	 * // Become premium user userService.premiumUser(user);
-	 * 
-	 * // Become premium again
-	 * Assertions.assertThrows(AlreadyPremiumUserException.class, () ->
-	 * userService.premiumUser(user)); }
-	 */
+
+	@Test
+	void becomePremiumBeingPremiumTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException { // Create user
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Sign up user
+		userService.signUp(user);
+
+		// Become premium user
+		userService.premiumUser(user);
+
+		// Become premium again
+		Assertions.assertEquals(Role.ROLE_USER, userService.premiumUser(user).getRole());
+	}
 
 	/**
 	 * Become premium not existent user test.
 	 */
-	/*
-	 * @Test void becomePremiumNotExistentUserTest() { // Create user
-	 * DefaultUserEntity user = createUser(LOGIN, EMAIL);
-	 * 
-	 * // Assign non existent id user.setId(NON_EXISTENT_ID);
-	 * 
-	 * // Become premium without sign up
-	 * Assertions.assertThrows(UserNotFoundException.class, () ->
-	 * userService.premiumUser(user)); }
-	 */
+
+	@Test
+	void becomePremiumNotExistentUserTest() { // Create user
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Assign non existent id
+		user.setId(NON_EXISTENT_ID);
+
+		// Become premium without sign up
+		Assertions.assertThrows(UserNotFoundException.class, () -> userService.premiumUser(user));
+	}
 
 }

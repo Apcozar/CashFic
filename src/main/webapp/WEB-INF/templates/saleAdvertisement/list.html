@@ -85,6 +85,18 @@
 							placeholder="Maximum Price">
 					</div>
 				</div>
+				
+				<div class="form-group">
+					
+					<div th:if="${isRated == true}">
+						<label for="minimunRating" th:text="#{label.minRating}"></label>
+						<div>
+							<input class="form-control mr-sm-2" type="number" min="1" max="5"
+								step="any" id="minRating" name="minRating"
+								placeholder="Minimun Rating">
+						</div>
+					</div>
+				</div>
 
 				<div class="form-group">
 					<button class="btn btn-primary btn-block" value="Search"
@@ -187,7 +199,7 @@
 					<div class="product-price-btn"
 						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>ï¿½
 						</p>
 						<p>
 							<span th:remove="tag"

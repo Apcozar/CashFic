@@ -132,14 +132,16 @@ public class SaleAdvertisementListViewController {
 	public String showSaleAdvertisementList(final ModelMap model, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String keywords, @RequestParam(required = false) String minDate,
 			@RequestParam(required = false) String maxDate, @RequestParam(required = false) BigDecimal minPrice,
-			@RequestParam(required = false) BigDecimal maxPrice, @RequestParam(required = false) Double rating) {
+			@RequestParam(required = false) BigDecimal maxPrice, @RequestParam(required = false) Double minRating) {
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity user;
 			user = userService.findByLogin(username);
 			model.addAttribute(AccountViewConstants.USER, user);
-			loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice, user, rating);
+			loadViewModel(model, city, keywords, minDate, maxDate, minPrice, maxPrice, user, minRating);
 			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME, SaleAdvertisementViewConstants.VIEW_LIST);
+			Boolean isRated = userService.existsRatingForUser(user);
+			model.addAttribute(AccountViewConstants.IS_RATED, isRated);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 		} catch (UserNotFoundException e) {
 			return ViewConstants.WELCOME;
@@ -150,7 +152,7 @@ public class SaleAdvertisementListViewController {
 	public String showFollowedSaleAdvertisementList(final ModelMap model, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String keywords, @RequestParam(required = false) String minDate,
 			@RequestParam(required = false) String maxDate, @RequestParam(required = false) BigDecimal minPrice,
-			@RequestParam(required = false) BigDecimal maxPrice, @RequestParam(required = false) Double rating) {
+			@RequestParam(required = false) BigDecimal maxPrice, @RequestParam(required = false) Double minRating) {
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity user;
@@ -160,9 +162,11 @@ public class SaleAdvertisementListViewController {
 			followed = user.getFollowed();
 
 			model.addAttribute(AccountViewConstants.USER, user);
-			loadViewModelFollow(model, city, keywords, minDate, maxDate, minPrice, maxPrice, followed, user, rating);
+			loadViewModelFollow(model, city, keywords, minDate, maxDate, minPrice, maxPrice, followed, user, minRating);
 			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME,
 					SaleAdvertisementViewConstants.VIEW_FILTERED_LIST);
+			Boolean isRated = userService.existsRatingForUser(user);
+			model.addAttribute(AccountViewConstants.IS_RATED, isRated);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 		} catch (UserNotFoundException e) {
 			return ViewConstants.WELCOME;
