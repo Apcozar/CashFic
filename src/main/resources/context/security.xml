@@ -15,6 +15,7 @@
         <intercept-url pattern="/profile" access="isAuthenticated()"/>
         <intercept-url pattern="/profile/**" access="isAuthenticated()"/>
         <intercept-url pattern="/saleAdvertisement/**" access="isAuthenticated()"/>
+        <intercept-url pattern="/chat/**" access="isAuthenticated()"/>
 
   
         <form-login login-page="/signIn" default-target-url="/" always-use-default-target="false" authentication-failure-url="/signIn?error" username-parameter="login" password-parameter="password"/>

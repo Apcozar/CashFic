@@ -8,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import es.udc.fi.dc.fd.model.ChatRoomEntity;
@@ -26,11 +26,11 @@ public class DefaultChatRoomEntity implements ChatRoomEntity {
 	@Column(name = "id", nullable = false, unique = true)
 	private Integer id;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "userIdOne")
 	private DefaultUserEntity userOne;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "userIdTwo")
 	private DefaultUserEntity userTwo;
 

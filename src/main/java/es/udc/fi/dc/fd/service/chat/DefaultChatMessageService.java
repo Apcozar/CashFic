@@ -21,20 +21,21 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 @Service
 public class DefaultChatMessageService implements ChatMessageService {
 
-	private ChatMessageRepository chatMessageRepository;
+	private final ChatMessageRepository chatMessageRepository;
 
-	private ChatRoomService chatRoomService;
+	private final ChatRoomService chatRoomService;
 
 	private final UserRepository userRepository;
+
+	private static final String NULL_POINTER_RECEIVED = "Received a null pointer as saleAdvertisementRepository";
 
 	@Autowired
 	public DefaultChatMessageService(ChatMessageRepository chatMessageRepository,
 			DefaultChatRoomService chatRoomService, UserRepository userRepository) {
 		super();
-		this.chatMessageRepository = checkNotNull(chatMessageRepository,
-				"Received a null pointer as saleAdvertisementRepository");
-		this.chatRoomService = checkNotNull(chatRoomService, "Received a null pointer as saleAdvertisementRepository");
-		this.userRepository = checkNotNull(userRepository, "Received a null pointer as saleAdvertisementRepository");
+		this.chatMessageRepository = checkNotNull(chatMessageRepository, NULL_POINTER_RECEIVED);
+		this.chatRoomService = checkNotNull(chatRoomService, NULL_POINTER_RECEIVED);
+		this.userRepository = checkNotNull(userRepository, NULL_POINTER_RECEIVED);
 	}
 
 	@Override
@@ -64,10 +65,7 @@ public class DefaultChatMessageService implements ChatMessageService {
 			throws UserNotFoundException, ChatRoomNotFoundException {
 		Integer chatId = chatRoomService.getChatId(senderId, recipientId, true);
 
-		List<DefaultChatMessageEntity> messages = chatMessageRepository.findByChatId(chatId);
-
-		return messages;
-
+		return chatMessageRepository.findByChatId(chatId);
 	}
 
 	@Override

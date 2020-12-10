@@ -72,9 +72,6 @@ public class DefaultChatRoomService implements ChatRoomService {
 		if (!user.isPresent())
 			throw new UserNotFoundException(userId);
 
-		Set<DefaultChatRoomEntity> chatRooms = chatRoomRepository.findByUserId(userId);
-
-		return chatRooms;
-
+		return chatRoomRepository.findByUserId(userId);
 	}
 }
