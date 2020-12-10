@@ -277,10 +277,6 @@ public class SaleAdvertisementListViewController {
 						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), minPrice, maxPrice, rating);
 		ArrayList<SaleAdvertisementWithLoggedUserInfoDTO> list = new ArrayList<>();
 
-		saleAdvertisementsList
-				.forEach(saleAdvertisement -> list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
-						user.getLikes().contains(saleAdvertisement),
-						user.getFollowed().contains(saleAdvertisement.getUser()))));
 		saleAdvertisementsList.forEach((saleAdvertisement) -> {
 			try {
 				list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
@@ -299,9 +295,7 @@ public class SaleAdvertisementListViewController {
 
 	private final void loadViewModelFollow(final ModelMap model, String city, String keywords, String minDate,
 			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed, UserEntity user,
-			Double rating) {
-			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed, UserEntity user)
-			throws UserNotFoundException, UserNoRatingException {
+			Double rating) throws UserNotFoundException, UserNoRatingException {
 
 		LocalDate minimumDate;
 		LocalDate maximumDate;
