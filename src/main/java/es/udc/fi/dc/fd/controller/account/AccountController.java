@@ -441,38 +441,4 @@ public class AccountController {
 		}
 	}
 
-	/**
-	 * Rate user.
-	 *
-	 * @param id            the id
-	 * @param rateForm      the rate form
-	 * @param bindingResult the binding result
-	 * @param model         the model
-	 * @param request       the request
-	 * @return the string
-	 */
-	@PostMapping(path = "/rate/{id}")
-	public String rateUser(@PathVariable(value = "id") Integer id, @ModelAttribute("rateForm") RateForm rateForm,
-			BindingResult bindingResult, Model model, HttpServletRequest request) {
-		try {
-			String previousPage = request.getHeader(referer);
-
-			if (bindingResult.hasErrors())
-				return redirect + previousPage;
-
-			String username = this.securityService.findLoggedInUsername();
-			DefaultUserEntity user = userService.findByLogin(username);
-
-			DefaultUserEntity userToRate = userService.findById(id);
-
-			userService.rateUser(user, userToRate, rateForm.getRatingValue());
-
-			return redirect + previousPage;
-
-		} catch (UserNotFoundException | UserAlreadyGiveRatingToUserToRate | LowRatingException
-				| HighRatingException e) {
-			return ViewConstants.WELCOME;
-		}
-	}
-
 }
