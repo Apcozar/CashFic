@@ -137,7 +137,7 @@ public interface SaleAdvertisementService {
 	 *         with the most recents first
 	 */
 	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsBySearchCriteria(String city, String keywords,
-			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2, Double rating);
 
 	/**
 	 * Gets the maximum price of all sale advertisements.

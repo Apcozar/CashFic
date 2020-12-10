@@ -11,6 +11,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker.min.css">
 <link rel="stylesheet" type="text/css"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker-standalone.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 <body>
@@ -82,6 +83,18 @@
 						<input class="form-control mr-sm-2" type="number" min="0"
 							step="any" id="maxPrice" name="maxPrice"
 							placeholder="Maximum Price">
+					</div>
+				</div>
+				
+				<div class="form-group">
+					
+					<div th:if="${isRated == true}">
+						<label for="minimunRating" th:text="#{label.minRating}"></label>
+						<div>
+							<input class="form-control mr-sm-2" type="number" min="1" max="5"
+								step="any" id="minRating" name="minRating"
+								placeholder="Minimun Rating">
+						</div>
 					</div>
 				</div>
 
@@ -186,7 +199,7 @@
 					<div class="product-price-btn"
 						th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
 						<p>
-							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>€
+							<span th:remove="tag" th:text="${saleAdvertisement?.price}"></span>ï¿½
 						</p>
 						<p>
 							<span th:remove="tag"
@@ -216,7 +229,13 @@
 							<small class="text-muted"><em class="far fa-heart"
 								th:text="${saleAdvertisement?.saleAdvertisementLikesCount}"></em></small>
 						</p>
-
+						<div>
+							<th:block th:if="${saleAdvertisement?.role} == 1">
+								<span class="align-top">
+									<em class="fa fa-diamond" style="color: rgb(222, 217, 12);"></em>
+								</span>
+							</th:block>
+						</div>
 					</div>
 				</div>
 

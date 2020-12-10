@@ -9,8 +9,14 @@
 	href="https://fonts.googleapis.com/css?family=Bentham|Playfair+Display|Raleway:400,500|Suranna|Trocchi"
 	rel="stylesheet">
 
-
 </head>
+<head>
+<title>Font Awesome Icons</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
 
 <body>
 	<header class="header" th:include="fragments/menu :: menu"> </header>
@@ -24,19 +30,25 @@
 				</div>
 				<div class="media-body">
 					<h2 class="media-heading">
-						<a th:href="@{/profile/} + ${user.id}"
-							th:text="${user.login}"></a>
+						<a th:href="@{/profile/} + ${user.id}" th:text="${user.login}"></a>
+
 						<th:block th:if="${userLogged.id} != ${user.id}">
 							<a th:if="${userLogged.followed.contains(user)} == false"
 								type="button" th:href="@{/follow/} + ${user.id}"> <i
 								class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
 							</a>
-							<a
-								th:unless="${userLogged.followed.contains(user)} == false"
+							<a th:unless="${userLogged.followed.contains(user)} == false"
 								type="button" th:href="@{/unfollow/} + ${user.id}"> <i
 								class="fa fa-user-times fa-lg" aria-hidden="true"></i>
 							</a>
+							<a th:href="@{/chat/} + ${user.id}"> <i class="fa fa-comment"
+								aria-hidden="true"></i>
+							</a>
 						</th:block>
+						<a	th:if="${userLogged.id} == ${user.id}"
+							type="button" th:href="@{/premium}"> <em
+							class="fa fa-diamond" style="color: rgb(222, 217, 12);"aria-hidden="true"></em>	
+						</a>
 					</h2>
 					<div class="media-links">
 						<p class="small">

@@ -31,6 +31,7 @@
 								type="button" th:href="@{/unfollow/} + ${user.id}"> <i
 								class="fa fa-user-times fa-lg" aria-hidden="true"></i>
 							</a>
+							<a th:href="@{/chat/} + ${user.id}"> <i class="fa fa-comment" aria-hidden="true"></i> </a>
 						</th:block>
 					</h2>
 					<div class="media-links">
@@ -121,6 +122,7 @@
 									type="button" th:href="@{/unfollow/} + ${followUser?.id}">
 									<i class="fa fa-user-times fa-lg" aria-hidden="true"></i>
 								</a>
+								<a th:href="@{/chat/} + ${followUser?.id}"> <i class="fa fa-comment" aria-hidden="true"></i> </a>
 							</th:block>
 						</h2>
 

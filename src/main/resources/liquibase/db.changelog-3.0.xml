@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog
 	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
@@ -35,4 +36,107 @@
 			deferrable="false" initiallyDeferred="false"
 			referencedColumnNames="id" referencedTableName="sale_advertisements" />
 	</changeSet>
+
+	<changeSet author="Rubinos" id="chat_room_table">
+		<createTable tableName="chat_room">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" />
+			</column>
+			<column  name="userIdOne " type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column  name="userIdTwo " type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	
+	<changeSet author="Rubinos" id="chat_room_relation">
+		<addForeignKeyConstraint
+			baseTableName="chat_room"
+			baseColumnNames="userIdOne"
+			constraintName="FK_chat_room_user_id_one"
+			referencedColumnNames="id"
+			referencedTableName="users"/>	
+		<addForeignKeyConstraint
+			baseTableName="chat_room"
+			baseColumnNames="userIdTwo"
+			constraintName="FK_chat_room_user_id_two"
+			referencedColumnNames="id"
+			referencedTableName="users"/>
+	</changeSet>
+	
+	<changeSet author="Rubinos" id="chat_messages_table">
+		<createTable tableName="chat_messages">
+			<column autoIncrement="true" name="id" type="BIGINT">
+				<constraints primaryKey="true" />
+			</column>
+			<column  name="chatId" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column  name="authorUserId" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column  name="recipientUserId" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="timeSent" type="DATETIME">
+				<constraints nullable="false"/>
+			</column>
+			<column name="content" type="VARCHAR(255)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	
+	<changeSet author="Rubinos" id="chat_messages_relation">
+		<addForeignKeyConstraint
+			baseTableName="chat_messages"
+			baseColumnNames="authorUserId"
+			constraintName="FK_chat_messages_user"
+			referencedColumnNames="id"
+			referencedTableName="users"/>	
+		<addForeignKeyConstraint
+			baseTableName="chat_messages"
+			baseColumnNames="recipientUserId"
+			constraintName="FK_chat_messages_recipent_user"
+			referencedColumnNames="id"
+			referencedTableName="users"/>
+		<addForeignKeyConstraint
+			baseTableName="chat_messages"
+			baseColumnNames="chatId"
+			constraintName="FK_chat_messages_chat_id"
+			referencedColumnNames="id"
+			referencedTableName="chat_room"/>
+	</changeSet>
+	
+	<changeSet author="Juan" id="rateUser" >
+		<createTable tableName="rate_user">
+			<column name="user_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="user_rated_id" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="rating" type="INT"></column>
+		</createTable>
+	</changeSet>
+	
+	
+	<changeSet author="Juan" id="rateUserRelation">
+		<addPrimaryKey columnNames="user_id,user_rated_id" tableName="rate_user"/>
+		<addForeignKeyConstraint
+			baseTableName="rate_user"
+			baseColumnNames="user_id"
+			constraintName="FK_rate_vendor_id"
+			referencedColumnNames="id"
+			referencedTableName="users"/>				
+		<addForeignKeyConstraint
+			baseTableName="rate_user"
+			baseColumnNames="user_rated_id"
+			constraintName="FK_rate_vendor_rated_user_id"
+			referencedColumnNames="id"
+			referencedTableName="users"/>	
+	</changeSet>	
+	
 </databaseChangeLog>

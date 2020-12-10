@@ -64,9 +64,30 @@ public interface SaleAdvertisementRepository extends JpaRepository<DefaultSaleAd
 	 */
 	@Query("SELECT s FROM SaleAdvertisementEntity s JOIN UserEntity u ON s.user = u WHERE u.city LIKE ?1 "
 			+ "AND (s.product_title LIKE %?2% OR s.product_description LIKE %?2%) AND s.date BETWEEN ?3 AND ?4 "
-			+ "AND (s.price BETWEEN ?5 AND ?6 OR s.price is null) ORDER BY s.date DESC")
+			+ "AND (s.price BETWEEN ?5 AND ?6 OR s.price is null) ORDER BY u.role DESC, s.date DESC")
 	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByCriteria(String city, String keywords,
 			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2);
+
+	/**
+	 * Find sale advertisements by search criteria.
+	 *
+	 * @param city     the city of the sale advertisement
+	 * @param keywords the keywords that should be in the title or description
+	 * @param date1    the oldest date in the date range
+	 * @param date2    the most recent date in the date range
+	 * @param price1   the minimum price in the price range
+	 * @param price2   the maximum price in the price range
+	 * @param rating   the rating
+	 * @return the sale advertisements that meet the search criteria order by date
+	 *         with the most recents first
+	 */
+	@Query("SELECT s FROM SaleAdvertisementEntity s JOIN UserEntity u ON s.user = u WHERE u.city LIKE ?1 "
+			+ "AND (s.product_title LIKE %?2% OR s.product_description LIKE %?2%) AND s.date BETWEEN ?3 AND ?4 "
+			+ "AND (s.price BETWEEN ?5 AND ?6 OR s.price is null) "
+			+ "AND (?7 <= (SELECT AVG(r.rating) FROM RateUserEntity r WHERE r.userRated = s.user)) "
+			+ "ORDER BY u.role DESC, s.date DESC")
+	Iterable<DefaultSaleAdvertisementEntity> findSaleAdvertisementsByCriteriaAndRating(String city, String keywords,
+			LocalDateTime date1, LocalDateTime date2, BigDecimal price1, BigDecimal price2, Double rating);
 
 	/**
 	 * Gets the maximum price of all sale advertisements.
