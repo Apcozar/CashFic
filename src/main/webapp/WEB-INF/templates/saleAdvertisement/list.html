@@ -235,6 +235,10 @@
 									<em class="fa fa-diamond" style="color: rgb(222, 217, 12);"></em>
 								</span>
 							</th:block>
+							<p th:if="${saleAdvertisement?.areUserRated} == true" class="small ratedUser">
+								<em th:text="#{label.average} + ${saleAdvertisement?.averageRating}"></em> <i
+									class="fa fa-star-o" aria-hidden="true"></i>
+							</p>
 						</div>
 					</div>
 				</div>

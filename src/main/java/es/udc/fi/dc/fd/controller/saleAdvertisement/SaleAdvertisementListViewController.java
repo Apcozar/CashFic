@@ -40,6 +40,7 @@ import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldExceptio
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNoRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 
 @Controller
@@ -168,7 +169,7 @@ public class SaleAdvertisementListViewController {
 			Boolean isRated = userService.existsRatingForUser(user);
 			model.addAttribute(AccountViewConstants.IS_RATED, isRated);
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
-		} catch (UserNotFoundException e) {
+		} catch (UserNotFoundException | UserNoRatingException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -280,6 +281,17 @@ public class SaleAdvertisementListViewController {
 				.forEach(saleAdvertisement -> list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
 						user.getLikes().contains(saleAdvertisement),
 						user.getFollowed().contains(saleAdvertisement.getUser()))));
+		saleAdvertisementsList.forEach((saleAdvertisement) -> {
+			try {
+				list.add(new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+						user.getLikes().contains(saleAdvertisement),
+						user.getFollowed().contains(saleAdvertisement.getUser()),
+						userService.existsRatingForUser(saleAdvertisement.getUser()),
+						userService.averageRating(saleAdvertisement.getUser())));
+			} catch (UserNotFoundException | UserNoRatingException e) {
+				e.printStackTrace();
+			}
+		});
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, list);
 
@@ -288,6 +300,8 @@ public class SaleAdvertisementListViewController {
 	private final void loadViewModelFollow(final ModelMap model, String city, String keywords, String minDate,
 			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed, UserEntity user,
 			Double rating) {
+			String maxDate, BigDecimal minPrice, BigDecimal maxPrice, Set<DefaultUserEntity> followed, UserEntity user)
+			throws UserNotFoundException, UserNoRatingException {
 
 		LocalDate minimumDate;
 		LocalDate maximumDate;
@@ -327,7 +341,9 @@ public class SaleAdvertisementListViewController {
 			if (followed.contains(saleAdvertisement.getUser()))
 				filtered.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
 						user.getLikes().contains(saleAdvertisement),
-						user.getFollowed().contains(saleAdvertisement.getUser()))));
+						user.getFollowed().contains(saleAdvertisement.getUser()),
+						userService.existsRatingForUser(saleAdvertisement.getUser()),
+						userService.averageRating(saleAdvertisement.getUser()))));
 		}
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, filtered);

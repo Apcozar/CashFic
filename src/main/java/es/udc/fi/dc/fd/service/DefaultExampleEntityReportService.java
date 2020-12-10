@@ -33,14 +33,13 @@ import org.apache.commons.collections.IteratorUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import es.udc.fi.dc.fd.model.persistence.DefaultExampleEntity;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
-
-import es.udc.fi.dc.fd.model.persistence.DefaultExampleEntity;
 
 /**
  * Default implementation of the report service.
@@ -49,56 +48,50 @@ import es.udc.fi.dc.fd.model.persistence.DefaultExampleEntity;
  *
  */
 @Service
-public final class DefaultExampleEntityReportService
-        implements ExampleEntityReportService {
+public final class DefaultExampleEntityReportService implements ExampleEntityReportService {
 
-    /**
-     * Default constructor.
-     */
-    public DefaultExampleEntityReportService() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public DefaultExampleEntityReportService() {
+		super();
+	}
 
-    @Override
-    public final JasperPrint
-            getReport(final Iterable<DefaultExampleEntity> data) {
-        final File reportFile;
-        final JasperReport jasperReport;
-        final JasperPrint jasperPrint;
-        final Map<String, Object> parameters;
+	@Override
+	public final JasperPrint getReport(final Iterable<DefaultExampleEntity> data) {
+		final File reportFile;
+		final JasperReport jasperReport;
+		final JasperPrint jasperPrint;
+		final Map<String, Object> parameters;
 
-        // TODO: The file should be received as a configuration value
-        try {
-            reportFile = new ClassPathResource("/report/entities.jasper")
-                    .getFile();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+		try {
+			reportFile = new ClassPathResource("/report/entities.jasper").getFile();
+		} catch (final IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        if (!reportFile.exists()) {
-            // TODO: Compile report
-        }
+		if (!reportFile.exists()) {
 
-        try {
-            jasperReport = (JasperReport) JRLoader
-                    .loadObjectFromFile(reportFile.getPath());
-        } catch (final JRException e) {
-            throw new RuntimeException(e);
-        }
+		}
 
-        parameters = new HashMap<>();
-        // TODO: Internationalize
-        parameters.put("ReportTitle", "Report");
+		try {
+			jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportFile.getPath());
+		} catch (final JRException e) {
+			throw new RuntimeException(e);
+		}
 
-        try {
-            jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
-                    new JRBeanCollectionDataSource(
-                            IteratorUtils.toList(data.iterator())));
-        } catch (final JRException e) {
-            throw new RuntimeException(e);
-        }
+		parameters = new HashMap<>();
 
-        return jasperPrint;
-    }
+		parameters.put("ReportTitle", "Report");
+
+		try {
+			jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
+					new JRBeanCollectionDataSource(IteratorUtils.toList(data.iterator())));
+		} catch (final JRException e) {
+			throw new RuntimeException(e);
+		}
+
+		return jasperPrint;
+	}
 
 }

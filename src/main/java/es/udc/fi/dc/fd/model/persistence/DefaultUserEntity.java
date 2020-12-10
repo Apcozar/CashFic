@@ -57,6 +57,9 @@ import es.udc.fi.dc.fd.model.UserEntity;
 @Table(name = "users")
 public class DefaultUserEntity implements UserEntity {
 
+	/** The Constant NULL_USER. */
+	private static final String NULL_USER = "Received a null pointer as user";
+
 	/**
 	 * Serialization ID.
 	 */
@@ -363,7 +366,7 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@Override
 	public void addFollowserUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followers.add(user);
 	}
 
@@ -374,7 +377,7 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@Override
 	public void removeFollowserUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followers.remove(user);
 	}
 
@@ -385,7 +388,7 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@Override
 	public void addFollowUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followed.add(user);
 	}
 
@@ -396,7 +399,7 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@Override
 	public void removeFollowUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followed.remove(user);
 	}
 
