@@ -147,7 +147,7 @@ public class DefaultRateUserEntity implements RateUserEntity {
 	/**
 	 * Hash code.
 	 *
-	 * @return the int
+	 * @return the integer
 	 */
 	@Override
 	public int hashCode() {
@@ -157,7 +157,7 @@ public class DefaultRateUserEntity implements RateUserEntity {
 	/**
 	 * Equals.
 	 *
-	 * @param obj the obj
+	 * @param obj the object
 	 * @return true, if successful
 	 */
 	@Override

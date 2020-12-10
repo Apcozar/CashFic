@@ -1,6 +1,7 @@
 package es.udc.fi.dc.fd.model.persistence;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -80,43 +81,29 @@ public class RateUserKey implements Serializable {
 	/**
 	 * Hash code.
 	 *
-	 * @return the int
+	 * @return the integer
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
-		result = prime * result + ((userRatedId == null) ? 0 : userRatedId.hashCode());
-		return result;
+		return Objects.hash(userId, userRatedId);
 	}
 
 	/**
 	 * Equals.
 	 *
-	 * @param obj the obj
+	 * @param obj the object
 	 * @return true, if successful
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (!(obj instanceof RateUserKey)) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		RateUserKey other = (RateUserKey) obj;
-		if (userId == null) {
-			if (other.userId != null)
-				return false;
-		} else if (!userId.equals(other.userId))
-			return false;
-		if (userRatedId == null) {
-			if (other.userRatedId != null)
-				return false;
-		} else if (!userRatedId.equals(other.userRatedId))
-			return false;
-		return true;
+		return Objects.equals(userId, other.userId) && Objects.equals(userRatedId, other.userRatedId);
 	}
 
 }

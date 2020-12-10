@@ -112,11 +112,18 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	private final boolean loggedUserFollowsSaleAdvertisementUser;
 
+	/** The are user rated. */
+	private final boolean areUserRated;
+
+	/** The average rating. */
+	private final Double averageRating;
+
 	/**
 	 * Constructs SaleAdvertisementWithLoggedUserInfoDTO DTO.
 	 */
 	public SaleAdvertisementWithLoggedUserInfoDTO(SaleAdvertisementEntity saleAdvertisement,
-			boolean userLikeSaleAdvertisement, boolean loggedUserFollowsSaleAdvertisementUser) {
+			boolean userLikeSaleAdvertisement, boolean loggedUserFollowsSaleAdvertisementUser, boolean areUserRated,
+			Double averageRating) {
 		super();
 
 		productTitle = saleAdvertisement.getProductTitle();
@@ -132,7 +139,8 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		price = saleAdvertisement.getPrice();
 		city = saleAdvertisement.getUser().getCity();
 		role = saleAdvertisement.getUser().getRole().ordinal();
-
+		this.areUserRated = areUserRated;
+		this.averageRating = averageRating;
 		saleAdvertisement.getImages().forEach(image -> images.add(new ImageDTO(image)));
 
 	}
@@ -205,6 +213,14 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		return city;
 	}
 
+	public boolean isAreUserRated() {
+		return areUserRated;
+	}
+
+	public Double getAverageRating() {
+		return averageRating;
+	}
+
 	/**
 	 * @return the role
 	 */
@@ -216,7 +232,7 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	public int hashCode() {
 		return Objects.hash(city, date, images, loggedUserFollowsSaleAdvertisementUser, ownerUserId, ownerUserLogin,
 				price, productDescription, productTitle, role, saleAdvertisementID, saleAdvertisementLikesCount, state,
-				userLikeSaleAdvertisement);
+				userLikeSaleAdvertisement, areUserRated, averageRating);
 	}
 
 	@Override
@@ -237,7 +253,9 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 				&& Objects.equals(productTitle, other.productTitle) && Objects.equals(role, other.role)
 				&& Objects.equals(saleAdvertisementID, other.saleAdvertisementID)
 				&& Objects.equals(saleAdvertisementLikesCount, other.saleAdvertisementLikesCount)
-				&& Objects.equals(state, other.state) && userLikeSaleAdvertisement == other.userLikeSaleAdvertisement;
+				&& Objects.equals(state, other.state) && userLikeSaleAdvertisement == other.userLikeSaleAdvertisement
+				&& Objects.equals(areUserRated, other.areUserRated)
+				&& Objects.equals(averageRating, other.averageRating);
 	}
 
 	@Override

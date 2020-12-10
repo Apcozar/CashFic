@@ -868,18 +868,20 @@ class ITUserService {
 	 * @throws UserNotFoundException            the user not found exception
 	 * @throws AlreadyPremiumUserException      the already premium user exception
 	 */
-	/*
-	 * @Test void becomePremiumTest() throws UserLoginExistsException,
-	 * UserEmailExistsException, UserLoginAndEmailExistsException,
-	 * UserNotFoundException, AlreadyPremiumUserException { // Create user
-	 * DefaultUserEntity user = createUser(LOGIN, EMAIL);
-	 * 
-	 * // Sign up user userService.signUp(user);
-	 * 
-	 * // Become premium user userService.premiumUser(user);
-	 * 
-	 * // Check data Assert.assertEquals(Role.ROLE_PREMIUM, user.getRole()); }
-	 */
+	@Test
+	void becomePremiumTest() throws UserLoginExistsException, UserEmailExistsException,
+			UserLoginAndEmailExistsException, UserNotFoundException, AlreadyPremiumUserException { // Create user
+		DefaultUserEntity user = createUser(LOGIN, EMAIL);
+
+		// Sign up user
+		userService.signUp(user);
+
+		// Become premium user
+		userService.premiumUser(user);
+
+		// Check data
+		Assert.assertEquals(Role.ROLE_PREMIUM, user.getRole());
+	}
 
 	@Test
 	void existsRatingFromUserToRateUserUserNotFoundTest() throws UserNotFoundException, UserLoginExistsException,
