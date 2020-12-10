@@ -50,6 +50,9 @@ public class AccountViewConstants {
 	/** The Constant USER_ADVERTISEMENTS_VIEW. */
 	public static final String USER_ADVERTISEMENTS_LIST = "saleAdvertisements";
 
+	/** The Constant USER_RATING. */
+	public static final String USER_RATING = "userRating";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */
