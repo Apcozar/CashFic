@@ -41,6 +41,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -100,7 +101,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	 * This is to have additional data apart from the id, to be used on the tests.
 	 */
 	@OneToMany(mappedBy = "sale_advertisement")
-	private Set<DefaultImageEntity> images = new HashSet<DefaultImageEntity>();
+	private Set<DefaultImageEntity> images = new HashSet<>();
 
 	/**
 	 * user of the sale_advertisement.
@@ -120,7 +121,10 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	private LocalDateTime date;
 
 	@ManyToMany(mappedBy = "likedSaleAdvertisements")
-	private Set<DefaultUserEntity> usersLikes = new HashSet<DefaultUserEntity>();
+	private Set<DefaultUserEntity> usersLikes = new HashSet<>();
+
+	@OneToOne(mappedBy = "saleAdvertisement")
+	private DefaultBuyTransactionEntity buyTransaction;
 
 	/**
 	 * The price of the sale_advertisement.
@@ -237,6 +241,14 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		return state;
 	}
 
+	/**
+	 * @return the buyTransaction
+	 */
+	@Override
+	public final DefaultBuyTransactionEntity getBuyTransaction() {
+		return buyTransaction;
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hash(id);
@@ -275,6 +287,16 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	@Override
 	public void setDate(final LocalDateTime value) {
 		date = checkNotNull(value, "Received a null pointer as date");
+	}
+
+	/**
+	 * Set an associated buy transaction
+	 * 
+	 * @param buyTransaction the buyTransaction to set
+	 */
+	@Override
+	public final void setBuyTransaction(DefaultBuyTransactionEntity buyTransaction) {
+		this.buyTransaction = buyTransaction;
 	}
 
 	@Override

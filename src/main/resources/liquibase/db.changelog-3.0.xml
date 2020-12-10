@@ -1,0 +1,38 @@
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+	<changeSet author="Santiago" id="buy_transaction_table">
+		<createTable tableName="buy_transactions">
+			<column name="user_id" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="sale_advertisement_id" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_at" type="DATETIME">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+
+		<addPrimaryKey
+			columnNames='user_id,sale_advertisement_id'
+			tableName='buy_transactions' />
+		<addForeignKeyConstraint
+			baseColumnNames='user_id' 
+			baseTableName='buy_transactions'
+			constraintName='FK_buy_transactions_user' 
+			deferrable='false'
+			initiallyDeferred='false' 
+			referencedColumnNames='id' 
+			referencedTableName='users' />
+		<addForeignKeyConstraint
+			baseColumnNames="sale_advertisement_id"
+			baseTableName="buy_transactions"
+			constraintName="FK_buy_transactions_sale_advertisement"
+			deferrable="false" initiallyDeferred="false"
+			referencedColumnNames="id" referencedTableName="sale_advertisements" />
+	</changeSet>
+</databaseChangeLog>
