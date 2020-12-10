@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import es.udc.fi.dc.fd.model.persistence.DefaultBuyTransactionEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 
@@ -167,5 +168,17 @@ public interface SaleAdvertisementEntity extends Serializable {
 	 * @return the price
 	 */
 	public BigDecimal getPrice();
+
+	/**
+	 * @return the buyTransaction
+	 */
+	DefaultBuyTransactionEntity getBuyTransaction();
+
+	/**
+	 * Set an associated buy transaction
+	 * 
+	 * @param buyTransaction the buyTransaction to set
+	 */
+	void setBuyTransaction(DefaultBuyTransactionEntity buyTransaction);
 
 }

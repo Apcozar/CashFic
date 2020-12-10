@@ -135,7 +135,13 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@ManyToMany
 	@JoinTable(name = "likes", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "sale_advertisement_id"))
-	private Set<DefaultSaleAdvertisementEntity> likedSaleAdvertisements = new HashSet<DefaultSaleAdvertisementEntity>();
+	private Set<DefaultSaleAdvertisementEntity> likedSaleAdvertisements = new HashSet<>();
+
+	/**
+	 * User's buy transactions
+	 */
+	@OneToMany(mappedBy = "user")
+	private Set<DefaultBuyTransactionEntity> buyTransactions = new HashSet<>();
 
 	/**
 	 * Constructs an sale_advertisement entity.
@@ -264,6 +270,16 @@ public class DefaultUserEntity implements UserEntity {
 	@Override
 	public Set<DefaultUserEntity> getFollowed() {
 		return followed;
+	}
+
+	/**
+	 * Gets the buy transactions.
+	 *
+	 * @return the buy transactions set
+	 */
+	@Override
+	public Set<DefaultBuyTransactionEntity> getBuyTransactions() {
+		return buyTransactions;
 	}
 
 	/**
@@ -398,6 +414,28 @@ public class DefaultUserEntity implements UserEntity {
 	public void removeFollowUser(DefaultUserEntity user) {
 		checkNotNull(user, "Received a null pointer as user");
 		followed.remove(user);
+	}
+
+	/**
+	 * Add buy transaction to this user entity
+	 * 
+	 * @param buyTransaction the buy transaction to add
+	 */
+	@Override
+	public void addBuyTransaction(DefaultBuyTransactionEntity buyTransaction) {
+		checkNotNull(buyTransaction, "Received a null pointer as buy transaction");
+		buyTransactions.add(buyTransaction);
+	}
+
+	/**
+	 * Remove buy transaction to this user entity
+	 * 
+	 * @param buyTransaction the buy transaction to remove
+	 */
+	@Override
+	public void removeBuyTransaction(DefaultBuyTransactionEntity buyTransaction) {
+		checkNotNull(buyTransaction, "Received a null pointer as buy transaction");
+		buyTransactions.remove(buyTransaction);
 	}
 
 	@Override

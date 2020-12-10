@@ -27,6 +27,7 @@ package es.udc.fi.dc.fd.model;
 import java.io.Serializable;
 import java.util.Set;
 
+import es.udc.fi.dc.fd.model.persistence.DefaultBuyTransactionEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 
@@ -116,6 +117,13 @@ public interface UserEntity extends Serializable {
 	 * @return the followed
 	 */
 	public Set<DefaultUserEntity> getFollowed();
+
+	/**
+	 * Gets the buy transactions.
+	 *
+	 * @return the buy transactions set
+	 */
+	public Set<DefaultBuyTransactionEntity> getBuyTransactions();
 
 	/**
 	 * Sets the identifier assigned to this user.
@@ -230,5 +238,19 @@ public interface UserEntity extends Serializable {
 	 * @param user the user
 	 */
 	public void removeFollowUser(DefaultUserEntity user);
+
+	/**
+	 * Remove buy transaction to this user entity
+	 * 
+	 * @param buyTransaction the buy transaction to remove
+	 */
+	public void removeBuyTransaction(DefaultBuyTransactionEntity buyTransaction);
+
+	/**
+	 * Add buy transaction to this user entity
+	 * 
+	 * @param buyTransaction the buy transaction to add
+	 */
+	public void addBuyTransaction(DefaultBuyTransactionEntity buyTransaction);
 
 }
