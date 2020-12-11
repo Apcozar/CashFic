@@ -166,6 +166,10 @@
 								class="text-muted"
 								th:unless="${saleAdvertisement.state} == 'STATE_ON_SALE'"
 								th:text="#{label.onHoldInfo}"></small>
+								<small
+									class="text-muted"
+									th:if="${saleAdvertisement?.saleAdvertisementIsSold} == true"
+									th:text="#{label.onSale}"></small>
 							</a>
 						</h1>
 						<h2>

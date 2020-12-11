@@ -245,7 +245,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	 * @return the buyTransaction
 	 */
 	@Override
-	public final DefaultBuyTransactionEntity getBuyTransaction() {
+	public DefaultBuyTransactionEntity getBuyTransaction() {
 		return buyTransaction;
 	}
 
@@ -295,7 +295,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	 * @param buyTransaction the buyTransaction to set
 	 */
 	@Override
-	public final void setBuyTransaction(DefaultBuyTransactionEntity buyTransaction) {
+	public void setBuyTransaction(DefaultBuyTransactionEntity buyTransaction) {
 		this.buyTransaction = buyTransaction;
 	}
 

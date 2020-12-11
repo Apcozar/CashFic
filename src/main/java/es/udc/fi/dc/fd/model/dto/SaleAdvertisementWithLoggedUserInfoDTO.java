@@ -119,11 +119,18 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	private final Double averageRating;
 
 	/**
+	 * boolean true sale advertisement have been sold false if not
+	 */
+	private final boolean saleAdvertisementIsSold;
+
+	/**
 	 * Constructs SaleAdvertisementWithLoggedUserInfoDTO DTO.
 	 */
 	public SaleAdvertisementWithLoggedUserInfoDTO(SaleAdvertisementEntity saleAdvertisement,
+
 			boolean userLikeSaleAdvertisement, boolean loggedUserFollowsSaleAdvertisementUser, boolean areUserRated,
-			Double averageRating) {
+			Double averageRating, boolean saleAdvertisementIsSold) {
+
 		super();
 
 		productTitle = saleAdvertisement.getProductTitle();
@@ -142,7 +149,15 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		this.areUserRated = areUserRated;
 		this.averageRating = averageRating;
 		saleAdvertisement.getImages().forEach(image -> images.add(new ImageDTO(image)));
+		this.saleAdvertisementIsSold = saleAdvertisementIsSold;
 
+	}
+
+	/**
+	 * @return the saleAdvertisementIsSold
+	 */
+	public boolean isSaleAdvertisementIsSold() {
+		return saleAdvertisementIsSold;
 	}
 
 	/**
