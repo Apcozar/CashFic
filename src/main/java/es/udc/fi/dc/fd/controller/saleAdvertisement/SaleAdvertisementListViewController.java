@@ -33,9 +33,11 @@ import es.udc.fi.dc.fd.model.dto.SaleAdvertisementWithLoggedUserInfoDTO;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.service.BuyTransactionService;
 import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
+import es.udc.fi.dc.fd.service.exceptions.BuyTransactionAlreadyExistsException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
@@ -62,6 +64,11 @@ public class SaleAdvertisementListViewController {
 	 */
 	private UserService userService;
 
+	/**
+	 * The buyTransactionService service.
+	 */
+	private BuyTransactionService buyTransactionService;
+
 	/** The context. */
 	private ServletContext context;
 
@@ -83,12 +90,13 @@ public class SaleAdvertisementListViewController {
 	@Autowired
 	public SaleAdvertisementListViewController(final SaleAdvertisementService saleAdvertisementService,
 			final ServletContext context, final ImageService imageService, final UserService userService,
-			final SecurityService securityService) {
+			final SecurityService securityService, final BuyTransactionService buyTransactionService) {
 		super();
 		this.saleAdvertisementService = checkNotNull(saleAdvertisementService, ViewConstants.NULL_POINTER);
 		this.imageService = checkNotNull(imageService, ViewConstants.NULL_POINTER);
 		this.userService = checkNotNull(userService, ViewConstants.NULL_POINTER);
 		this.securityService = checkNotNull(securityService, ViewConstants.NULL_POINTER);
+		this.buyTransactionService = checkNotNull(buyTransactionService, ViewConstants.NULL_POINTER);
 		this.context = checkNotNull(context, ViewConstants.NULL_POINTER);
 	}
 
@@ -290,9 +298,17 @@ public class SaleAdvertisementListViewController {
 				averageRating = userService.averageRating(saleAdvertisement.getUser());
 			else
 				averageRating = null;
-			list.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
-					user.getLikes().contains(saleAdvertisement),
-					user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating)));
+
+			if ((saleAdvertisement.getBuyTransaction() != null) && (saleAdvertisement.getBuyTransaction()
+					.getCreatedDate().isBefore(LocalDateTime.now().minusDays(1)))) {
+				// NO SE METE
+			} else {
+
+				list.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+						user.getLikes().contains(saleAdvertisement),
+						user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating,
+						saleAdvertisement.getBuyTransaction() != null)));
+			}
 		}
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, list);
@@ -347,7 +363,9 @@ public class SaleAdvertisementListViewController {
 			if (followed.contains(saleAdvertisement.getUser()))
 				filtered.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
 						user.getLikes().contains(saleAdvertisement),
-						user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating)));
+						user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating,
+						(saleAdvertisement.getBuyTransaction() != null))));
+
 		}
 
 		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, filtered);
@@ -476,4 +494,37 @@ public class SaleAdvertisementListViewController {
 			return ViewConstants.WELCOME;
 		}
 	}
+
+	/**
+	 * Sets the on sale sale advertisement.
+	 *
+	 * @param saleAdvertisementId the saleAdvertisementId
+	 * @param model               the model
+	 * @param request             the request
+	 * @return the string
+	 */
+	@PostMapping(path = "/buy/{saleAdvertisementId}")
+	public String buySaleAdvertisement(@PathVariable(value = "saleAdvertisementId") Integer saleAdvertisementId,
+			Model model, HttpServletRequest request) {
+
+		try {
+			SaleAdvertisementEntity saleAdvertisement;
+			saleAdvertisement = saleAdvertisementService.findById(saleAdvertisementId);
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			if (saleAdvertisement.getUser().getId().equals(user.getId())) {
+				return ViewConstants.WELCOME;
+			}
+			buyTransactionService.create(user, saleAdvertisement);
+
+			String previousPage = request.getHeader(REFERER);
+
+			return REDIRECT + previousPage;
+
+		} catch (SaleAdvertisementNotFoundException | UserNotFoundException | BuyTransactionAlreadyExistsException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
 }
