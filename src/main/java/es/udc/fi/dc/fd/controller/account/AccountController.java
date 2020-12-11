@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
+import es.udc.fi.dc.fd.model.form.account.RateForm;
 import es.udc.fi.dc.fd.model.form.account.SignInForm;
 import es.udc.fi.dc.fd.model.form.account.SignUpForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
+import es.udc.fi.dc.fd.service.HighRatingException;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
+import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
@@ -39,6 +43,10 @@ public class AccountController {
 	 * The Security service.
 	 */
 	private SecurityService securityService;
+
+	private String redirect = "redirect:";
+
+	private String referer = "Referer";
 
 	/**
 	 * Constructs a controller with the specified dependencies.
@@ -169,6 +177,12 @@ public class AccountController {
 
 			model.addAttribute(AccountViewConstants.USER, user);
 
+			model.addAttribute("rateForm", new RateForm());
+
+			if (userService.existsRatingFromUserToRateUser(userLogged, user))
+				model.addAttribute(AccountViewConstants.USER_RATING,
+						userService.givenRatingFromUserToRatedUser(userLogged, user));
+
 		} catch (UserNotFoundException e) {
 			return ViewConstants.VIEW_SIGNIN;
 		}
@@ -194,9 +208,9 @@ public class AccountController {
 
 			userService.followUser(user, userToFollow);
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(referer);
 
-			return "redirect:" + previousPage;
+			return redirect + previousPage;
 
 		} catch (UserNotFoundException | UserToFollowExistsException e) {
 			return ViewConstants.WELCOME;
@@ -204,7 +218,7 @@ public class AccountController {
 	}
 
 	/**
-	 * Follow user.
+	 * Unfollow user.
 	 *
 	 * @param id      the id
 	 * @param model   the model
@@ -221,9 +235,9 @@ public class AccountController {
 
 			userService.unfollowUser(user, userToFollow);
 
-			String previousPage = request.getHeader("Referer");
+			String previousPage = request.getHeader(referer);
 
-			return "redirect:" + previousPage;
+			return redirect + previousPage;
 
 		} catch (UserNotFoundException | UserToUnfollowNotFoundException e) {
 			return ViewConstants.WELCOME;
@@ -372,6 +386,58 @@ public class AccountController {
 			model.addAttribute(AccountViewConstants.EMAIL_EXIST, AccountViewConstants.EMAIL_EXIST);
 		} catch (UserEmailNotFoundException e) {
 			// If the exception jump, the email is not in use
+		}
+	}
+
+	@GetMapping(path = "/premium")
+	public String becomePremium(Model model, HttpServletRequest request) {
+
+		try {
+
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
+
+			userService.premiumUser(user);
+			model.addAttribute(AccountViewConstants.USER, user);
+			return ViewConstants.VIEW_PROFILE;
+		} catch (UserNotFoundException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Rate user.
+	 *
+	 * @param id            the id
+	 * @param rateForm      the rate form
+	 * @param bindingResult the binding result
+	 * @param model         the model
+	 * @param request       the request
+	 * @return the string
+	 */
+	@PostMapping(path = "/rate/{id}")
+	public String rateUser(@PathVariable(value = "id") Integer id, @ModelAttribute("rateForm") RateForm rateForm,
+			BindingResult bindingResult, Model model, HttpServletRequest request) {
+		try {
+			String previousPage = request.getHeader(referer);
+
+			if (bindingResult.hasErrors())
+				return redirect + previousPage;
+
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			DefaultUserEntity userToRate = userService.findById(id);
+
+			userService.rateUser(user, userToRate, rateForm.getRatingValue());
+
+			return redirect + previousPage;
+
+		} catch (UserNotFoundException | UserAlreadyGiveRatingToUserToRate | LowRatingException
+				| HighRatingException e) {
+			return ViewConstants.WELCOME;
 		}
 	}
 

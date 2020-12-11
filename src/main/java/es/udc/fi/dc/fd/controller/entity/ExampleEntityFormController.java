@@ -38,9 +38,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import es.udc.fi.dc.fd.service.ExampleEntityService;
-import es.udc.fi.dc.fd.model.persistence.DefaultExampleEntity;
 import es.udc.fi.dc.fd.model.form.ExampleEntityForm;
+import es.udc.fi.dc.fd.model.persistence.DefaultExampleEntity;
+import es.udc.fi.dc.fd.service.ExampleEntityService;
 
 /**
  * Controller for the example entities form view.
@@ -53,106 +53,96 @@ import es.udc.fi.dc.fd.model.form.ExampleEntityForm;
 @RequestMapping("/entity")
 public class ExampleEntityFormController {
 
-    /**
-     * Example entity service.
-     */
-    private final ExampleEntityService exampleEntityService;
+	/**
+	 * Example entity service.
+	 */
+	private final ExampleEntityService exampleEntityService;
 
-    /**
-     * Constructs a controller with the specified dependencies.
-     * 
-     * @param service
-     *            example entity service
-     */
-    @Autowired
-    public ExampleEntityFormController(final ExampleEntityService service) {
-        super();
+	/**
+	 * Constructs a controller with the specified dependencies.
+	 * 
+	 * @param service example entity service
+	 */
+	@Autowired
+	public ExampleEntityFormController(final ExampleEntityService service) {
+		super();
 
-        exampleEntityService = checkNotNull(service,
-                "Received a null pointer as service");
-    }
+		exampleEntityService = checkNotNull(service, "Received a null pointer as service");
+	}
 
-    /**
-     * Returns the initial entity form data.
-     * 
-     * @return the initial entity form data
-     */
-    @ModelAttribute(ExampleEntityViewConstants.BEAN_FORM)
-    public ExampleEntityForm getEntityForm() {
-        return new ExampleEntityForm();
-    }
+	/**
+	 * Returns the initial entity form data.
+	 * 
+	 * @return the initial entity form data
+	 */
+	@ModelAttribute(ExampleEntityViewConstants.BEAN_FORM)
+	public ExampleEntityForm getEntityForm() {
+		return new ExampleEntityForm();
+	}
 
-    /**
-     * Persists an entity.
-     * 
-     * @param model
-     *            model map
-     * @param form
-     *            form data
-     * @param bindingResult
-     *            binding result
-     * @param response
-     *            HTTP response
-     * @return the next view to show
-     */
-    @PostMapping
-    public String saveEntity(final ModelMap model,
-            @ModelAttribute(ExampleEntityViewConstants.BEAN_FORM) @Valid final ExampleEntityForm form,
-            final BindingResult bindingResult, final HttpServletResponse response) {
-        final String path;
-        final DefaultExampleEntity entity;
+	/**
+	 * Persists an entity.
+	 * 
+	 * @param model         model map
+	 * @param form          form data
+	 * @param bindingResult binding result
+	 * @param response      HTTP response
+	 * @return the next view to show
+	 */
+	@PostMapping
+	public String saveEntity(final ModelMap model,
+			@ModelAttribute(ExampleEntityViewConstants.BEAN_FORM) @Valid final ExampleEntityForm form,
+			final BindingResult bindingResult, final HttpServletResponse response) {
+		final String path;
+		final DefaultExampleEntity entity;
 
-        if (bindingResult.hasErrors()) {
-            // Invalid form data
+		if (bindingResult.hasErrors()) {
+			// Invalid form data
 
-            // Returns to the form view
-            path = ExampleEntityViewConstants.VIEW_ENTITY_FORM;
+			// Returns to the form view
+			path = ExampleEntityViewConstants.VIEW_ENTITY_FORM;
 
-            // Marks the response as a bad request
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        } else {
+			// Marks the response as a bad request
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} else {
 
-            entity = new DefaultExampleEntity();
-            entity.setName(form.getName());
+			entity = new DefaultExampleEntity();
+			entity.setName(form.getName());
 
-            exampleEntityService.add(entity);
+			exampleEntityService.add(entity);
 
-            // TODO: This flow decision shouldn't be handled by the controller
-            // TODO: This should be a redirection to the list controller
-            // Loads required data into the model
-            loadViewModel(model);
+			// Loads required data into the model
+			loadViewModel(model);
 
-            path = ExampleEntityViewConstants.VIEW_ENTITY_LIST;
-        }
+			path = ExampleEntityViewConstants.VIEW_ENTITY_LIST;
+		}
 
-        return path;
-    }
+		return path;
+	}
 
-    /**
-     * Shows the entity edition view.
-     * <p>
-     * Actually it just returns the name of the view. Spring will take care of
-     * the rest.
-     * 
-     * @return the name for the entity edition view
-     */
-    @GetMapping(path = "/edit")
-    public String showEntityForm() {
-        return ExampleEntityViewConstants.VIEW_ENTITY_FORM;
-    }
+	/**
+	 * Shows the entity edition view.
+	 * <p>
+	 * Actually it just returns the name of the view. Spring will take care of the
+	 * rest.
+	 * 
+	 * @return the name for the entity edition view
+	 */
+	@GetMapping(path = "/edit")
+	public String showEntityForm() {
+		return ExampleEntityViewConstants.VIEW_ENTITY_FORM;
+	}
 
-    /**
-     * Loads the model data required for the entities listing view.
-     * <p>
-     * As the view will list all the entities, it requires these entities as one
-     * of the parameters.
-     * 
-     * @param model
-     *            model map
-     */
-    private final void loadViewModel(final ModelMap model) {
-        model.put(ExampleEntityViewConstants.PARAM_ENTITIES,
-                exampleEntityService.getAllEntities());
-    }
+	/**
+	 * Loads the model data required for the entities listing view.
+	 * <p>
+	 * As the view will list all the entities, it requires these entities as one of
+	 * the parameters.
+	 * 
+	 * @param model model map
+	 */
+	private final void loadViewModel(final ModelMap model) {
+		model.put(ExampleEntityViewConstants.PARAM_ENTITIES, exampleEntityService.getAllEntities());
+	}
 
 }

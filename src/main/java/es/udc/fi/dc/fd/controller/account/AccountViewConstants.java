@@ -20,6 +20,9 @@ public class AccountViewConstants {
 	/** The Constant USER. */
 	public static final String USER = "user";
 
+	/** The Constant IS_RATED. */
+	public static final String IS_RATED = "isRated";
+
 	/** The Constant FOLLOWLIST. */
 	public static final String FOLLOWLIST = "followList";
 
@@ -46,6 +49,9 @@ public class AccountViewConstants {
 
 	/** The Constant USER_ADVERTISEMENTS_VIEW. */
 	public static final String USER_ADVERTISEMENTS_LIST = "saleAdvertisements";
+
+	/** The Constant USER_RATING. */
+	public static final String USER_RATING = "userRating";
 
 	/**
 	 * Private constructor to avoid initialization.

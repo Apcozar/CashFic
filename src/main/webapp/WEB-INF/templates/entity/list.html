@@ -2,7 +2,9 @@
 
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
-<head th:include="fragments/header :: header" />
+<head th:include="fragments/header :: header" >
+<title >Example List</title>
+</head>
 <body>
 	<header class="header" th:include="fragments/menu :: menu" />
 
@@ -10,10 +12,11 @@
 		<h1 th:text="#{title.entity.list}">Entity list</h1>
 		<p>This view shows data embedded into the template. There are no
 			additional request for changing pages.</p>
-		<table class="table table-striped display dataTable">
+		<table class="table table-striped display dataTable" >
+			<caption>Example table</caption>
 			<thead>
 				<tr>
-					<th th:text="#{label.name}">Name</th>
+					<th scope="col" th:text="#{label.name}">Name</th>
 				</tr>
 			</thead>
 			<tbody>

@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 
@@ -78,6 +80,9 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	private final Integer ownerUserId;
 
+	/** The role. */
+	private final Integer role;
+
 	/**
 	 * Sale advertisement's publish date
 	 */
@@ -107,11 +112,25 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	private final boolean loggedUserFollowsSaleAdvertisementUser;
 
+	/** The are user rated. */
+	private final boolean areUserRated;
+
+	/** The average rating. */
+	private final Double averageRating;
+
+	/**
+	 * boolean true sale advertisement have been sold false if not
+	 */
+	private final boolean saleAdvertisementIsSold;
+
 	/**
 	 * Constructs SaleAdvertisementWithLoggedUserInfoDTO DTO.
 	 */
 	public SaleAdvertisementWithLoggedUserInfoDTO(SaleAdvertisementEntity saleAdvertisement,
-			boolean userLikeSaleAdvertisement, boolean loggedUserFollowsSaleAdvertisementUser) {
+
+			boolean userLikeSaleAdvertisement, boolean loggedUserFollowsSaleAdvertisementUser, boolean areUserRated,
+			Double averageRating, boolean saleAdvertisementIsSold) {
+
 		super();
 
 		productTitle = saleAdvertisement.getProductTitle();
@@ -126,18 +145,25 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		state = saleAdvertisement.getState().toString();
 		price = saleAdvertisement.getPrice();
 		city = saleAdvertisement.getUser().getCity();
+		role = saleAdvertisement.getUser().getRole().ordinal();
+		this.areUserRated = areUserRated;
+		this.averageRating = averageRating;
+		saleAdvertisement.getImages().forEach(image -> images.add(new ImageDTO(image)));
+		this.saleAdvertisementIsSold = saleAdvertisementIsSold;
 
-		saleAdvertisement.getImages().forEach((image) -> {
-			images.add(new ImageDTO(image));
+	}
 
-		});
-
+	/**
+	 * @return the saleAdvertisementIsSold
+	 */
+	public boolean isSaleAdvertisementIsSold() {
+		return saleAdvertisementIsSold;
 	}
 
 	/**
 	 * @return the images
 	 */
-	public ArrayList<ImageDTO> getImages() {
+	public List<ImageDTO> getImages() {
 		return images;
 	}
 
@@ -202,22 +228,26 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		return city;
 	}
 
+	public boolean isAreUserRated() {
+		return areUserRated;
+	}
+
+	public Double getAverageRating() {
+		return averageRating;
+	}
+
+	/**
+	 * @return the role
+	 */
+	public Integer getRole() {
+		return role;
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
-		result = prime * result + ((images == null) ? 0 : images.hashCode());
-		result = prime * result + (loggedUserFollowsSaleAdvertisementUser ? 1231 : 1237);
-		result = prime * result + ((ownerUserId == null) ? 0 : ownerUserId.hashCode());
-		result = prime * result + ((ownerUserLogin == null) ? 0 : ownerUserLogin.hashCode());
-		result = prime * result + ((productDescription == null) ? 0 : productDescription.hashCode());
-		result = prime * result + ((productTitle == null) ? 0 : productTitle.hashCode());
-		result = prime * result + ((saleAdvertisementID == null) ? 0 : saleAdvertisementID.hashCode());
-		result = prime * result + ((saleAdvertisementLikesCount == null) ? 0 : saleAdvertisementLikesCount.hashCode());
-		result = prime * result + ((state == null) ? 0 : state.hashCode());
-		result = prime * result + (userLikeSaleAdvertisement ? 1231 : 1237);
-		return result;
+		return Objects.hash(city, date, images, loggedUserFollowsSaleAdvertisementUser, ownerUserId, ownerUserLogin,
+				price, productDescription, productTitle, role, saleAdvertisementID, saleAdvertisementLikesCount, state,
+				userLikeSaleAdvertisement, areUserRated, averageRating);
 	}
 
 	@Override
@@ -229,56 +259,18 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		if (getClass() != obj.getClass())
 			return false;
 		SaleAdvertisementWithLoggedUserInfoDTO other = (SaleAdvertisementWithLoggedUserInfoDTO) obj;
-		if (date == null) {
-			if (other.date != null)
-				return false;
-		} else if (!date.equals(other.date))
-			return false;
-		if (images == null) {
-			if (other.images != null)
-				return false;
-		} else if (!images.equals(other.images))
-			return false;
-		if (loggedUserFollowsSaleAdvertisementUser != other.loggedUserFollowsSaleAdvertisementUser)
-			return false;
-		if (ownerUserId == null) {
-			if (other.ownerUserId != null)
-				return false;
-		} else if (!ownerUserId.equals(other.ownerUserId))
-			return false;
-		if (ownerUserLogin == null) {
-			if (other.ownerUserLogin != null)
-				return false;
-		} else if (!ownerUserLogin.equals(other.ownerUserLogin))
-			return false;
-		if (productDescription == null) {
-			if (other.productDescription != null)
-				return false;
-		} else if (!productDescription.equals(other.productDescription))
-			return false;
-		if (productTitle == null) {
-			if (other.productTitle != null)
-				return false;
-		} else if (!productTitle.equals(other.productTitle))
-			return false;
-		if (saleAdvertisementID == null) {
-			if (other.saleAdvertisementID != null)
-				return false;
-		} else if (!saleAdvertisementID.equals(other.saleAdvertisementID))
-			return false;
-		if (saleAdvertisementLikesCount == null) {
-			if (other.saleAdvertisementLikesCount != null)
-				return false;
-		} else if (!saleAdvertisementLikesCount.equals(other.saleAdvertisementLikesCount))
-			return false;
-		if (state == null) {
-			if (other.state != null)
-				return false;
-		} else if (!state.equals(other.state))
-			return false;
-		if (userLikeSaleAdvertisement != other.userLikeSaleAdvertisement)
-			return false;
-		return true;
+		return Objects.equals(city, other.city) && Objects.equals(date, other.date)
+				&& Objects.equals(images, other.images)
+				&& loggedUserFollowsSaleAdvertisementUser == other.loggedUserFollowsSaleAdvertisementUser
+				&& Objects.equals(ownerUserId, other.ownerUserId)
+				&& Objects.equals(ownerUserLogin, other.ownerUserLogin) && Objects.equals(price, other.price)
+				&& Objects.equals(productDescription, other.productDescription)
+				&& Objects.equals(productTitle, other.productTitle) && Objects.equals(role, other.role)
+				&& Objects.equals(saleAdvertisementID, other.saleAdvertisementID)
+				&& Objects.equals(saleAdvertisementLikesCount, other.saleAdvertisementLikesCount)
+				&& Objects.equals(state, other.state) && userLikeSaleAdvertisement == other.userLikeSaleAdvertisement
+				&& Objects.equals(areUserRated, other.areUserRated)
+				&& Objects.equals(averageRating, other.averageRating);
 	}
 
 	@Override

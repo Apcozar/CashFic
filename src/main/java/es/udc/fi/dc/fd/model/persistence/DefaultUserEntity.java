@@ -57,6 +57,9 @@ import es.udc.fi.dc.fd.model.UserEntity;
 @Table(name = "users")
 public class DefaultUserEntity implements UserEntity {
 
+	/** The Constant NULL_USER. */
+	private static final String NULL_USER = "Received a null pointer as user";
+
 	/**
 	 * Serialization ID.
 	 */
@@ -135,7 +138,13 @@ public class DefaultUserEntity implements UserEntity {
 	 */
 	@ManyToMany
 	@JoinTable(name = "likes", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "sale_advertisement_id"))
-	private Set<DefaultSaleAdvertisementEntity> likedSaleAdvertisements = new HashSet<DefaultSaleAdvertisementEntity>();
+	private Set<DefaultSaleAdvertisementEntity> likedSaleAdvertisements = new HashSet<>();
+
+	/**
+	 * User's buy transactions
+	 */
+	@OneToMany(mappedBy = "user")
+	private Set<DefaultBuyTransactionEntity> buyTransactions = new HashSet<>();
 
 	/**
 	 * Constructs an sale_advertisement entity.
@@ -267,6 +276,16 @@ public class DefaultUserEntity implements UserEntity {
 	}
 
 	/**
+	 * Gets the buy transactions.
+	 *
+	 * @return the buy transactions set
+	 */
+	@Override
+	public Set<DefaultBuyTransactionEntity> getBuyTransactions() {
+		return buyTransactions;
+	}
+
+	/**
 	 * Sets the id.
 	 *
 	 * @param value the new id
@@ -361,8 +380,9 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void addFollowserUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followers.add(user);
 	}
 
@@ -371,8 +391,9 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void removeFollowserUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followers.remove(user);
 	}
 
@@ -381,8 +402,9 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void addFollowUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followed.add(user);
 	}
 
@@ -391,9 +413,32 @@ public class DefaultUserEntity implements UserEntity {
 	 *
 	 * @param user the user
 	 */
+	@Override
 	public void removeFollowUser(DefaultUserEntity user) {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER);
 		followed.remove(user);
+	}
+
+	/**
+	 * Add buy transaction to this user entity
+	 * 
+	 * @param buyTransaction the buy transaction to add
+	 */
+	@Override
+	public void addBuyTransaction(DefaultBuyTransactionEntity buyTransaction) {
+		checkNotNull(buyTransaction, "Received a null pointer as buy transaction");
+		buyTransactions.add(buyTransaction);
+	}
+
+	/**
+	 * Remove buy transaction to this user entity
+	 * 
+	 * @param buyTransaction the buy transaction to remove
+	 */
+	@Override
+	public void removeBuyTransaction(DefaultBuyTransactionEntity buyTransaction) {
+		checkNotNull(buyTransaction, "Received a null pointer as buy transaction");
+		buyTransactions.remove(buyTransaction);
 	}
 
 	@Override

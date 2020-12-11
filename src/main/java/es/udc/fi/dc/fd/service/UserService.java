@@ -28,11 +28,14 @@ import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNoRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
@@ -149,4 +152,75 @@ public interface UserService {
 	 */
 	UserEntity unfollowUser(UserEntity user, UserEntity userToUnfollow)
 			throws UserNotFoundException, UserToUnfollowNotFoundException;
+
+	/**
+	 * Gets the max rating.
+	 *
+	 * @return the max rating
+	 */
+	int getMaxRating();
+
+	/**
+	 * Gets the min rating.
+	 *
+	 * @return the min rating
+	 */
+	int getMinRating();
+
+	/**
+	 * Exists rating from user to rate user.
+	 *
+	 * @param user      the user
+	 * @param ratedUser the rated user
+	 * @return true, if successful
+	 * @throws UserNotFoundException the user not found exception
+	 */
+	boolean existsRatingFromUserToRateUser(UserEntity user, UserEntity ratedUser) throws UserNotFoundException;
+
+	/**
+	 * Exists rating for user.
+	 *
+	 * @param user the user
+	 * @return true, if successful
+	 * @throws UserNotFoundException the user not found exception
+	 */
+	boolean existsRatingForUser(UserEntity user) throws UserNotFoundException;
+
+	/**
+	 * Rate user.
+	 *
+	 * @param user       the user
+	 * @param userToRate the user to rate
+	 * @param rating     the rating
+	 * @throws UserNotFoundException             the user not found exception
+	 * @throws UserAlreadyGiveRatingToUserToRate the user already give rating to
+	 *                                           user to rate
+	 * @throws LowRatingException                the low rating exception
+	 * @throws HighRatingException               the high rating exception
+	 */
+	void rateUser(UserEntity user, UserEntity userToRate, Integer rating)
+			throws UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException;
+
+	/**
+	 * Average rating.
+	 *
+	 * @param user the user
+	 * @return the double
+	 * @throws UserNotFoundException the user not found exception
+	 * @throws UserNoRatingException the user no rating exception
+	 */
+	Double averageRating(UserEntity user) throws UserNotFoundException, UserNoRatingException;
+
+	/**
+	 * Given rating from user to rated user.
+	 *
+	 * @param user      the user
+	 * @param ratedUser the rated user
+	 * @return the int
+	 * @throws UserNotFoundException the user not found exception
+	 */
+	int givenRatingFromUserToRatedUser(UserEntity user, UserEntity ratedUser) throws UserNotFoundException;
+
+	public UserEntity premiumUser(UserEntity user) throws UserNotFoundException;
+
 }

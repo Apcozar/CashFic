@@ -5,6 +5,8 @@
 
 <head th:include="fragments/header :: header">
 <title th:text="#{title.saleAdvertisement}"></title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -19,7 +21,6 @@
 		th:unless="${saleAdvertisementNotExist=='saleAdvertisementNotExist'}"
 		class="container">
 		<div class="container">
-			<!-- <div class="card bg-dark"> -->
 
 			<div th:if="${uploadImageError}">
 				<p th:each="image : ${uploadImageError}"
@@ -28,8 +29,17 @@
 			</div>
 
 			<div class="card-header">
+				<th:block th:if="${userId} != ${saleAdvertisement.user.id}">
+					<form method="post"
+						th:action="@{/saleAdvertisement/} + @{buy/} + ${saleAdvertisement.id}"
+						th:object="${saleAdvertisement.id}">
+						<button th:if="null == ${saleAdvertisement.buyTransaction}"
+							type="submit" class="btn btn-primary" th:text="#{label.buy}"></button>
+					</form>
 
-				<!-- <h3 th:text="${saleAdvertisement.productTitle}"></h3> -->
+
+
+				</th:block>
 
 				<!-- Button trigger modal -->
 				<button th:if="${userId} == ${saleAdvertisement.user.id}"
@@ -154,6 +164,12 @@
 									class="text-muted"
 									th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
 									th:text="#{label.onHoldInfo}"></small>
+									<small
+									class="text-muted"
+									th:if="null != ${saleAdvertisement.buyTransaction}"
+									th:text="#{label.onSale}"></small>
+									
+									
 								</a>
 							</h1>
 							<h2>
@@ -219,6 +235,18 @@
 								<small class="text-muted"><em class="far fa-heart"
 									th:text="${saleAdvertisement?.getLikes().size()}"></em></small>
 							</p>
+							<div>
+								<th:block
+									th:if="${saleAdvertisement?.user.role.toString()} == 'ROLE_PREMIUM'">
+									<span class="align-top"> <em class="far fa-gem"
+										style="color: rgb(222, 217, 12);"></em>
+									</span>
+								</th:block>
+								<p th:if="${averageRating} != null" class="small ratedUser">
+									<em th:text="#{label.average} + ${averageRating}"></em> <i
+										class="fa fa-star-o" aria-hidden="true"></i>
+								</p>
+							</div>
 						</div>
 					</div>
 				</div>
