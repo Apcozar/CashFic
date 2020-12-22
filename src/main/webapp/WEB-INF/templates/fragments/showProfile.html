@@ -1,0 +1,158 @@
+<th:block th:fragment="showProfile(user)">
+	<div class="page-heading">
+		<div class="media clearfix">
+			<div class="media-left pr30">
+				<i class="fas fa-user-circle fa-5x" aria-hidden="true"></i>
+			</div>
+			<div class="media-body">
+				<h2 class="media-heading">
+					<a th:href="@{/profile/} + ${user.id}" th:text="${user.login}"></a>
+					
+					<em th:if="${user.isPremium()} == true" class="far fa-gem"
+							style="color: rgb(222, 217, 12);" ></em>
+							
+					<th:block th:if="${user.isUserLogged()} == true">
+						<a th:if="${user.isPremium()} == false" type="button"
+							data-toggle="modal" data-target="#premiumModalCenter" href=""> <em class="far fa-gem"
+							style="color: rgb(222, 217, 12);" aria-hidden="true"></em>
+						</a>
+						<a th:unless="${user.isPremium()} == false" class="fa-stack fa-lg" type="button"
+							data-toggle="modal" data-target="#premiumModalCenter" href="">
+						  <em class="far fa-gem fa-stack-1x" style="color: rgb(222, 217, 12);"></em>
+						  <em class="fa fa-ban fa-stack-2x text-danger"></em>
+						</a>
+						
+						<div class="modal fade" id="premiumModalCenter" tabindex="-1"
+							role="dialog" aria-labelledby="premiumModalCenterTitle"
+							aria-hidden="true">
+							<div class="modal-dialog modal-dialog-centered" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="premiumModalLongTitle"
+											th:text="#{title.premium}"></h5>
+										<button type="button" class="close" data-dismiss="modal"
+											aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<span
+											th:text="${user.isPremium()} == false ? #{label.becomePremium} : #{label.becomeUser}">
+										</span>
+									</div>
+									<div class="modal-footer">
+										<form method="post"
+											th:action="@{/premium}">
+											<button type="button" class="btn btn-secondary"
+												data-dismiss="modal" th:text="#{label.cancel}"></button>
+		
+											<button type="submit" class="btn btn-primary"
+												th:text="#{label.accept}"></button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</th:block>
+					
+					<th:block th:if="${user.isUserLogged()} == false">
+						<a th:if="${user.isFollowedByUserLogged()} == false" type="button"
+							th:href="@{/follow/} + ${user.id}"> <i
+							class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
+						</a>
+
+						<a th:unless="${user.isFollowedByUserLogged()} == false"
+							type="button" th:href="@{/unfollow/} + ${user.id}"> <i
+							class="fa fa-user-times fa-lg" aria-hidden="true"></i>
+						</a>
+
+						<a th:href="@{/chat/} + ${user.id}"> <i class="fa fa-comment"
+							aria-hidden="true"></i>
+						</a>
+
+						<form th:if="${user.isRatedByUserLogged()} == false" method="post"
+							th:action="@{/rate/} + ${user.id}" th:object="${rateForm}">
+							<fieldset class="rating">
+								<legend></legend>
+								<button type="submit" class="btn btn-primary pull-right"
+									th:text="#{label.rate}"></button>
+								<input type="radio" id="star5" name="rating" value="5"
+									th:field="*{ratingValue}" /><label for="star5" title="Rocks!">5
+									stars</label> <input type="radio" id="star4" name="rating" value="4"
+									th:field="*{ratingValue}" /><label for="star4"
+									title="Pretty good">4 stars</label> <input type="radio"
+									id="star3" name="rating" value="3" th:field="*{ratingValue}" /><label
+									for="star3" title="Meh">3 stars</label> <input type="radio"
+									id="star2" name="rating" value="2" th:field="*{ratingValue}" /><label
+									for="star2" title="Kinda bad">2 stars</label> <input
+									type="radio" id="star1" name="rating" value="1"
+									th:field="*{ratingValue}" required /><label for="star1"
+									title="Sucks big time">1 star</label>
+							</fieldset>
+						</form>
+						<p th:unless="${user.isRatedByUserLogged()} == false"
+							class="small ratedUser">
+							<em th:text="#{label.rateWith} + ${user.rateByUserLogged}"></em>
+							<i class="fa fa-star-o" aria-hidden="true"></i>
+						</p>
+					</th:block>
+
+				</h2>
+				<div class="media-links">
+					<p class="small">
+						<i class="fa fa-user-circle" aria-hidden="true"
+							th:text="${user.name} + ' ' + ${user.lastName}"></i>
+					</p>
+					<p class="small">
+						<i class="fa fa-envelope" aria-hidden="true"
+							th:text="${user.email}"></i>
+					</p>
+					<p class="small">
+						<i class="fa fa-map-marker" aria-hidden="true"
+							th:text="${user.city}"></i>
+					</p>
+					<p th:if="${user.existsAverageRating} == true" class="small">
+						<i class="fa fa-star" aria-hidden="true"
+							th:text="${user.averageRating}"></i>
+					</p>
+				</div>
+				<div class="media-links pull-right">
+					<ul class="list-inline">
+						<li class="list-inline-item">
+							<h5 class="text-center">
+								<a th:href="@{/profile/} + ${user.id} + @{/advertisements}"
+									th:text="${user.countAdvertisements}"></a>
+							</h5> <small class="text-muted"><em class="fa fa-picture-o"
+								th:text="#{label.Adds}"></em></small>
+						</li>
+						<li class="list-inline-item">
+							<h5 class="text-center">
+								<a th:href="@{/profile/} + ${user.id} + @{/likes}"
+									th:text="${user.countLikes}"></a>
+							</h5> <small class="text-muted"><em class="fa fa-picture-o"
+								th:text="#{label.Likes}"></em></small>
+						</li>
+
+						<li class="list-inline-item">
+							<h5 class="text-center">
+								<a th:href="@{/profile/followers/} + ${user.id}"
+									th:text="${user.countFollowers}"></a>
+							</h5> <small class="text-muted"><em class="fa fa-user-circle"
+								th:text="#{label.Followers}"></em></small>
+						</li>
+
+						<li class="list-inline-item">
+							<h5 class="text-center">
+								<a th:href="@{/profile/followed/} + ${user.id}"
+									th:text="${user.countFollowed}"></a>
+							</h5> <small class="text-muted"><em class="fa fa-user-circle"
+								th:text="#{label.Following}"></em></small>
+						</li>
+
+					</ul>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</th:block>

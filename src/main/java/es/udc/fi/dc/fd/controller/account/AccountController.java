@@ -2,6 +2,10 @@ package es.udc.fi.dc.fd.controller.account;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -15,9 +19,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
+import es.udc.fi.dc.fd.model.dto.SaleAdvertisementWithLoggedUserInfoDTO;
+import es.udc.fi.dc.fd.model.dto.UserDTO;
 import es.udc.fi.dc.fd.model.form.account.RateForm;
 import es.udc.fi.dc.fd.model.form.account.SignInForm;
 import es.udc.fi.dc.fd.model.form.account.SignUpForm;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.HighRatingException;
 import es.udc.fi.dc.fd.service.UserService;
@@ -28,6 +35,7 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNoRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
@@ -138,21 +146,18 @@ public class AccountController {
 	 */
 	@GetMapping(path = "/profile")
 	public String showProfile(final Model model) {
-
-		String username;
-		DefaultUserEntity user;
 		try {
-			username = this.securityService.findLoggedInUsername();
-			user = userService.findByLogin(username);
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
 
-			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
-			model.addAttribute(AccountViewConstants.USER, user);
+			UserDTO userDTO = createUserDTO(user, user);
 
-		} catch (UserNotFoundException e) {
+			model.addAttribute(AccountViewConstants.USER, userDTO);
+
+			return ViewConstants.VIEW_PROFILE;
+		} catch (UserNotFoundException | UserNoRatingException e) {
 			return ViewConstants.VIEW_SIGNIN;
 		}
-
-		return ViewConstants.VIEW_PROFILE;
 	}
 
 	/**
@@ -164,30 +169,21 @@ public class AccountController {
 	 */
 	@GetMapping(path = "/profile/{id}")
 	public String showUserProfile(@PathVariable(value = "id") Integer id, final Model model) {
-
-		DefaultUserEntity user;
 		try {
+			model.addAttribute(AccountViewConstants.RATE_FORM, new RateForm());
 
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity userLogged = userService.findByLogin(username);
+			DefaultUserEntity user = userService.findById(id);
 
-			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+			UserDTO userDTO = createUserDTO(user, userLogged);
+			model.addAttribute(AccountViewConstants.USER, userDTO);
 
-			user = userService.findById(id);
-
-			model.addAttribute(AccountViewConstants.USER, user);
-
-			model.addAttribute("rateForm", new RateForm());
-
-			if (userService.existsRatingFromUserToRateUser(userLogged, user))
-				model.addAttribute(AccountViewConstants.USER_RATING,
-						userService.givenRatingFromUserToRatedUser(userLogged, user));
-
-		} catch (UserNotFoundException e) {
-			return ViewConstants.VIEW_SIGNIN;
+			return ViewConstants.VIEW_PROFILE;
+		} catch (UserNotFoundException | UserNoRatingException e) {
+			return ViewConstants.WELCOME;
 		}
 
-		return ViewConstants.VIEW_PROFILE;
 	}
 
 	/**
@@ -257,16 +253,19 @@ public class AccountController {
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity userLogged = userService.findByLogin(username);
+			DefaultUserEntity user = userService.findById(id);
 
-			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+			UserDTO userDTO = createUserDTO(user, userLogged);
+			model.addAttribute(AccountViewConstants.USER, userDTO);
 
-			DefaultUserEntity user;
-			user = userService.findById(id);
-			model.addAttribute(AccountViewConstants.USER, user);
-			model.addAttribute(AccountViewConstants.FOLLOWLIST, user.getFollowers());
+			List<UserDTO> usersDTOList = createUserDTOList(user.getFollowers(), userLogged);
+			model.addAttribute(AccountViewConstants.FOLLOWLIST, usersDTOList);
+
 			model.addAttribute(AccountViewConstants.FOLLOW_NAME, AccountViewConstants.FOLLOWERS);
+			model.addAttribute(AccountViewConstants.RATE_FORM, new RateForm());
+
 			return ViewConstants.VIEW_FOLLOW_LIST;
-		} catch (UserNotFoundException e) {
+		} catch (UserNotFoundException | UserNoRatingException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -284,16 +283,19 @@ public class AccountController {
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity userLogged = userService.findByLogin(username);
+			DefaultUserEntity user = userService.findById(id);
 
-			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+			UserDTO userDTO = createUserDTO(user, userLogged);
+			model.addAttribute(AccountViewConstants.USER, userDTO);
 
-			DefaultUserEntity user;
-			user = userService.findById(id);
-			model.addAttribute(AccountViewConstants.USER, user);
-			model.addAttribute(AccountViewConstants.FOLLOWLIST, user.getFollowed());
+			List<UserDTO> usersDTOList = createUserDTOList(user.getFollowed(), userLogged);
+			model.addAttribute(AccountViewConstants.FOLLOWLIST, usersDTOList);
+
 			model.addAttribute(AccountViewConstants.FOLLOW_NAME, AccountViewConstants.FOLLOWED);
+			model.addAttribute(AccountViewConstants.RATE_FORM, new RateForm());
+
 			return ViewConstants.VIEW_FOLLOW_LIST;
-		} catch (UserNotFoundException e) {
+		} catch (UserNotFoundException | UserNoRatingException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -307,20 +309,23 @@ public class AccountController {
 	 */
 	@GetMapping(path = "/profile/{id}/advertisements")
 	public String showUserAdvertisements(@PathVariable(value = "id") Integer id, Model model) {
-
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity userLogged = userService.findByLogin(username);
+			DefaultUserEntity user = userService.findById(id);
 
-			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+			UserDTO userDTO = createUserDTO(user, userLogged);
+			model.addAttribute(AccountViewConstants.USER, userDTO);
 
-			DefaultUserEntity user;
-			user = userService.findById(id);
-			model.addAttribute(AccountViewConstants.USER, user);
-			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, user.getSaleAdvertisements());
+			List<SaleAdvertisementWithLoggedUserInfoDTO> saleAdvertisementsDtoList = createSaleAdvertisementDTOList(
+					user.getSaleAdvertisements(), userLogged);
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, saleAdvertisementsDtoList);
+
 			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_ADVERTISEMENTS);
+
 			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
-		} catch (UserNotFoundException e) {
+
+		} catch (UserNotFoundException | UserNoRatingException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -334,20 +339,82 @@ public class AccountController {
 	 */
 	@GetMapping(path = "/profile/{id}/likes")
 	public String showUserLikes(@PathVariable(value = "id") Integer id, Model model) {
-
 		try {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity userLogged = userService.findByLogin(username);
+			DefaultUserEntity user = userService.findById(id);
 
-			model.addAttribute(AccountViewConstants.USER_LOGGED, userLogged);
+			UserDTO userDTO = createUserDTO(user, userLogged);
+			model.addAttribute(AccountViewConstants.USER, userDTO);
 
-			DefaultUserEntity user;
-			user = userService.findById(id);
-			model.addAttribute(AccountViewConstants.USER, user);
-			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, user.getLikes());
+			List<SaleAdvertisementWithLoggedUserInfoDTO> saleAdvertisementsDtoList = createSaleAdvertisementDTOList(
+					user.getLikes(), userLogged);
+			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, saleAdvertisementsDtoList);
+
 			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_LIKES);
+
 			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
-		} catch (UserNotFoundException e) {
+
+		} catch (UserNotFoundException | UserNoRatingException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Become premium. Change the role from user to premium user or from premium
+	 * user to user.
+	 *
+	 * @param model   the model
+	 * @param request the request
+	 * @return the string
+	 */
+	@PostMapping(path = "/premium")
+	public String becomePremium(Model model, HttpServletRequest request) {
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			userService.premiumUser(user);
+
+			UserDTO userDTO = createUserDTO(user, user);
+			model.addAttribute(AccountViewConstants.USER, userDTO);
+
+			return ViewConstants.VIEW_PROFILE;
+		} catch (UserNotFoundException | UserNoRatingException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
+	 * Rate user.
+	 *
+	 * @param id            the id
+	 * @param rateForm      the rate form
+	 * @param bindingResult the binding result
+	 * @param model         the model
+	 * @param request       the request
+	 * @return the string
+	 */
+	@PostMapping(path = "/rate/{id}")
+	public String rateUser(@PathVariable(value = "id") Integer id, @ModelAttribute("rateForm") RateForm rateForm,
+			BindingResult bindingResult, Model model, HttpServletRequest request) {
+		try {
+			String previousPage = request.getHeader(referer);
+
+			if (bindingResult.hasErrors())
+				return redirect + previousPage;
+
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity user = userService.findByLogin(username);
+
+			DefaultUserEntity userToRate = userService.findById(id);
+
+			userService.rateUser(user, userToRate, rateForm.getRatingValue());
+
+			return redirect + previousPage;
+
+		} catch (UserNotFoundException | UserAlreadyGiveRatingToUserToRate | LowRatingException
+				| HighRatingException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -389,56 +456,110 @@ public class AccountController {
 		}
 	}
 
-	@GetMapping(path = "/premium")
-	public String becomePremium(Model model, HttpServletRequest request) {
+	/**
+	 * Creates a new user DTO.
+	 *
+	 * @param user       the user
+	 * @param userLogged the user logged
+	 * @return the user DTO
+	 * @throws UserNotFoundException the user not found exception
+	 * @throws UserNoRatingException the user no rating exception
+	 */
+	private UserDTO createUserDTO(DefaultUserEntity user, DefaultUserEntity userLogged)
+			throws UserNotFoundException, UserNoRatingException {
+		boolean isUserLogged;
+		boolean isFollowedByUserLogged;
+		boolean isRatedByUserLogged;
+		Integer rateByUserLogged = null;
+		boolean existsAverageRating;
+		Double averageRating = null;
 
-		try {
-
-			String username = this.securityService.findLoggedInUsername();
-			DefaultUserEntity user = userService.findByLogin(username);
-
-			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
-
-			userService.premiumUser(user);
-			model.addAttribute(AccountViewConstants.USER, user);
-			return ViewConstants.VIEW_PROFILE;
-		} catch (UserNotFoundException e) {
-			return ViewConstants.WELCOME;
+		if (user.equals(userLogged)) {
+			isUserLogged = true;
+			isFollowedByUserLogged = false;
+			isRatedByUserLogged = false;
+		} else {
+			isUserLogged = false;
+			isFollowedByUserLogged = userLogged.getFollowed().contains(user);
+			isRatedByUserLogged = userService.existsRatingFromUserToRateUser(userLogged, user);
 		}
+
+		if (isRatedByUserLogged)
+			rateByUserLogged = userService.givenRatingFromUserToRatedUser(userLogged, user);
+
+		existsAverageRating = userService.existsRatingForUser(user);
+
+		if (existsAverageRating)
+			averageRating = userService.averageRating(user);
+
+		return new UserDTO(user, isUserLogged, isFollowedByUserLogged, isRatedByUserLogged, rateByUserLogged,
+				existsAverageRating, averageRating);
 	}
 
 	/**
-	 * Rate user.
+	 * Creates a new user DTO list.
 	 *
-	 * @param id            the id
-	 * @param rateForm      the rate form
-	 * @param bindingResult the binding result
-	 * @param model         the model
-	 * @param request       the request
-	 * @return the string
+	 * @param usersList  the users list
+	 * @param userLogged the user logged
+	 * @return the list
+	 * @throws UserNotFoundException the user not found exception
+	 * @throws UserNoRatingException the user no rating exception
 	 */
-	@PostMapping(path = "/rate/{id}")
-	public String rateUser(@PathVariable(value = "id") Integer id, @ModelAttribute("rateForm") RateForm rateForm,
-			BindingResult bindingResult, Model model, HttpServletRequest request) {
-		try {
-			String previousPage = request.getHeader(referer);
+	private List<UserDTO> createUserDTOList(Set<DefaultUserEntity> usersList, DefaultUserEntity userLogged)
+			throws UserNotFoundException, UserNoRatingException {
+		List<UserDTO> usersDTOList = new ArrayList<>();
 
-			if (bindingResult.hasErrors())
-				return redirect + previousPage;
-
-			String username = this.securityService.findLoggedInUsername();
-			DefaultUserEntity user = userService.findByLogin(username);
-
-			DefaultUserEntity userToRate = userService.findById(id);
-
-			userService.rateUser(user, userToRate, rateForm.getRatingValue());
-
-			return redirect + previousPage;
-
-		} catch (UserNotFoundException | UserAlreadyGiveRatingToUserToRate | LowRatingException
-				| HighRatingException e) {
-			return ViewConstants.WELCOME;
+		for (DefaultUserEntity user : usersList) {
+			usersDTOList.add(createUserDTO(user, userLogged));
 		}
+
+		return usersDTOList;
 	}
 
+	/**
+	 * Creates a new sale advertisement DTO.
+	 *
+	 * @param saleAdvertisement the sale advertisement
+	 * @param userLogged        the user logged
+	 * @return the sale advertisement with logged user info DTO
+	 * @throws UserNotFoundException the user not found exception
+	 * @throws UserNoRatingException the user no rating exception
+	 */
+	private SaleAdvertisementWithLoggedUserInfoDTO createSaleAdvertisementDTO(
+			DefaultSaleAdvertisementEntity saleAdvertisement, DefaultUserEntity userLogged)
+			throws UserNotFoundException, UserNoRatingException {
+		boolean isRated = userService.existsRatingForUser(saleAdvertisement.getUser());
+		Double averageRating;
+		if (isRated)
+			averageRating = userService.averageRating(saleAdvertisement.getUser());
+		else
+			averageRating = null;
+
+		return new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+				userLogged.getLikes().contains(saleAdvertisement),
+				userLogged.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating,
+				saleAdvertisement.getBuyTransaction() != null, saleAdvertisement.getUser().equals(userLogged));
+
+	}
+
+	/**
+	 * Creates a new sale advertisement DTO list.
+	 *
+	 * @param saleAdvertisementsList the sale advertisements list
+	 * @param userLogged             the user logged
+	 * @return the list
+	 * @throws UserNotFoundException the user not found exception
+	 * @throws UserNoRatingException the user no rating exception
+	 */
+	private List<SaleAdvertisementWithLoggedUserInfoDTO> createSaleAdvertisementDTOList(
+			Set<DefaultSaleAdvertisementEntity> saleAdvertisementsList, DefaultUserEntity userLogged)
+			throws UserNotFoundException, UserNoRatingException {
+		List<SaleAdvertisementWithLoggedUserInfoDTO> saleAdvertisementsListDtoList = new ArrayList<>();
+
+		for (DefaultSaleAdvertisementEntity saleAdvertisement : saleAdvertisementsList) {
+			saleAdvertisementsListDtoList.add(createSaleAdvertisementDTO(saleAdvertisement, userLogged));
+		}
+
+		return saleAdvertisementsListDtoList;
+	}
 }

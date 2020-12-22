@@ -2,8 +2,11 @@ package es.udc.fi.dc.fd.controller.saleAdvertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,7 +37,6 @@ import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.BuyTransactionService;
-import es.udc.fi.dc.fd.service.ImageService;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
 import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.exceptions.BuyTransactionAlreadyExistsException;
@@ -55,9 +57,6 @@ public class SaleAdvertisementListViewController {
 
 	/** The sale advertisement service. */
 	private final SaleAdvertisementService saleAdvertisementService;
-
-	/** The image service. */
-	private ImageService imageService;
 
 	/**
 	 * The User service.
@@ -82,18 +81,16 @@ public class SaleAdvertisementListViewController {
 	 *
 	 * @param saleAdvertisementService the sale advertisement service
 	 * @param context                  the context
-	 * @param imageService             the image service
 	 * @param userService              the user service
 	 * @param securityService          the security service
-	 * @param userService              the user service
+	 * @param buyTransactionService    the buy transaction service
 	 */
 	@Autowired
 	public SaleAdvertisementListViewController(final SaleAdvertisementService saleAdvertisementService,
-			final ServletContext context, final ImageService imageService, final UserService userService,
-			final SecurityService securityService, final BuyTransactionService buyTransactionService) {
+			final ServletContext context, final UserService userService, final SecurityService securityService,
+			final BuyTransactionService buyTransactionService) {
 		super();
 		this.saleAdvertisementService = checkNotNull(saleAdvertisementService, ViewConstants.NULL_POINTER);
-		this.imageService = checkNotNull(imageService, ViewConstants.NULL_POINTER);
 		this.userService = checkNotNull(userService, ViewConstants.NULL_POINTER);
 		this.securityService = checkNotNull(securityService, ViewConstants.NULL_POINTER);
 		this.buyTransactionService = checkNotNull(buyTransactionService, ViewConstants.NULL_POINTER);
@@ -110,21 +107,17 @@ public class SaleAdvertisementListViewController {
 	@GetMapping(path = "/{id}")
 	public String showSaleAdvertisement(@PathVariable(value = "id") Integer id, Model model) {
 		try {
-
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity user = userService.findByLogin(username);
 
-			model.addAttribute(ViewConstants.USER_ID, user.getId());
-			model.addAttribute(AccountViewConstants.USER_LOGGED, user);
-
 			DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(id);
 
-			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisement);
+			SaleAdvertisementWithLoggedUserInfoDTO saleAdvertisementDto = createSaleAdvertisementDTO(saleAdvertisement,
+					user);
+			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT, saleAdvertisementDto);
 
-			if (userService.existsRatingForUser(saleAdvertisement.getUser()))
-				model.addAttribute(SaleAdvertisementViewConstants.AVERAGE_RATING,
-						userService.averageRating(saleAdvertisement.getUser()));
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT;
+
 		} catch (SaleAdvertisementNotFoundException e) {
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
 					SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
@@ -137,7 +130,14 @@ public class SaleAdvertisementListViewController {
 	/**
 	 * Show sale add list.
 	 *
-	 * @param model the model
+	 * @param model     the model
+	 * @param city      the city
+	 * @param keywords  the keywords
+	 * @param minDate   the min date
+	 * @param maxDate   the max date
+	 * @param minPrice  the min price
+	 * @param maxPrice  the max price
+	 * @param minRating the min rating
 	 * @return the string
 	 */
 	@GetMapping(path = "/list")
@@ -307,7 +307,7 @@ public class SaleAdvertisementListViewController {
 				list.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
 						user.getLikes().contains(saleAdvertisement),
 						user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating,
-						saleAdvertisement.getBuyTransaction() != null)));
+						saleAdvertisement.getBuyTransaction() != null, saleAdvertisement.getUser().equals(user))));
 			}
 		}
 
@@ -364,7 +364,7 @@ public class SaleAdvertisementListViewController {
 				filtered.add((new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
 						user.getLikes().contains(saleAdvertisement),
 						user.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating,
-						(saleAdvertisement.getBuyTransaction() != null))));
+						(saleAdvertisement.getBuyTransaction() != null), saleAdvertisement.getUser().equals(user))));
 
 		}
 
@@ -417,14 +417,20 @@ public class SaleAdvertisementListViewController {
 	 * Delete the images.
 	 *
 	 * @param images the images
+	 * @return true, if successful removes all the images
 	 */
-	private void deleteImages(Set<DefaultImageEntity> images) {
+	private boolean deleteImages(Set<DefaultImageEntity> images) {
+		boolean result = true;
 		for (DefaultImageEntity image : images) {
-			File file = new File(context.getRealPath("/"), image.getImagePath());
-
-			file.delete();
+			try {
+				Path path = Paths.get(context.getRealPath("/") + image.getImagePath());
+				Files.delete(path);
+			} catch (IOException e) {
+				result = false;
+			}
 		}
 
+		return result;
 	}
 
 	/**
@@ -525,6 +531,32 @@ public class SaleAdvertisementListViewController {
 		} catch (SaleAdvertisementNotFoundException | UserNotFoundException | BuyTransactionAlreadyExistsException e) {
 			return ViewConstants.WELCOME;
 		}
+	}
+
+	/**
+	 * Creates a new sale advertisement DTO.
+	 *
+	 * @param saleAdvertisement the sale advertisement
+	 * @param userLogged        the user logged
+	 * @return the sale advertisement with logged user info DTO
+	 * @throws UserNotFoundException the user not found exception
+	 * @throws UserNoRatingException the user no rating exception
+	 */
+	private SaleAdvertisementWithLoggedUserInfoDTO createSaleAdvertisementDTO(
+			DefaultSaleAdvertisementEntity saleAdvertisement, DefaultUserEntity userLogged)
+			throws UserNotFoundException, UserNoRatingException {
+		boolean isRated = userService.existsRatingForUser(saleAdvertisement.getUser());
+		Double averageRating;
+		if (isRated)
+			averageRating = userService.averageRating(saleAdvertisement.getUser());
+		else
+			averageRating = null;
+
+		return new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+				userLogged.getLikes().contains(saleAdvertisement),
+				userLogged.getFollowed().contains(saleAdvertisement.getUser()), isRated, averageRating,
+				saleAdvertisement.getBuyTransaction() != null, saleAdvertisement.getUser().equals(userLogged));
+
 	}
 
 }

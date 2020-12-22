@@ -133,6 +133,7 @@ public interface SaleAdvertisementService {
 	 * @param date2    the most recent date in the date range
 	 * @param price1   the minimum price in the price range
 	 * @param price2   the maximum price in the price range
+	 * @param rating   the rating
 	 * @return the sale advertisements that meet the search criteria order by date
 	 *         with the most recents first
 	 */

@@ -85,9 +85,10 @@ public class DefaultUserService implements UserService {
 
 	/**
 	 * Constructs an user service with the specified repository.
-	 * 
+	 *
 	 * @param repository                  the repository for the user instances
 	 * @param saleAdvertisementRepository the repository for sale advertisements
+	 * @param rateUserRepository          the rate user repository
 	 */
 	@Autowired
 	public DefaultUserService(final UserRepository repository,
