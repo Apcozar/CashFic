@@ -53,6 +53,9 @@ public class AccountViewConstants {
 	/** The Constant USER_RATING. */
 	public static final String USER_RATING = "userRating";
 
+	/** The Constant RATE_FORM. */
+	public static final String RATE_FORM = "rateForm";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

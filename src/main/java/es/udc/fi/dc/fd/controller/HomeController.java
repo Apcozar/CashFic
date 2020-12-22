@@ -24,17 +24,11 @@
 
 package es.udc.fi.dc.fd.controller;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import es.udc.fi.dc.fd.service.UserService;
-import es.udc.fi.dc.fd.service.securityService.SecurityService;
 
 /**
  * Controller for home view.
@@ -46,32 +40,10 @@ import es.udc.fi.dc.fd.service.securityService.SecurityService;
 public class HomeController {
 
 	/**
-	 * The User service.
-	 */
-	private UserService userService;
-
-	/**
-	 * The Security service.
-	 */
-	private SecurityService securityService;
-
-	/**
 	 * Default constructor.
 	 */
 	public HomeController() {
 		super();
-	}
-
-	/**
-	 * Instantiates a new home controller.
-	 *
-	 * @param securityService the security service
-	 * @param userService     the user service
-	 */
-	@Autowired
-	public HomeController(final SecurityService securityService, final UserService userService) {
-		this.securityService = checkNotNull(securityService, "received a null pointer as service");
-		this.userService = checkNotNull(userService, "received a null pointer as service");
 	}
 
 	/**
