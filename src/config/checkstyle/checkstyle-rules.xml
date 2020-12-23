@@ -59,8 +59,6 @@
 		<module name="NonEmptyAtclauseDescription" />
 		<module name="SummaryJavadocCheck" />
 		<!-- Not yet supported -->
-		<!--<module name="JavadocParagraph"> <property name="allowNewlineParagraph" 
-			value="true" /> </module> -->
 		<module name="CommentsIndentation" />
 
 		<!-- Checks for texts -->
@@ -87,7 +85,6 @@
 		<module name="PackageName" />
 		<module name="ParameterName" />
 		<!-- Not yet supported -->
-		<!-- <module name="LambdaParameterName" /> -->
 		<module name="CatchParameterName" />
 		<module name="StaticVariableName" />
 		<module name="ClassTypeParameterName" />

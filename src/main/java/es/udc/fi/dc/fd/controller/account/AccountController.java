@@ -19,11 +19,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
+import es.udc.fi.dc.fd.model.dto.BuyTransactionDTO;
 import es.udc.fi.dc.fd.model.dto.SaleAdvertisementWithLoggedUserInfoDTO;
 import es.udc.fi.dc.fd.model.dto.UserDTO;
 import es.udc.fi.dc.fd.model.form.account.RateForm;
 import es.udc.fi.dc.fd.model.form.account.SignInForm;
 import es.udc.fi.dc.fd.model.form.account.SignUpForm;
+import es.udc.fi.dc.fd.model.persistence.DefaultBuyTransactionEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.service.HighRatingException;
@@ -420,6 +422,32 @@ public class AccountController {
 	}
 
 	/**
+	 * Show purchase history.
+	 *
+	 * @param model the model
+	 * @return the string
+	 */
+	@GetMapping(path = "/profile/history")
+	public String showPurchaseHistory(Model model) {
+		try {
+			String username = this.securityService.findLoggedInUsername();
+			DefaultUserEntity userLogged = userService.findByLogin(username);
+
+			UserDTO userDTO = createUserDTO(userLogged, userLogged);
+			model.addAttribute(AccountViewConstants.USER, userDTO);
+
+			List<BuyTransactionDTO> buyTransactionDTOList = createBuyTransactionDTOList(userLogged.getBuyTransactions(),
+					userLogged);
+			model.addAttribute(AccountViewConstants.USER_TRANSACTION_LIST, buyTransactionDTOList);
+
+			return ViewConstants.USER_PURCHASE_HISTORY;
+
+		} catch (UserNotFoundException | UserNoRatingException e) {
+			return ViewConstants.WELCOME;
+		}
+	}
+
+	/**
 	 * Check if the user name and email already exits
 	 * 
 	 * @param signUpForm the sign up form
@@ -561,5 +589,24 @@ public class AccountController {
 		}
 
 		return saleAdvertisementsListDtoList;
+	}
+
+	/**
+	 * Creates the buy transaction DTO list.
+	 *
+	 * @param buyTransactionList the buy transaction list
+	 * @param userLogged         the user logged
+	 * @return the list
+	 * @throws UserNotFoundException the user not found exception
+	 * @throws UserNoRatingException the user no rating exception
+	 */
+	private List<BuyTransactionDTO> createBuyTransactionDTOList(Set<DefaultBuyTransactionEntity> buyTransactionList,
+			DefaultUserEntity userLogged) throws UserNotFoundException, UserNoRatingException {
+		List<BuyTransactionDTO> buyTransactionDtoList = new ArrayList<>();
+		for (DefaultBuyTransactionEntity buyTransaction : buyTransactionList) {
+			buyTransactionDtoList.add(new BuyTransactionDTO(buyTransaction.getCreatedDate(),
+					createSaleAdvertisementDTO(buyTransaction.getSaleAdvertisement(), userLogged)));
+		}
+		return buyTransactionDtoList;
 	}
 }

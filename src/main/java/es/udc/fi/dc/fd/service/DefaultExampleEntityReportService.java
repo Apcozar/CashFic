@@ -70,10 +70,6 @@ public final class DefaultExampleEntityReportService implements ExampleEntityRep
 			throw new RuntimeException(e);
 		}
 
-		if (!reportFile.exists()) {
-
-		}
-
 		try {
 			jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportFile.getPath());
 		} catch (final JRException e) {

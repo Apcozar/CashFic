@@ -45,6 +45,9 @@ public class ViewConstants {
 	/** The Constant USER_ADVERTISEMENTS_LIKES_LIST. */
 	public static final String USER_ADVERTISEMENTS_LIKES_LIST = "account/advertisementsList";
 
+	/** The Constant USER_PURCHASE_HISTORY. */
+	public static final String USER_PURCHASE_HISTORY = "account/purchaseHistory";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

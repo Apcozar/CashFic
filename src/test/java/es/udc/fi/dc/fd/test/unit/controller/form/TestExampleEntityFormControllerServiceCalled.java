@@ -24,9 +24,13 @@
 
 package es.udc.fi.dc.fd.test.unit.controller.form;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -34,10 +38,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import es.udc.fi.dc.fd.controller.entity.ExampleEntityFormController;
 import es.udc.fi.dc.fd.controller.entity.ExampleEntityViewConstants;
@@ -52,82 +52,77 @@ import es.udc.fi.dc.fd.test.config.UrlConfig;
  * @author Bernardo Mart&iacute;nez Garrido
  */
 @RunWith(JUnitPlatform.class)
-public final class TestExampleEntityFormControllerServiceCalled {
+final class TestExampleEntityFormControllerServiceCalled {
 
-    /**
-     * Mocked MVC context.
-     */
-    private MockMvc              mockMvc;
+	/**
+	 * Mocked MVC context.
+	 */
+	private MockMvc mockMvc;
 
-    private ExampleEntityService service;
+	private ExampleEntityService service;
 
-    /**
-     * Default constructor.
-     */
-    public TestExampleEntityFormControllerServiceCalled() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public TestExampleEntityFormControllerServiceCalled() {
+		super();
+	}
 
-    /**
-     * Sets up the mocked MVC context.
-     * <p>
-     * It expects all the responses to have the OK (200) HTTP code.
-     */
-    @BeforeEach
-    public final void setUpMockContext() {
-        service = Mockito.mock(ExampleEntityService.class);
+	/**
+	 * Sets up the mocked MVC context.
+	 * <p>
+	 * It expects all the responses to have the OK (200) HTTP code.
+	 */
+	@BeforeEach
+	public final void setUpMockContext() {
+		service = Mockito.mock(ExampleEntityService.class);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(getController(service))
-                .alwaysExpect(MockMvcResultMatchers.status().isOk()).build();
-    }
+		mockMvc = MockMvcBuilders.standaloneSetup(getController(service))
+				.alwaysExpect(MockMvcResultMatchers.status().isOk()).build();
+	}
 
-    /**
-     * Verifies that after received valid form data the expected view is
-     * returned.
-     */
-    @Test
-    public final void testSendFormData_CalledService() throws Exception {
-        final ResultActions result; // Request result
+	/**
+	 * Verifies that after received valid form data the expected view is returned.
+	 */
+	@Test
+	final void testSendFormData_CalledService() throws Exception {
+		final ResultActions result; // Request result
 
-        result = mockMvc.perform(getFormRequest());
+		result = mockMvc.perform(getFormRequest());
 
-        // The view is valid
-        result.andExpect(MockMvcResultMatchers.view()
-                .name(ExampleEntityViewConstants.VIEW_ENTITY_LIST));
-        
-        Mockito.verify(service, Mockito.times(1)).add(Mockito.any());
-    }
+		// The view is valid
+		result.andExpect(MockMvcResultMatchers.view().name(ExampleEntityViewConstants.VIEW_ENTITY_LIST));
 
-    /**
-     * Returns a controller with mocked dependencies.
-     * 
-     * @param service
-     *            service for the controller
-     * @return a mocked controller
-     */
-    private final ExampleEntityFormController
-            getController(final ExampleEntityService service) {
-        final Collection<DefaultExampleEntity> entities; // Mocked entities
+		Mockito.verify(service, Mockito.times(1)).add(Mockito.any());
+	}
 
-        entities = new ArrayList<>();
+	/**
+	 * Returns a controller with mocked dependencies.
+	 * 
+	 * @param service service for the controller
+	 * @return a mocked controller
+	 */
+	private final ExampleEntityFormController getController(final ExampleEntityService service) {
+		final Collection<DefaultExampleEntity> entities; // Mocked entities
 
-        Mockito.when(service.getAllEntities()).thenReturn(entities);
+		entities = new ArrayList<>();
 
-        return new ExampleEntityFormController(service);
-    }
+		Mockito.when(service.getAllEntities()).thenReturn(entities);
 
-    /**
-     * Returns a request builder for posting the form data.
-     * <p>
-     * This request contains all the required request parameters.
-     * <p>
-     * There is only a single required parameter, the {@code name} parameter.
-     * 
-     * @return a request builder for posting the form data
-     */
-    private final RequestBuilder getFormRequest() {
-        return MockMvcRequestBuilders.post(UrlConfig.URL_FORM_POST)
-                .param("name", "name");
-    }
+		return new ExampleEntityFormController(service);
+	}
+
+	/**
+	 * Returns a request builder for posting the form data.
+	 * <p>
+	 * This request contains all the required request parameters.
+	 * <p>
+	 * There is only a single required parameter, the {@code name} parameter.
+	 * 
+	 * @return a request builder for posting the form data
+	 */
+	private final RequestBuilder getFormRequest() {
+		return MockMvcRequestBuilders.post(UrlConfig.URL_FORM_POST).param("name", "name");
+	}
 
 }
