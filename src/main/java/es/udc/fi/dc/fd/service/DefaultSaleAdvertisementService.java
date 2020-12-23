@@ -36,7 +36,6 @@ import org.springframework.stereotype.Service;
 
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.State;
-import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.repository.ImageRepository;
 import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
@@ -54,6 +53,8 @@ import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
  */
 @Service
 public class DefaultSaleAdvertisementService implements SaleAdvertisementService {
+
+	private static final String RECEIVED_A_NULL_POINTER_AS_IDENTIFIER = "Received a null pointer as identifier";
 
 	/**
 	 * Repository for the domain entities handled by the service.
@@ -94,13 +95,12 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	@Override
 	public final SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementNotFoundException {
 
-		checkNotNull(identifier, "Received a null pointer as identifier");
+		checkNotNull(identifier, RECEIVED_A_NULL_POINTER_AS_IDENTIFIER);
 
 		if (!saleAdvertisementRepository.existsById(identifier)) {
 			throw new SaleAdvertisementNotFoundException(identifier);
 		}
-		DefaultSaleAdvertisementEntity result = saleAdvertisementRepository.getOne(identifier);
-		return result;
+		return saleAdvertisementRepository.getOne(identifier);
 	}
 
 	/**
@@ -152,11 +152,11 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	@Override
 	public final void remove(final DefaultSaleAdvertisementEntity saleAdvertisement)
 			throws SaleAdvertisementNotFoundException {
-		checkNotNull(saleAdvertisement, "Received a null pointer as identifier");
+		checkNotNull(saleAdvertisement, RECEIVED_A_NULL_POINTER_AS_IDENTIFIER);
 		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
 			throw new SaleAdvertisementNotFoundException(saleAdvertisement.getId());
 		}
-		saleAdvertisement.getImages().forEach((final DefaultImageEntity image) -> imageRepository.delete(image));
+		saleAdvertisement.getImages().forEach(imageRepository::delete);
 		saleAdvertisementRepository.delete(saleAdvertisement);
 	}
 
@@ -203,13 +203,16 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	public final DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
 			throws SaleAdvertisementNotFoundException {
 
-		checkNotNull(identifier, "Received a null pointer as identifier");
+		checkNotNull(identifier, RECEIVED_A_NULL_POINTER_AS_IDENTIFIER);
 
-		if (!saleAdvertisementRepository.existsById(identifier)) {
+		Optional<DefaultSaleAdvertisementEntity> defaultSaleAdvertisement = saleAdvertisementRepository
+				.findById(identifier);
+
+		if (!defaultSaleAdvertisement.isPresent()) {
 			throw new SaleAdvertisementNotFoundException(identifier);
 		}
 
-		return saleAdvertisementRepository.findById(identifier).get();
+		return defaultSaleAdvertisement.get();
 	}
 
 	/**
@@ -232,7 +235,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 
 		if (rating < DefaultUserService.MIN_RATING)
 			rating = Double.valueOf(DefaultUserService.MIN_RATING);
-		
+
 		if (rating > DefaultUserService.MAX_RATING)
 			rating = Double.valueOf(DefaultUserService.MAX_RATING);
 

@@ -50,6 +50,9 @@ public class SaleAdvertisementViewConstants {
 	/** The Constant AVERAGE_RATING. */
 	public static final String AVERAGE_RATING = "averageRating";
 
+	/** The Constant SEARCH_CRITERIA_FORM. */
+	public static final String SEARCH_CRITERIA_FORM = "searchCriteriaForm";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */
