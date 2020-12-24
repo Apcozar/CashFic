@@ -24,13 +24,13 @@
 
 			<form class="form-inline my-2 my-lg-0"
 				th:action="${viewName} == 'viewList' ? @{/saleAdvertisement/list} : @{/saleAdvertisement/followedList}"
-				method="get">
+				method="get" th:object="${searchCriteriaForm}">
 
 				<div class="form-group">
 					<label for="keywords" th:text="#{label.searchKeywords}"></label>
 					<div>
 						<input class="form-control mr-sm-2" type="text" id="keywords"
-							name="keywords" placeholder="Search Keywords">
+							name="keywords" placeholder="Search Keywords" th:field="*{keywords}">
 					</div>
 				</div>
 
@@ -38,7 +38,7 @@
 					<label for="city" th:text="#{label.searchCity}"></label>
 					<div>
 						<input class="form-control mr-sm-2" type="text" id="city"
-							name="city" placeholder="Search City">
+							name="city" placeholder="Search City" th:field="*{city}">
 					</div>
 				</div>
 
@@ -47,7 +47,7 @@
 						<label for="minDate" th:text="#{label.minDate}"></label>
 						<div class="md-form md-outline input-with-post-icon datepicker">
 							<input type='date' class="form-control mr-sm-1" id='minDate'
-								name="minDate" placeholder="dd/MM/yyyy" /> <span
+								name="minDate" placeholder="dd/MM/yyyy" th:field="*{minDate}"/> <span
 								class="input-group-addon"> <span
 								class="glyphicon glyphicon-calendar"></span>
 							</span>
@@ -60,7 +60,7 @@
 						<label for="maxDate" th:text="#{label.maxDate}"></label>
 						<div class="md-form md-outline input-with-post-icon datepicker">
 							<input type='date' class="form-control mr-sm-2" id='maxDate'
-								name="maxDate" placeholder="dd/MM/yyyy" /> <span
+								name="maxDate" placeholder="dd/MM/yyyy" th:field="*{maxDate}"/> <span
 								class="input-group-addon"> <span
 								class="glyphicon glyphicon-calendar"></span>
 							</span>
@@ -73,7 +73,7 @@
 					<div>
 						<input class="form-control mr-sm-2" type="number" min="0"
 							step="any" id="minPrice" name="minPrice"
-							placeholder="Minimum Price">
+							placeholder="Minimum Price" th:field="*{minPrice}">
 					</div>
 				</div>
 
@@ -82,7 +82,7 @@
 					<div>
 						<input class="form-control mr-sm-2" type="number" min="0"
 							step="any" id="maxPrice" name="maxPrice"
-							placeholder="Maximum Price">
+							placeholder="Maximum Price" th:field="*{maxPrice}">
 					</div>
 				</div>
 				
@@ -93,7 +93,7 @@
 						<div>
 							<input class="form-control mr-sm-2" type="number" min="1" max="5"
 								step="any" id="minRating" name="minRating"
-								placeholder="Minimun Rating">
+								placeholder="Minimun Rating" th:field="*{minRating}">
 						</div>
 					</div>
 				</div>
