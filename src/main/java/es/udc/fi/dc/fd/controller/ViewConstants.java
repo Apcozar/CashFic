@@ -51,6 +51,10 @@ public class ViewConstants {
 	/** The Constant REFERER. */
 	public static final String REFERER = "Referer";
 
+	/** The Constant USER_PURCHASE_HISTORY. */
+	public static final String USER_PURCHASE_HISTORY = "account/purchaseHistory";
+
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

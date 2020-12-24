@@ -49,123 +49,115 @@ import es.udc.fi.dc.fd.test.config.UrlConfig;
  * @author Bernardo Mart&iacute;nez Garrido
  */
 @RunWith(JUnitPlatform.class)
-public final class TestExampleEntityRestControllerPagination {
+final class TestExampleEntityRestControllerPagination {
 
-    /**
-     * Argument captor for pagination data.
-     */
-    private ArgumentCaptor<Pageable>   captor;
+	/**
+	 * Argument captor for pagination data.
+	 */
+	private ArgumentCaptor<Pageable> captor;
 
-    /**
-     * Mocked MVC context.
-     */
-    private MockMvc                    mockMvc;
+	/**
+	 * Mocked MVC context.
+	 */
+	private MockMvc mockMvc;
 
-    /**
-     * Mocked service.
-     */
-    private final ExampleEntityService service;
+	/**
+	 * Mocked service.
+	 */
+	private final ExampleEntityService service;
 
-    /**
-     * Default constructor;
-     */
-    public TestExampleEntityRestControllerPagination() {
-        super();
+	/**
+	 * Default constructor;
+	 */
+	public TestExampleEntityRestControllerPagination() {
+		super();
 
-        service = getExampleEntityService();
-    }
+		service = getExampleEntityService();
+	}
 
-    /**
-     * Sets up the mocked MVC context.
-     */
-    @BeforeEach
-    public final void setUpMockContext() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(new ExampleEntityRestController(service))
-                .setCustomArgumentResolvers(
-                        new PageableHandlerMethodArgumentResolver())
-                .alwaysExpect(MockMvcResultMatchers.status().isOk())
-                .alwaysExpect(MockMvcResultMatchers.content()
-                        .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .build();
-    }
+	/**
+	 * Sets up the mocked MVC context.
+	 */
+	@BeforeEach
+	public final void setUpMockContext() {
+		mockMvc = MockMvcBuilders.standaloneSetup(new ExampleEntityRestController(service))
+				.setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+				.alwaysExpect(MockMvcResultMatchers.status().isOk())
+				.alwaysExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8)).build();
+	}
 
-    /**
-     * Verifies that the page received as parameter is used for pagination.
-     */
-    @Test
-    public final void testGet_Page_SetInPagination() throws Exception {
-        final Pageable pageable;
+	/**
+	 * Verifies that the page received as parameter is used for pagination.
+	 */
+	@Test
+	final void testGet_Page_SetInPagination() throws Exception {
+		final Pageable pageable;
 
-        mockMvc.perform(getGetRequestWithPage());
+		mockMvc.perform(getGetRequestWithPage());
 
-        pageable = captor.getValue();
+		pageable = captor.getValue();
 
-        Assert.assertEquals(10, pageable.getPageNumber());
-    }
+		Assert.assertEquals(10, pageable.getPageNumber());
+	}
 
-    /**
-     * Verifies that default pagination values are used when no pagination
-     * parameters are received.
-     */
-    @Test
-    public final void testGet_WithoutPagination_DefaultValues()
-            throws Exception {
-        final Pageable pageable;
+	/**
+	 * Verifies that default pagination values are used when no pagination
+	 * parameters are received.
+	 */
+	@Test
+	final void testGet_WithoutPagination_DefaultValues() throws Exception {
+		final Pageable pageable;
 
-        mockMvc.perform(getGetRequest());
+		mockMvc.perform(getGetRequest());
 
-        pageable = captor.getValue();
+		pageable = captor.getValue();
 
-        Assert.assertEquals(20, pageable.getPageSize());
-        Assert.assertEquals(0, pageable.getPageNumber());
-    }
+		Assert.assertEquals(20, pageable.getPageSize());
+		Assert.assertEquals(0, pageable.getPageNumber());
+	}
 
-    /**
-     * Returns a mocked service.
-     * <p>
-     * It is prepared for using the pagination data argument captor.
-     * 
-     * @return a mocked service
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private final ExampleEntityService getExampleEntityService() {
-        final ExampleEntityService service;   // Mocked service
-        final Collection<ExampleEntity> entities; // Returned entities
+	/**
+	 * Returns a mocked service.
+	 * <p>
+	 * It is prepared for using the pagination data argument captor.
+	 * 
+	 * @return a mocked service
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private final ExampleEntityService getExampleEntityService() {
+		final ExampleEntityService service; // Mocked service
+		final Collection<ExampleEntity> entities; // Returned entities
 
-        service = Mockito.mock(ExampleEntityService.class);
+		service = Mockito.mock(ExampleEntityService.class);
 
-        entities = new ArrayList<>();
-        entities.add(Mockito.mock(ExampleEntity.class));
-        entities.add(Mockito.mock(ExampleEntity.class));
-        entities.add(Mockito.mock(ExampleEntity.class));
+		entities = new ArrayList<>();
+		entities.add(Mockito.mock(ExampleEntity.class));
+		entities.add(Mockito.mock(ExampleEntity.class));
+		entities.add(Mockito.mock(ExampleEntity.class));
 
-        captor = ArgumentCaptor.forClass(Pageable.class);
+		captor = ArgumentCaptor.forClass(Pageable.class);
 
-        Mockito.when(service.getEntities(captor.capture()))
-                .thenReturn((Iterable) entities);
+		Mockito.when(service.getEntities(captor.capture())).thenReturn((Iterable) entities);
 
-        return service;
-    }
+		return service;
+	}
 
-    /**
-     * Returns a request builder prepared for reading entities.
-     * 
-     * @return a request builder prepared for reading entities
-     */
-    private final RequestBuilder getGetRequest() {
-        return MockMvcRequestBuilders.get(UrlConfig.URL_REST)
-                .contentType(MediaType.APPLICATION_JSON_UTF8);
-    }
+	/**
+	 * Returns a request builder prepared for reading entities.
+	 * 
+	 * @return a request builder prepared for reading entities
+	 */
+	private final RequestBuilder getGetRequest() {
+		return MockMvcRequestBuilders.get(UrlConfig.URL_REST).contentType(MediaType.APPLICATION_JSON_UTF8);
+	}
 
-    /**
-     * Returns a request builder prepared for reading entities and a page set.
-     * 
-     * @return a request builder prepared for reading entities
-     */
-    private final RequestBuilder getGetRequestWithPage() {
-        return MockMvcRequestBuilders.get(UrlConfig.URL_REST + "?page=10")
-                .contentType(MediaType.APPLICATION_JSON_UTF8);
-    }
+	/**
+	 * Returns a request builder prepared for reading entities and a page set.
+	 * 
+	 * @return a request builder prepared for reading entities
+	 */
+	private final RequestBuilder getGetRequestWithPage() {
+		return MockMvcRequestBuilders.get(UrlConfig.URL_REST + "?page=10").contentType(MediaType.APPLICATION_JSON_UTF8);
+	}
 
 }
