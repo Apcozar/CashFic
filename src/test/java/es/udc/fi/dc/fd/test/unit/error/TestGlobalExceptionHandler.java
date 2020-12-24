@@ -24,6 +24,10 @@
 
 package es.udc.fi.dc.fd.test.unit.error;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -31,95 +35,89 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
-import es.udc.fi.dc.fd.controller.error.GlobalExceptionHandler;
-import es.udc.fi.dc.fd.controller.error.ErrorViewConstants;
 import es.udc.fi.dc.fd.controller.entity.ExampleEntityFormController;
+import es.udc.fi.dc.fd.controller.error.ErrorViewConstants;
+import es.udc.fi.dc.fd.controller.error.GlobalExceptionHandler;
 import es.udc.fi.dc.fd.service.ExampleEntityService;
 import es.udc.fi.dc.fd.test.config.UrlConfig;
 
 /**
- * Unit tests for {@link GlobalExceptionHandler}, checking that it catches and handles errors.
+ * Unit tests for {@link GlobalExceptionHandler}, checking that it catches and
+ * handles errors.
  * 
  * @author Bernardo Mart&iacute;nez Garrido
  */
 @RunWith(JUnitPlatform.class)
-public final class TestGlobalExceptionHandler {
+final class TestGlobalExceptionHandler {
 
-    /**
-     * Mocked MVC context.
-     */
-    private MockMvc mockMvc;
+	/**
+	 * Mocked MVC context.
+	 */
+	private MockMvc mockMvc;
 
-    /**
-     * Default constructor.
-     */
-    public TestGlobalExceptionHandler() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public TestGlobalExceptionHandler() {
+		super();
+	}
 
-    /**
-     * Sets up the mocked MVC context.
-     * <p>
-     * It expects all the responses to have the OK (200) HTTP code.
-     */
-    @BeforeEach
-    public final void setUpMockContext() {
-        final GlobalExceptionHandler exceptionHandler;
+	/**
+	 * Sets up the mocked MVC context.
+	 * <p>
+	 * It expects all the responses to have the OK (200) HTTP code.
+	 */
+	@BeforeEach
+	public final void setUpMockContext() {
+		final GlobalExceptionHandler exceptionHandler;
 
-        exceptionHandler = new GlobalExceptionHandler();
-        mockMvc = MockMvcBuilders.standaloneSetup(getController())
-                .alwaysExpect(MockMvcResultMatchers.status().isOk())
-                .setControllerAdvice(exceptionHandler).build();
-    }
+		exceptionHandler = new GlobalExceptionHandler();
+		mockMvc = MockMvcBuilders.standaloneSetup(getController()).alwaysExpect(MockMvcResultMatchers.status().isOk())
+				.setControllerAdvice(exceptionHandler).build();
+	}
 
-    /**
-     * Verifies that when an exception is thrown in the backend  the error view is returned.
-     */
-    @Test
-    public final void testSendFormData_ExpectedView() throws Exception {
-        final ResultActions result; // Request result
+	/**
+	 * Verifies that when an exception is thrown in the backend the error view is
+	 * returned.
+	 */
+	@Test
+	final void testSendFormData_ExpectedView() throws Exception {
+		final ResultActions result; // Request result
 
-        // TODO: Just verify it is not this same view
-        result = mockMvc.perform(getFormRequest());
+		// TODO: Just verify it is not this same view
+		result = mockMvc.perform(getFormRequest());
 
-        // The view is valid
-        result.andExpect(MockMvcResultMatchers.view()
-                .name(ErrorViewConstants.VIEW_ERROR));
-    }
+		// The view is valid
+		result.andExpect(MockMvcResultMatchers.view().name(ErrorViewConstants.VIEW_ERROR));
+	}
 
-    /**
-     * Returns a controller with mocked dependencies.
-     * 
-     * @return a mocked controller
-     */
-    private final ExampleEntityFormController getController() {
-        final ExampleEntityService service; // Mocked service
+	/**
+	 * Returns a controller with mocked dependencies.
+	 * 
+	 * @return a mocked controller
+	 */
+	private final ExampleEntityFormController getController() {
+		final ExampleEntityService service; // Mocked service
 
-        service = Mockito.mock(ExampleEntityService.class);
+		service = Mockito.mock(ExampleEntityService.class);
 
-        Mockito.when(service.getAllEntities())
-                .thenThrow(RuntimeException.class);
+		Mockito.when(service.getAllEntities()).thenThrow(RuntimeException.class);
 
-        return new ExampleEntityFormController(service);
-    }
+		return new ExampleEntityFormController(service);
+	}
 
-    /**
-     * Returns a request builder for posting the form data.
-     * <p>
-     * This request contains all the required request parameters.
-     * <p>
-     * There is only a single required parameter, the {@code name} parameter.
-     * 
-     * @return a request builder for posting the form data
-     */
-    private final RequestBuilder getFormRequest() {
-        return MockMvcRequestBuilders.post(UrlConfig.URL_FORM_POST)
-                .param("name", "name");
-    }
+	/**
+	 * Returns a request builder for posting the form data.
+	 * <p>
+	 * This request contains all the required request parameters.
+	 * <p>
+	 * There is only a single required parameter, the {@code name} parameter.
+	 * 
+	 * @return a request builder for posting the form data
+	 */
+	private final RequestBuilder getFormRequest() {
+		return MockMvcRequestBuilders.post(UrlConfig.URL_FORM_POST).param("name", "name");
+	}
 
 }

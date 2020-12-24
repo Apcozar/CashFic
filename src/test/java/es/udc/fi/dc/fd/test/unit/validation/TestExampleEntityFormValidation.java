@@ -29,12 +29,12 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import es.udc.fi.dc.fd.model.form.ExampleEntityForm;
 
@@ -47,82 +47,82 @@ import es.udc.fi.dc.fd.model.form.ExampleEntityForm;
  * @author Bernardo Mart&iacute;nez Garrido
  */
 @RunWith(JUnitPlatform.class)
-public final class TestExampleEntityFormValidation {
+final class TestExampleEntityFormValidation {
 
-    /**
-     * Validator for validating the bean.
-     */
-    private Validator validator;
+	/**
+	 * Validator for validating the bean.
+	 */
+	private Validator validator;
 
-    /**
-     * Default constructor.
-     */
-    public TestExampleEntityFormValidation() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public TestExampleEntityFormValidation() {
+		super();
+	}
 
-    /**
-     * Sets up the validator for the tests.
-     */
-    @BeforeEach
-    public final void setUpValidator() {
-        validator = createValidator();
-    }
+	/**
+	 * Sets up the validator for the tests.
+	 */
+	@BeforeEach
+	public final void setUpValidator() {
+		validator = createValidator();
+	}
 
-    /**
-     * Verifies that if the name is empty this field is marked with an error.
-     */
-    @Test
-    public final void testValidation_EmptyName_Error() {
-        final ExampleEntityForm form; // Tested form
-        final Set<ConstraintViolation<ExampleEntityForm>> errors;
-        final ConstraintViolation<ExampleEntityForm> error;
+	/**
+	 * Verifies that if the name is empty this field is marked with an error.
+	 */
+	@Test
+	final void testValidation_EmptyName_Error() {
+		final ExampleEntityForm form; // Tested form
+		final Set<ConstraintViolation<ExampleEntityForm>> errors;
+		final ConstraintViolation<ExampleEntityForm> error;
 
-        form = new ExampleEntityForm();
+		form = new ExampleEntityForm();
 
-        form.setName("");
+		form.setName("");
 
-        errors = validator.validate(form);
+		errors = validator.validate(form);
 
-        Assert.assertEquals(1, errors.size());
+		Assert.assertEquals(1, errors.size());
 
-        error = errors.iterator().next();
-        Assert.assertEquals("name", error.getPropertyPath().toString());
-    }
+		error = errors.iterator().next();
+		Assert.assertEquals("name", error.getPropertyPath().toString());
+	}
 
-    /**
-     * Verifies that if the name is null this field is marked with an error.
-     */
-    @Test
-    public final void testValidation_NullName_Error() {
-        final ExampleEntityForm form; // Tested form
-        final Set<ConstraintViolation<ExampleEntityForm>> errors;
-        final ConstraintViolation<ExampleEntityForm> error;
+	/**
+	 * Verifies that if the name is null this field is marked with an error.
+	 */
+	@Test
+	final void testValidation_NullName_Error() {
+		final ExampleEntityForm form; // Tested form
+		final Set<ConstraintViolation<ExampleEntityForm>> errors;
+		final ConstraintViolation<ExampleEntityForm> error;
 
-        form = new ExampleEntityForm();
+		form = new ExampleEntityForm();
 
-        // form.setName(null);
+		// form.setName(null);
 
-        errors = validator.validate(form);
+		errors = validator.validate(form);
 
-        Assert.assertEquals(1, errors.size());
+		Assert.assertEquals(1, errors.size());
 
-        error = errors.iterator().next();
-        Assert.assertEquals("name", error.getPropertyPath().toString());
-    }
+		error = errors.iterator().next();
+		Assert.assertEquals("name", error.getPropertyPath().toString());
+	}
 
-    /**
-     * Returns the validator to use in the tests.
-     * 
-     * @return the validator to use in the tests
-     */
-    private final Validator createValidator() {
-        final LocalValidatorFactoryBean localValidatorFactoryBean;
+	/**
+	 * Returns the validator to use in the tests.
+	 * 
+	 * @return the validator to use in the tests
+	 */
+	private final Validator createValidator() {
+		final LocalValidatorFactoryBean localValidatorFactoryBean;
 
-        localValidatorFactoryBean = new LocalValidatorFactoryBean();
-        localValidatorFactoryBean.afterPropertiesSet();
+		localValidatorFactoryBean = new LocalValidatorFactoryBean();
+		localValidatorFactoryBean.afterPropertiesSet();
 
-        return localValidatorFactoryBean;
-    }
+		return localValidatorFactoryBean;
+	}
 
 }

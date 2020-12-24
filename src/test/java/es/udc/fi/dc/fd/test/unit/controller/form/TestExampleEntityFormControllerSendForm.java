@@ -24,9 +24,13 @@
 
 package es.udc.fi.dc.fd.test.unit.controller.form;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -34,10 +38,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import es.udc.fi.dc.fd.controller.entity.ExampleEntityFormController;
 import es.udc.fi.dc.fd.controller.entity.ExampleEntityViewConstants;
@@ -52,93 +52,88 @@ import es.udc.fi.dc.fd.test.config.UrlConfig;
  * @author Bernardo Mart&iacute;nez Garrido
  */
 @RunWith(JUnitPlatform.class)
-public final class TestExampleEntityFormControllerSendForm {
+final class TestExampleEntityFormControllerSendForm {
 
-    /**
-     * Mocked MVC context.
-     */
-    private MockMvc mockMvc;
+	/**
+	 * Mocked MVC context.
+	 */
+	private MockMvc mockMvc;
 
-    /**
-     * Default constructor.
-     */
-    public TestExampleEntityFormControllerSendForm() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public TestExampleEntityFormControllerSendForm() {
+		super();
+	}
 
-    /**
-     * Sets up the mocked MVC context.
-     * <p>
-     * It expects all the responses to have the OK (200) HTTP code.
-     */
-    @BeforeEach
-    public final void setUpMockContext() {
-        mockMvc = MockMvcBuilders.standaloneSetup(getController())
-                .alwaysExpect(MockMvcResultMatchers.status().isOk()).build();
-    }
+	/**
+	 * Sets up the mocked MVC context.
+	 * <p>
+	 * It expects all the responses to have the OK (200) HTTP code.
+	 */
+	@BeforeEach
+	public final void setUpMockContext() {
+		mockMvc = MockMvcBuilders.standaloneSetup(getController()).alwaysExpect(MockMvcResultMatchers.status().isOk())
+				.build();
+	}
 
-    /**
-     * Verifies that after receiving valid form data the expected attributes are
-     * loaded into the model.
-     */
-    @Test
-    public final void testSendFormData_ExpectedAttributeModel()
-            throws Exception {
-        final ResultActions result; // Request result
+	/**
+	 * Verifies that after receiving valid form data the expected attributes are
+	 * loaded into the model.
+	 */
+	@Test
+	final void testSendFormData_ExpectedAttributeModel() throws Exception {
+		final ResultActions result; // Request result
 
-        result = mockMvc.perform(getFormRequest());
+		result = mockMvc.perform(getFormRequest());
 
-        // The response model contains the expected attributes
-        result.andExpect(MockMvcResultMatchers.model()
-                .attributeExists(ExampleEntityViewConstants.BEAN_FORM));
-    }
+		// The response model contains the expected attributes
+		result.andExpect(MockMvcResultMatchers.model().attributeExists(ExampleEntityViewConstants.BEAN_FORM));
+	}
 
-    /**
-     * Verifies that after received valid form data the expected view is
-     * returned.
-     */
-    @Test
-    public final void testSendFormData_ExpectedView() throws Exception {
-        final ResultActions result; // Request result
+	/**
+	 * Verifies that after received valid form data the expected view is returned.
+	 */
+	@Test
+	final void testSendFormData_ExpectedView() throws Exception {
+		final ResultActions result; // Request result
 
-        // TODO: Just verify it is not this same view
-        result = mockMvc.perform(getFormRequest());
+		// TODO: Just verify it is not this same view
+		result = mockMvc.perform(getFormRequest());
 
-        // The view is valid
-        result.andExpect(MockMvcResultMatchers.view()
-                .name(ExampleEntityViewConstants.VIEW_ENTITY_LIST));
-    }
+		// The view is valid
+		result.andExpect(MockMvcResultMatchers.view().name(ExampleEntityViewConstants.VIEW_ENTITY_LIST));
+	}
 
-    /**
-     * Returns a controller with mocked dependencies.
-     * 
-     * @return a mocked controller
-     */
-    private final ExampleEntityFormController getController() {
-        final ExampleEntityService service; // Mocked service
-        final Collection<DefaultExampleEntity> entities; // Mocked entities
+	/**
+	 * Returns a controller with mocked dependencies.
+	 * 
+	 * @return a mocked controller
+	 */
+	private final ExampleEntityFormController getController() {
+		final ExampleEntityService service; // Mocked service
+		final Collection<DefaultExampleEntity> entities; // Mocked entities
 
-        service = Mockito.mock(ExampleEntityService.class);
+		service = Mockito.mock(ExampleEntityService.class);
 
-        entities = new ArrayList<>();
+		entities = new ArrayList<>();
 
-        Mockito.when(service.getAllEntities()).thenReturn(entities);
+		Mockito.when(service.getAllEntities()).thenReturn(entities);
 
-        return new ExampleEntityFormController(service);
-    }
+		return new ExampleEntityFormController(service);
+	}
 
-    /**
-     * Returns a request builder for posting the form data.
-     * <p>
-     * This request contains all the required request parameters.
-     * <p>
-     * There is only a single required parameter, the {@code name} parameter.
-     * 
-     * @return a request builder for posting the form data
-     */
-    private final RequestBuilder getFormRequest() {
-        return MockMvcRequestBuilders.post(UrlConfig.URL_FORM_POST)
-                .param("name", "name");
-    }
+	/**
+	 * Returns a request builder for posting the form data.
+	 * <p>
+	 * This request contains all the required request parameters.
+	 * <p>
+	 * There is only a single required parameter, the {@code name} parameter.
+	 * 
+	 * @return a request builder for posting the form data
+	 */
+	private final RequestBuilder getFormRequest() {
+		return MockMvcRequestBuilders.post(UrlConfig.URL_FORM_POST).param("name", "name");
+	}
 
 }

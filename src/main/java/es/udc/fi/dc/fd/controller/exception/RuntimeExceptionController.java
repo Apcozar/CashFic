@@ -28,6 +28,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import es.udc.fi.dc.fd.controller.saleAdvertisement.exceptions.InternalServerErrorException;
+
 /**
  * Controller which generates a runtime exception.
  * <p>
@@ -39,19 +41,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/exception")
 public class RuntimeExceptionController {
 
-    /**
-     * Constructs a controller.
-     */
-    public RuntimeExceptionController() {
-        super();
-    }
+	/**
+	 * Constructs a controller.
+	 */
+	public RuntimeExceptionController() {
+		super();
+	}
 
-    /**
-     * Throws a runtime exception.
-     */
-    @GetMapping(path = "/runtime")
-    public void showEntityList() {
-        throw new RuntimeException("Some unspecified error has occurred");
-    }
+	/**
+	 * Throws a runtime exception.
+	 *
+	 * @throws InternalServerErrorException the internal server error exception
+	 */
+	@GetMapping(path = "/runtime")
+	public void showEntityList() throws InternalServerErrorException {
+		throw new InternalServerErrorException();
+	}
 
 }

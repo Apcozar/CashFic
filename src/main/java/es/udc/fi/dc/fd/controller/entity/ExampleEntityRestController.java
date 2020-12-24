@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.udc.fi.dc.fd.model.ExampleEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultExampleEntity;
 import es.udc.fi.dc.fd.service.ExampleEntityService;
 
 /**
@@ -44,35 +44,32 @@ import es.udc.fi.dc.fd.service.ExampleEntityService;
 @RequestMapping("/rest/entity")
 public class ExampleEntityRestController {
 
-    /**
-     * Example entity service.
-     */
-    private final ExampleEntityService exampleEntityService;
+	/**
+	 * Example entity service.
+	 */
+	private final ExampleEntityService exampleEntityService;
 
-    /**
-     * Constructs a controller with the specified dependencies.
-     * 
-     * @param service
-     *            example entity service
-     */
-    @Autowired
-    public ExampleEntityRestController(final ExampleEntityService service) {
-        super();
+	/**
+	 * Constructs a controller with the specified dependencies.
+	 * 
+	 * @param service example entity service
+	 */
+	@Autowired
+	public ExampleEntityRestController(final ExampleEntityService service) {
+		super();
 
-        exampleEntityService = checkNotNull(service,
-                "Received a null pointer as service");
-    }
+		exampleEntityService = checkNotNull(service, "Received a null pointer as service");
+	}
 
-    /**
-     * Returns a paginated collection of entities.
-     * 
-     * @param page
-     *            pagination data
-     * @return a paginated collection of entities
-     */
-    @GetMapping
-    public Iterable<? extends ExampleEntity> getEntities(final Pageable page) {
-        return exampleEntityService.getEntities(page);
-    }
+	/**
+	 * Returns a paginated collection of entities.
+	 * 
+	 * @param page pagination data
+	 * @return a paginated collection of entities
+	 */
+	@GetMapping
+	public Iterable<DefaultExampleEntity> getEntities(final Pageable page) {
+		return exampleEntityService.getEntities(page);
+	}
 
 }

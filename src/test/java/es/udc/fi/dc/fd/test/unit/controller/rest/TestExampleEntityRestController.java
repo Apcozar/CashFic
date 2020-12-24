@@ -49,82 +49,76 @@ import es.udc.fi.dc.fd.test.config.UrlConfig;
  * @author Bernardo Mart&iacute;nez Garrido
  */
 @RunWith(JUnitPlatform.class)
-public final class TestExampleEntityRestController {
+final class TestExampleEntityRestController {
 
-    /**
-     * Mocked MVC context.
-     */
-    private MockMvc mockMvc;
+	/**
+	 * Mocked MVC context.
+	 */
+	private MockMvc mockMvc;
 
-    /**
-     * Default constructor;
-     */
-    public TestExampleEntityRestController() {
-        super();
-    }
+	/**
+	 * Default constructor;
+	 */
+	public TestExampleEntityRestController() {
+		super();
+	}
 
-    /**
-     * Sets up the mocked MVC context.
-     */
-    @BeforeEach
-    public final void setUpMockContext() {
-        mockMvc = MockMvcBuilders.standaloneSetup(getController())
-                .setCustomArgumentResolvers(
-                        new PageableHandlerMethodArgumentResolver())
-                .alwaysExpect(MockMvcResultMatchers.status().isOk())
-                .alwaysExpect(MockMvcResultMatchers.content()
-                        .contentType(MediaType.APPLICATION_JSON_UTF8))
-                .build();
-    }
+	/**
+	 * Sets up the mocked MVC context.
+	 */
+	@BeforeEach
+	public final void setUpMockContext() {
+		mockMvc = MockMvcBuilders.standaloneSetup(getController())
+				.setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+				.alwaysExpect(MockMvcResultMatchers.status().isOk())
+				.alwaysExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8)).build();
+	}
 
-    /**
-     * Verifies that the data read from the service is returned.
-     */
-    @Test
-    public final void testGet_ExpectedResults() throws Exception {
-        final ResultActions result; // Request result
+	/**
+	 * Verifies that the data read from the service is returned.
+	 */
+	@Test
+	final void testGet_ExpectedResults() throws Exception {
+		final ResultActions result; // Request result
 
-        result = mockMvc.perform(getGetRequest());
+		result = mockMvc.perform(getGetRequest());
 
-        // The operation was accepted
-        result.andExpect(MockMvcResultMatchers.status().isOk());
+		// The operation was accepted
+		result.andExpect(MockMvcResultMatchers.status().isOk());
 
-        // The response model contains the expected attributes
-        result.andExpect(
-                MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)));
-    }
+		// The response model contains the expected attributes
+		result.andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)));
+	}
 
-    /**
-     * Returns a controller with mocked dependencies.
-     * 
-     * @return a controller with mocked dependencies
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private final ExampleEntityRestController getController() {
-        final ExampleEntityService service;   // Mocked service
-        final Collection<ExampleEntity> entities; // Returned entities
+	/**
+	 * Returns a controller with mocked dependencies.
+	 * 
+	 * @return a controller with mocked dependencies
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private final ExampleEntityRestController getController() {
+		final ExampleEntityService service; // Mocked service
+		final Collection<ExampleEntity> entities; // Returned entities
 
-        service = Mockito.mock(ExampleEntityService.class);
+		service = Mockito.mock(ExampleEntityService.class);
 
-        entities = new ArrayList<>();
-        entities.add(Mockito.mock(ExampleEntity.class));
-        entities.add(Mockito.mock(ExampleEntity.class));
-        entities.add(Mockito.mock(ExampleEntity.class));
+		entities = new ArrayList<>();
+		entities.add(Mockito.mock(ExampleEntity.class));
+		entities.add(Mockito.mock(ExampleEntity.class));
+		entities.add(Mockito.mock(ExampleEntity.class));
 
-        Mockito.when(service.getEntities(ArgumentMatchers.any()))
-                .thenReturn((Iterable) entities);
+		Mockito.when(service.getEntities(ArgumentMatchers.any())).thenReturn((Iterable) entities);
 
-        return new ExampleEntityRestController(service);
-    }
+		return new ExampleEntityRestController(service);
+	}
 
-    /**
-     * Returns a request builder prepared for reading entities.
-     * 
-     * @return a request builder prepared for reading entities
-     */
-    private final RequestBuilder getGetRequest() {
-        return MockMvcRequestBuilders.get(UrlConfig.URL_REST)
-                .contentType(MediaType.APPLICATION_JSON_UTF8);
-    }
+	/**
+	 * Returns a request builder prepared for reading entities.
+	 * 
+	 * @return a request builder prepared for reading entities
+	 */
+	private final RequestBuilder getGetRequest() {
+		return MockMvcRequestBuilders.get(UrlConfig.URL_REST).contentType(MediaType.APPLICATION_JSON_UTF8);
+	}
 
 }

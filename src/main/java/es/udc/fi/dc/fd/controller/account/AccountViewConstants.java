@@ -56,6 +56,9 @@ public class AccountViewConstants {
 	/** The Constant RATE_FORM. */
 	public static final String RATE_FORM = "rateForm";
 
+	/** The Constant USER_TRANSACTION_LIST. */
+	public static final String USER_TRANSACTION_LIST = "buyTransactions";
+
 	/**
 	 * Private constructor to avoid initialization.
 	 */

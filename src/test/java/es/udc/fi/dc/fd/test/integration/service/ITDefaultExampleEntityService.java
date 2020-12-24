@@ -56,7 +56,7 @@ import es.udc.fi.dc.fd.service.ExampleEntityService;
 @Rollback
 @ContextConfiguration(locations = { "classpath:context/application-context.xml" })
 @TestPropertySource({ "classpath:config/persistence-access.properties" })
-public class ITDefaultExampleEntityService {
+class ITDefaultExampleEntityService {
 
 	/**
 	 * Service being tested.
@@ -75,7 +75,7 @@ public class ITDefaultExampleEntityService {
 	 * Verifies that the service adds entities into persistence.
 	 */
 	@Test
-	public void testAdd_NotExisting_Added() {
+	void testAdd_NotExisting_Added() {
 		final DefaultExampleEntity entity; // Entity to add
 		final Integer entitiesCount; // Original number of entities
 		final Integer finalEntitiesCount; // Final number of entities
@@ -96,7 +96,7 @@ public class ITDefaultExampleEntityService {
 	 * Verifies that searching an existing entity by id returns the expected entity.
 	 */
 	@Test
-	public void testFindById_Existing_Valid() {
+	void testFindById_Existing_Valid() {
 		final ExampleEntity entity; // Found entity
 
 		entity = service.findById(1);
@@ -109,7 +109,7 @@ public class ITDefaultExampleEntityService {
 	 * entity.
 	 */
 	@Test
-	public void testFindById_NotExisting_Invalid() {
+	void testFindById_NotExisting_Invalid() {
 		final ExampleEntity entity; // Found entity
 
 		entity = service.findById(100);
