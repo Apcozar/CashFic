@@ -370,8 +370,7 @@ public class SaleAdvertisementListViewController {
 				return ViewConstants.WELCOME;
 			}
 
-			if (saleAdvertisement.getState() == State.STATE_ON_SALE
-					|| saleAdvertisement.getState() == State.STATE_ON_HOLD) {
+			if (saleAdvertisement.getState() == State.STATE_ON_HOLD) {
 
 				return ViewConstants.WELCOME;
 			}
