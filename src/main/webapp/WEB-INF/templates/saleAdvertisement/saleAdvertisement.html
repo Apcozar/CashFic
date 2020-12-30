@@ -33,80 +33,99 @@
 					<form method="post"
 						th:action="@{/saleAdvertisement/} + @{buy/} + ${saleAdvertisement.saleAdvertisementID}"
 						th:object="${saleAdvertisement.saleAdvertisementID}">
-						<button th:if="${saleAdvertisement.saleAdvertisementIsSold} == false"
-							type="submit" class="btn btn-primary" th:text="#{label.buy}"></button>
+						<th:block th:if="${saleAdvertisement.saleAdvertisementIsSold} == false">
+							<button th:if="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+								type="submit" class="btn btn-primary" th:text="#{label.buy}"></button>
+								
+							<button th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+								type="submit" class="btn btn-primary" th:text="#{label.buy}" disabled></button>
+							<p th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
+							th:text="#{label.hold}">
+							</p>
+						</th:block>
 					</form>
 				</th:block>
 
 				<!-- Button trigger modal -->
-				<button th:if="${saleAdvertisement.isUserLogged()} == true"
-					type="button" class="btn btn-danger" data-toggle="modal"
-					data-target="#exampleModalCenter" th:text="#{label.remove}"></button>
-				<div class="modal fade" id="exampleModalCenter" tabindex="-1"
-					role="dialog" aria-labelledby="exampleModalCenterTitle"
-					aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered" role="document">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="exampleModalLongTitle"
-									th:text="#{title.remove}"></h5>
-								<button type="button" class="close" data-dismiss="modal"
-									aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="modal-body">
-								<span th:text="#{label.removeAddText}"></span>
-							</div>
-							<div class="modal-footer">
-								<form method="post"
-									th:action="@{/saleAdvertisement/} + @{remove/} + ${saleAdvertisement.saleAdvertisementID}">
-									<button type="button" class="btn btn-secondary"
-										data-dismiss="modal" th:text="#{label.cancel}"></button>
-
-									<button type="submit" class="btn btn-danger"
-										th:text="#{label.remove}"></button>
-								</form>
+				<th:block th:if="${saleAdvertisement.isUserLogged() == true}">
+					<button  th:if="${saleAdvertisement.isSaleAdvertisementIsSold() == false}"
+						type="button" class="btn btn-danger" data-toggle="modal"
+						data-target="#exampleModalCenter" th:text="#{label.remove}"></button>
+						
+					<button  th:unless="${saleAdvertisement.isSaleAdvertisementIsSold() == false}"
+						type="button" class="btn btn-danger" th:text="#{label.remove}" disabled></button>
+					<p th:unless="${saleAdvertisement.isSaleAdvertisementIsSold() == false}"
+						th:text="#{label.sold}">
+					</p>
+						
+					<div class="modal fade" id="exampleModalCenter" tabindex="-1"
+						role="dialog" aria-labelledby="exampleModalCenterTitle"
+						aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="exampleModalLongTitle"
+										th:text="#{title.remove}"></h5>
+									<button type="button" class="close" data-dismiss="modal"
+										aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									<span th:text="#{label.removeAddText}"></span>
+								</div>
+								<div class="modal-footer">
+									<form method="post"
+										th:action="@{/saleAdvertisement/} + @{remove/} + ${saleAdvertisement.saleAdvertisementID}">
+										<button type="button" class="btn btn-secondary"
+											data-dismiss="modal" th:text="#{label.cancel}"></button>
+	
+										<button type="submit" class="btn btn-danger"
+											th:text="#{label.remove}"></button>
+									</form>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</th:block>
 				<!-- Button trigger modal -->
-				<button th:if="${saleAdvertisement.isUserLogged()} == true"
-					class="btn btn-primary" data-toggle="modal"
-					data-target="#onHoldModalCenter"
-					th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHold} : #{label.onSale}">
-				</button>
-				<div class="modal fade" id="onHoldModalCenter" tabindex="-1"
-					role="dialog" aria-labelledby="exampleModalCenterTitle"
-					aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered" role="document">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="onHoldModalLongTitle"
-									th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{title.onHold} : #{title.onSale}"></h5>
-								<button type="button" class="close" data-dismiss="modal"
-									aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="modal-body">
-								<span
-									th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHoldText} : #{label.onSaleText}"></span>
-							</div>
-							<div class="modal-footer">
-								<form method="post"
-									th:action="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? @{/saleAdvertisement/setOnHold/} + ${saleAdvertisement.saleAdvertisementID} : @{/saleAdvertisement/setOnSale/} + ${saleAdvertisement.saleAdvertisementID}">
-									<button type="button" class="btn btn-secondary"
-										data-dismiss="modal" th:text="#{label.cancel}"></button>
-
-									<button type="submit" class="btn btn-primary"
-										th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHold} : #{label.onSale}"></button>
-								</form>
+				<th:block th:if="${saleAdvertisement.isSaleAdvertisementIsSold()} == false">
+					<button th:if="${saleAdvertisement.isUserLogged()} == true"
+						class="btn btn-primary" data-toggle="modal"
+						data-target="#onHoldModalCenter"
+						th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHold} : #{title.onSale}">
+					</button>
+					<div class="modal fade" id="onHoldModalCenter" tabindex="-1"
+						role="dialog" aria-labelledby="exampleModalCenterTitle"
+						aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="onHoldModalLongTitle"
+										th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{title.onHold} : #{title.onSale}"></h5>
+									<button type="button" class="close" data-dismiss="modal"
+										aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									<span
+										th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHoldText} : #{label.onSaleText}"></span>
+								</div>
+								<div class="modal-footer">
+									<form method="post"
+										th:action="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? @{/saleAdvertisement/setOnHold/} + ${saleAdvertisement.saleAdvertisementID} : @{/saleAdvertisement/setOnSale/} + ${saleAdvertisement.saleAdvertisementID}">
+										<button type="button" class="btn btn-secondary"
+											data-dismiss="modal" th:text="#{label.cancel}"></button>
+	
+										<button type="submit" class="btn btn-primary"
+											th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHold} : #{label.onSale}"></button>
+									</form>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				<th:block>
 			</div>
 
 			<div class="container">
