@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import es.udc.fi.dc.fd.controller.ViewConstants;
 import es.udc.fi.dc.fd.controller.account.AccountViewConstants;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
+import es.udc.fi.dc.fd.model.State;
 import es.udc.fi.dc.fd.model.UserEntity;
 import es.udc.fi.dc.fd.model.dto.SaleAdvertisementWithLoggedUserInfoDTO;
 import es.udc.fi.dc.fd.model.form.SearchCriteriaForm;
@@ -366,6 +367,11 @@ public class SaleAdvertisementListViewController {
 			DefaultUserEntity user = userService.findByLogin(username);
 
 			if (saleAdvertisement.getUser().getId().equals(user.getId())) {
+				return ViewConstants.WELCOME;
+			}
+
+			if (saleAdvertisement.getState() == State.STATE_ON_HOLD) {
+
 				return ViewConstants.WELCOME;
 			}
 			buyTransactionService.create(user, saleAdvertisement);

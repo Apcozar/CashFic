@@ -244,6 +244,7 @@ public class SaleAdvertisementFormController {
 			throws InternalServerErrorException {
 
 		try {
+			final String slash = "/";
 			InputStream inputStream = file.getInputStream();
 
 			openFolder(getUserFolderAbsolutePath());
@@ -253,7 +254,7 @@ public class SaleAdvertisementFormController {
 			writeInputStreamIntoFile(inputStream, newFile);
 
 			String finalFileName = newFile.getName();
-			String filePath = getUserFolderRelativePath() + "/" + finalFileName;
+			String filePath = getUserFolderRelativePath() + slash + finalFileName;
 
 			imageService.add(new DefaultImageEntity(filePath, finalFileName, saleAdvertisement));
 		} catch (IOException | InternalServerErrorException | ImageAlreadyExistsException e) {
@@ -298,9 +299,10 @@ public class SaleAdvertisementFormController {
 			String extension = FilenameUtils.getExtension(originalFileName);
 
 			String finalFileName = fileName + "." + extension;
+			final String slash = "/";
 
 			File newFile = new File(folderPath, finalFileName);
-			String filePath = getUserFolderRelativePath() + "/" + finalFileName;
+			String filePath = getUserFolderRelativePath() + slash + finalFileName;
 
 			// If file exists, new version
 			int version = 1;
@@ -308,7 +310,7 @@ public class SaleAdvertisementFormController {
 				finalFileName = fileName + version + "." + extension;
 				newFile = new File(folderPath, finalFileName);
 				version++;
-				filePath = getUserFolderRelativePath() + "/" + finalFileName;
+				filePath = getUserFolderRelativePath() + slash + finalFileName;
 			}
 
 			if (!newFile.createNewFile()) {
