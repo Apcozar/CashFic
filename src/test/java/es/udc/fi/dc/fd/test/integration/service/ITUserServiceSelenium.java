@@ -291,6 +291,7 @@ class ITUserServiceSelenium {
 			element = driver.findElement(By.id("submit"));
 			element.submit();
 
+			Thread.sleep(500);
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("errorEmailExist")));
 
 			element = driver.findElement(By.id("errorEmailExist"));
@@ -334,6 +335,8 @@ class ITUserServiceSelenium {
 			element = driver.findElement(By.id("submit"));
 			element.submit();
 
+			Thread.sleep(500);
+
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuLogged")));
 
 			element = driver.findElement(By.id("menuLogged"));
@@ -366,6 +369,7 @@ class ITUserServiceSelenium {
 			assertNotNull(element);
 			element.click();
 
+			Thread.sleep(500);
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("ratedValue")));
 
 			element = driver.findElement(By.id("ratedValue"));

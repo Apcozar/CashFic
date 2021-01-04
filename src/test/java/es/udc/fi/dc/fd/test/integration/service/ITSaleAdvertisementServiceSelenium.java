@@ -146,7 +146,6 @@ class ITSaleAdvertisementServiceSelenium {
 		element.click();
 
 		Thread.sleep(500);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirmChangeSaleState")));
 
 		element = driver.findElement(By.id("confirmChangeSaleState"));
 		assertNotNull(element);
@@ -269,7 +268,7 @@ class ITSaleAdvertisementServiceSelenium {
 		assertNotNull(element);
 		element.click();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("logOut")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("logOut"));
 		assertNotNull(element);
