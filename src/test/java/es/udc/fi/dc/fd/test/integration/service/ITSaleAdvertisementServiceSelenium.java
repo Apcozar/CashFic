@@ -326,40 +326,15 @@ class ITSaleAdvertisementServiceSelenium {
 
 		Thread.sleep(500);
 
-		element = driver.findElement(By.id("likeSaleAdvertisement"));
-		assertNotNull(element);
-		element.click();
-
-		driver.get(BASE_URL + "profile/" + userLoggedId + "/likes");
-		element = driver.findElement(By.linkText(SALE_NAME));
-		assertNotNull(element);
-
-		driver.get(BASE_URL + "saleAdvertisement/" + saleAdvertisementID);
-
-		Thread.sleep(500);
-
-		element = driver.findElement(By.id("unlikeSaleAdvertisement"));
-		assertNotNull(element);
-		element.click();
-
-		Thread.sleep(500);
-
 		element = driver.findElement(By.id("buySaleAdvertisement"));
 		assertNotNull(element);
 		element.click();
 
 		Thread.sleep(500);
 
-		element = driver.findElement(By.id("saleAdvertisementSoldInfo"));
-		assertNotNull(element);
+		driver.get(BASE_URL + "profile/history");
 
-		element = driver.findElement(By.id("menuLogged"));
-		assertNotNull(element);
-		element.click();
-
-		element = driver.findElement(By.id("history"));
-		assertNotNull(element);
-		element.click();
+		Thread.sleep(500);
 
 		driver.get(BASE_URL + "profile/" + userOwnerSaleAdvertisementId);
 
@@ -368,6 +343,8 @@ class ITSaleAdvertisementServiceSelenium {
 		element = driver.findElement(By.id("unfollowUser"));
 		assertNotNull(element);
 		element.click();
+
+		driver.get(BASE_URL + "profile/" + userLoggedId + "/likes");
 
 		BuyTransactionId transactionIdentifier = new BuyTransactionId(userLogged.getId(),
 				Integer.parseInt(saleAdvertisementID));
