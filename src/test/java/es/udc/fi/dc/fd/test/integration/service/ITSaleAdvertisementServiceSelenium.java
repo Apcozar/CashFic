@@ -324,7 +324,7 @@ class ITSaleAdvertisementServiceSelenium {
 
 		driver.get(BASE_URL + "saleAdvertisement/" + saleAdvertisementID);
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("likeSaleAdvertisement")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("likeSaleAdvertisement"));
 		assertNotNull(element);
@@ -336,19 +336,19 @@ class ITSaleAdvertisementServiceSelenium {
 
 		driver.get(BASE_URL + "saleAdvertisement/" + saleAdvertisementID);
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("unlikeSaleAdvertisement")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("unlikeSaleAdvertisement"));
 		assertNotNull(element);
 		element.click();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("buySaleAdvertisement")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("buySaleAdvertisement"));
 		assertNotNull(element);
 		element.click();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("saleAdvertisementSoldInfo")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("saleAdvertisementSoldInfo"));
 		assertNotNull(element);
@@ -363,7 +363,7 @@ class ITSaleAdvertisementServiceSelenium {
 
 		driver.get(BASE_URL + "profile/" + userOwnerSaleAdvertisementId);
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("unfollowUser")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("unfollowUser"));
 		assertNotNull(element);
