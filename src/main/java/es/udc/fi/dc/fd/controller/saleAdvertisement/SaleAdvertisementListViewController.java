@@ -407,7 +407,7 @@ public class SaleAdvertisementListViewController {
 		checkSearchCriteriaForm(form);
 
 		if (form.getMinDate() == null || form.getMinDate().isEmpty())
-			minimumDate = LocalDate.MIN;
+			minimumDate = LocalDate.of(1900, 1, 1);
 		else
 			minimumDate = LocalDate.parse(form.getMinDate(), DateTimeFormatter.ISO_LOCAL_DATE);
 
@@ -453,7 +453,7 @@ public class SaleAdvertisementListViewController {
 		checkSearchCriteriaForm(form);
 
 		if (form.getMinDate() == null || form.getMinDate().isEmpty())
-			minimumDate = LocalDate.MIN;
+			minimumDate = LocalDate.of(1900, 1, 1);
 		else
 			minimumDate = LocalDate.parse(form.getMinDate(), DateTimeFormatter.ISO_LOCAL_DATE);
 

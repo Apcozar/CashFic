@@ -35,7 +35,7 @@
 						th:object="${saleAdvertisement.saleAdvertisementID}">
 						<th:block th:if="${saleAdvertisement.saleAdvertisementIsSold} == false">
 							<button th:if="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
-								type="submit" class="btn btn-primary" th:text="#{label.buy}"></button>
+								type="submit" class="btn btn-primary" th:text="#{label.buy}" id="buySaleAdvertisement"></button>
 								
 							<button th:unless="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE'"
 								type="submit" class="btn btn-primary" th:text="#{label.buy}" disabled></button>
@@ -50,7 +50,7 @@
 				<th:block th:if="${saleAdvertisement.isUserLogged() == true}">
 					<button  th:if="${saleAdvertisement.isSaleAdvertisementIsSold() == false}"
 						type="button" class="btn btn-danger" data-toggle="modal"
-						data-target="#exampleModalCenter" th:text="#{label.remove}"></button>
+						data-target="#exampleModalCenter" th:text="#{label.remove}" id="removeSaleAdvertisement"></button>
 						
 					<button  th:unless="${saleAdvertisement.isSaleAdvertisementIsSold() == false}"
 						type="button" class="btn btn-danger" th:text="#{label.remove}" disabled></button>
@@ -78,10 +78,10 @@
 									<form method="post"
 										th:action="@{/saleAdvertisement/} + @{remove/} + ${saleAdvertisement.saleAdvertisementID}">
 										<button type="button" class="btn btn-secondary"
-											data-dismiss="modal" th:text="#{label.cancel}"></button>
+											data-dismiss="modal" th:text="#{label.cancel}" id="cancelRemove"></button>
 	
 										<button type="submit" class="btn btn-danger"
-											th:text="#{label.remove}"></button>
+											th:text="#{label.remove}" id="confirmRemove"></button>
 									</form>
 								</div>
 							</div>
@@ -90,7 +90,7 @@
 				</th:block>
 				<!-- Button trigger modal -->
 				<th:block th:if="${saleAdvertisement.isSaleAdvertisementIsSold()} == false">
-					<button th:if="${saleAdvertisement.isUserLogged()} == true"
+					<button th:if="${saleAdvertisement.isUserLogged()} == true" id="changeSaleState"
 						class="btn btn-primary" data-toggle="modal"
 						data-target="#onHoldModalCenter"
 						th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHold} : #{title.onSale}">
@@ -116,9 +116,9 @@
 									<form method="post"
 										th:action="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? @{/saleAdvertisement/setOnHold/} + ${saleAdvertisement.saleAdvertisementID} : @{/saleAdvertisement/setOnSale/} + ${saleAdvertisement.saleAdvertisementID}">
 										<button type="button" class="btn btn-secondary"
-											data-dismiss="modal" th:text="#{label.cancel}"></button>
+											data-dismiss="modal" th:text="#{label.cancel}" id="cancelChangeSaleState"></button>
 	
-										<button type="submit" class="btn btn-primary"
+										<button type="submit" class="btn btn-primary" id="confirmChangeSaleState"
 											th:text="${saleAdvertisement.state.toString()} == 'STATE_ON_SALE' ? #{label.onHold} : #{label.onSale}"></button>
 									</form>
 								</div>

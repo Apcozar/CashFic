@@ -5,11 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.udc.fi.dc.fd.model.persistence.DefaultRateUserEntity;
+import es.udc.fi.dc.fd.model.persistence.RateUserKey;
 
 /**
  * The Interface RateUserRepository.
  */
-public interface RateUserRepository extends JpaRepository<DefaultRateUserEntity, Integer> {
+public interface RateUserRepository extends JpaRepository<DefaultRateUserEntity, RateUserKey> {
 
 	/**
 	 * Find average rating.

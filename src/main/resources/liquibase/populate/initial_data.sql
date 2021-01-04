@@ -29,9 +29,9 @@
 
 
 INSERT INTO users (login, password, name, last_name, email , city, role) VALUES
-   ('santiago.paz', '123', 'santiago', 'paz perez', 'santi@udc.es', 'naron', 0),
-   ('adrian.ulla','123','adrian', 'Ulla Rubinos', 'adrian.rubinos@udc.es', 'rabade', 0),
-   ('user.example','123','exaplme', 'last name', 'example@udc.es', 'rabade', 0);
+   ('santiago.paz', '$2a$10$xz4kea2PSm/oLwXNM1skpe63zhdOYFMQk6AMdTQouAUCATA5XN0oK', 'santiago', 'paz perez', 'santi@udc.es', 'naron', 0),
+   ('adrian.ulla','$2a$10$xz4kea2PSm/oLwXNM1skpe63zhdOYFMQk6AMdTQouAUCATA5XN0oK','adrian', 'Ulla Rubinos', 'adrian.rubinos@udc.es', 'rabade', 0),
+   ('user.example','$2a$10$xz4kea2PSm/oLwXNM1skpe63zhdOYFMQk6AMdTQouAUCATA5XN0oK','exaplme', 'last name', 'example@udc.es', 'rabade', 0);
 
 
 INSERT INTO sale_advertisements  (product_title, product_description, user_id, add_date, price, state) VALUES  
