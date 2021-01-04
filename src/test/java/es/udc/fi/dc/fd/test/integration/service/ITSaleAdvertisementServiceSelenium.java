@@ -90,7 +90,7 @@ class ITSaleAdvertisementServiceSelenium {
 	@BeforeEach
 	public void setUpTest() {
 		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
 	}
 
 	@AfterEach
@@ -100,7 +100,7 @@ class ITSaleAdvertisementServiceSelenium {
 
 	@Test
 	void testCreateAndDeleteSaleAdvertisement() throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		DefaultUserEntity user = userService.findByLogin(LOGIN_USER_3);
 		String userId = user.getId().toString();
@@ -145,6 +145,7 @@ class ITSaleAdvertisementServiceSelenium {
 		assertNotNull(element);
 		element.click();
 
+		Thread.sleep(500);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirmChangeSaleState")));
 
 		element = driver.findElement(By.id("confirmChangeSaleState"));
@@ -226,7 +227,7 @@ class ITSaleAdvertisementServiceSelenium {
 
 	@Test
 	void testLikeAndBuySaleAdvertisement() throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		DefaultUserEntity userOwnerSaleAdvertisement = userService.findByLogin(LOGIN_USER_1);
 		String userOwnerSaleAdvertisementId = userOwnerSaleAdvertisement.getId().toString();
@@ -260,11 +261,15 @@ class ITSaleAdvertisementServiceSelenium {
 		int index = saleAdvertisementID.lastIndexOf("/");
 		saleAdvertisementID = saleAdvertisementID.substring(index + 1);
 
+		Thread.sleep(500);
+
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuLogged")));
 
 		element = driver.findElement(By.id("menuLogged"));
 		assertNotNull(element);
 		element.click();
+
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("logOut")));
 
 		element = driver.findElement(By.id("logOut"));
 		assertNotNull(element);
@@ -380,7 +385,7 @@ class ITSaleAdvertisementServiceSelenium {
 	}
 
 	private void signIn(String login, String password) throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		driver.get(BASE_URL);
 

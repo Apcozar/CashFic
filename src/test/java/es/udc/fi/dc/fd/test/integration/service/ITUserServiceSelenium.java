@@ -137,7 +137,7 @@ class ITUserServiceSelenium {
 	@BeforeEach
 	public void setUpTest() {
 		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
 	}
 
 	@AfterEach
@@ -148,7 +148,7 @@ class ITUserServiceSelenium {
 	@Test
 	void testSignUpAndRateUser() throws Exception {
 		try {
-			WebDriverWait wait = new WebDriverWait(driver, 10);
+			WebDriverWait wait = new WebDriverWait(driver, 40);
 
 			driver.get(BASE_URL);
 
@@ -388,7 +388,7 @@ class ITUserServiceSelenium {
 
 	@Test
 	void testSignInAndBecamePremium() throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		driver.get(BASE_URL);
 
@@ -490,7 +490,7 @@ class ITUserServiceSelenium {
 
 	@Test
 	void testFollowAndUnfollowUser() throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		signIn(LOGIN_USER_3, PASSWORD);
 
@@ -532,7 +532,7 @@ class ITUserServiceSelenium {
 	}
 
 	private void signIn(String login, String password) throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 5);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		driver.get(BASE_URL);
 

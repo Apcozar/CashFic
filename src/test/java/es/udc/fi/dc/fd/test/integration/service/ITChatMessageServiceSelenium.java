@@ -73,7 +73,7 @@ class ITChatMessageServiceSelenium {
 	@BeforeEach
 	public void setUpTest() {
 		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
 	}
 
 	@AfterEach
@@ -83,7 +83,7 @@ class ITChatMessageServiceSelenium {
 
 	@Test
 	void testChat() throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		DefaultUserEntity userToChat = userService.findByLogin(LOGIN_USER_2);
 		String userToChatId = userToChat.getId().toString();
@@ -106,6 +106,8 @@ class ITChatMessageServiceSelenium {
 		assertFalse(element.isEnabled());
 
 		driver.get(BASE_URL + "chat/" + userToChatId);
+
+		Thread.sleep(500);
 
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("submitMessage")));
 
@@ -144,7 +146,7 @@ class ITChatMessageServiceSelenium {
 	}
 
 	private void signIn(String login, String password) throws Exception {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 40);
 
 		driver.get(BASE_URL);
 
