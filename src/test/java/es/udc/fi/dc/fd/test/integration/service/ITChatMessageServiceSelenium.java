@@ -128,21 +128,6 @@ class ITChatMessageServiceSelenium {
 		assertNotNull(element);
 		element.submit();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("submitMessage")));
-
-		element = driver.findElement(By.id("message"));
-		element.sendKeys(MESSAGE);
-		element = driver.findElement(By.id("submitMessage"));
-		assertNotNull(element);
-		element.submit();
-
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("submitMessage")));
-
-		element = driver.findElement(By.id("message"));
-		element.sendKeys(MESSAGE);
-		element = driver.findElement(By.id("submitMessage"));
-		assertNotNull(element);
-		element.submit();
 	}
 
 	private void signIn(String login, String password) throws Exception {

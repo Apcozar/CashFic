@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -160,7 +161,7 @@ class ITSaleAdvertisementServiceSelenium {
 		assertNotNull(element);
 		element.click();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirmChangeSaleState")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("confirmChangeSaleState"));
 		assertNotNull(element);
@@ -172,7 +173,7 @@ class ITSaleAdvertisementServiceSelenium {
 		assertNotNull(element);
 		element.click();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("submitSearchCriteria")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.linkText(SALE_NAME));
 		assertNotNull(element);
@@ -195,7 +196,7 @@ class ITSaleAdvertisementServiceSelenium {
 		assertNotNull(element);
 		element.submit();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("submitSearchCriteria")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.linkText(SALE_NAME));
 		assertNotNull(element);
@@ -206,19 +207,19 @@ class ITSaleAdvertisementServiceSelenium {
 		assertNotNull(element);
 		element.click();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("removeSaleAdvertisement")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("removeSaleAdvertisement"));
 		assertNotNull(element);
 		element.click();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("confirmRemove")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("confirmRemove"));
 		assertNotNull(element);
 		element.submit();
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("addSaleAdvertisementRemove")));
+		Thread.sleep(500);
 
 		element = driver.findElement(By.id("addSaleAdvertisementRemove"));
 		assertNotNull(element);
@@ -272,7 +273,8 @@ class ITSaleAdvertisementServiceSelenium {
 
 		element = driver.findElement(By.id("logOut"));
 		assertNotNull(element);
-		element.click();
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		js.executeScript("arguments[0].click();", element);
 
 		DefaultUserEntity userLogged = userService.findByLogin(LOGIN_USER_2);
 		String userLoggedId = userLogged.getId().toString();

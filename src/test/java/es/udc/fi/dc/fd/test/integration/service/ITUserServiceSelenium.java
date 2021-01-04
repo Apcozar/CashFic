@@ -232,7 +232,7 @@ class ITUserServiceSelenium {
 			element = driver.findElement(By.id("submit"));
 			element.submit();
 
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("errorLoginExists")));
+			Thread.sleep(500);
 
 			element = driver.findElement(By.id("errorLoginExists"));
 			assertNotNull(element);
