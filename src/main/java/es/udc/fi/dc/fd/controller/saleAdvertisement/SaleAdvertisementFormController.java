@@ -43,7 +43,6 @@ import es.udc.fi.dc.fd.service.UserService;
 import es.udc.fi.dc.fd.service.exceptions.ImageAlreadyExistsException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 import es.udc.fi.dc.fd.service.securityService.SecurityService;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
 
@@ -182,7 +181,7 @@ public class SaleAdvertisementFormController {
 							saleAdvertisementForm.getProductDescription(), user, LocalDateTime.now()));
 
 			return ViewConstants.WELCOME;
-		} catch (SaleAdvertisementServiceException e) {
+		} catch (SaleAdvertisementNotFoundException e) {
 			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
 					SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
 			return SaleAdvertisementViewConstants.UPDATE_SALE_ADVERTISEMENT;
@@ -217,7 +216,8 @@ public class SaleAdvertisementFormController {
 	 */
 	private void uploadImages(Integer saleId, List<MultipartFile> files, Model model)
 			throws SaleAdvertisementNotFoundException {
-		DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(saleId);
+		DefaultSaleAdvertisementEntity saleAdvertisement = (DefaultSaleAdvertisementEntity) saleAdvertisementService
+				.findById(saleId);
 		List<String> imageError = new ArrayList<>();
 
 		for (MultipartFile file : files) {

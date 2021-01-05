@@ -129,12 +129,7 @@ public class DefaultImageService implements ImageService {
 	@Override
 	public final ImageEntity update(final DefaultImageEntity image) throws ImageNotFoundException {
 		DefaultImageEntity updatedImage;
-		checkNotNull(image, "Received a null pointer as image");
-
-		if (!imageRepository.existsById(image.getId())) {
-			throw new ImageNotFoundException(image.getId());
-		}
-
+		checkImageFound(image);
 		updatedImage = imageRepository.save(image);
 		SaleAdvertisementEntity saleAdvertisementToUpdate = updatedImage.getSale_advertisement();
 		saleAdvertisementToUpdate.addImage(updatedImage);
@@ -150,10 +145,7 @@ public class DefaultImageService implements ImageService {
 	 */
 	@Override
 	public final void remove(final DefaultImageEntity image) throws ImageNotFoundException {
-		checkNotNull(image, "Received a null pointer as identifier");
-		if (!imageRepository.existsById(image.getId())) {
-			throw new ImageNotFoundException(image.getId());
-		}
+		checkImageFound(image);
 		DefaultSaleAdvertisementEntity saleAdvertisement = (DefaultSaleAdvertisementEntity) image
 				.getSale_advertisement();
 		saleAdvertisement.removeImage(image);
@@ -192,4 +184,11 @@ public class DefaultImageService implements ImageService {
 		return imageRepository.findAll(page);
 	}
 
+	private final void checkImageFound(DefaultImageEntity image) throws ImageNotFoundException {
+		checkNotNull(image, "Received a null pointer as image");
+
+		if (!imageRepository.existsById(image.getId())) {
+			throw new ImageNotFoundException(image.getId());
+		}
+	}
 }

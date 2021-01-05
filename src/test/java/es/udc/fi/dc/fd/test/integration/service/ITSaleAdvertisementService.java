@@ -191,7 +191,7 @@ class ITSaleAdvertisementService {
 	// NOT CHECKED WHAT HAPPEN IF UPDATE SET OF IMAGES OR USER
 	@Test
 	void testUpdate_Existing_Updated()
-			throws SaleAdvertisementServiceException, UserNotFoundException, SaleAdvertisementAlreadyExistsException {
+			throws SaleAdvertisementNotFoundException, UserNotFoundException, SaleAdvertisementAlreadyExistsException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for update
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -252,7 +252,7 @@ class ITSaleAdvertisementService {
 
 		saleAdvertisement.setId(100);
 		// Update not existing sale advertisement throw exception
-		Assertions.assertThrows(SaleAdvertisementServiceException.class,
+		Assertions.assertThrows(SaleAdvertisementNotFoundException.class,
 				() -> service.update((DefaultSaleAdvertisementEntity) saleAdvertisement));
 	}
 

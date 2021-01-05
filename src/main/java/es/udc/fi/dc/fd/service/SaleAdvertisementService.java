@@ -35,7 +35,6 @@ import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsExceptio
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Service for the saleAdd domain.
@@ -102,9 +101,9 @@ public interface SaleAdvertisementService {
 	 *
 	 * @param saleAdd the sale add
 	 * @return the sale add entity
-	 * @throws SaleAdvertisementServiceException the sale add service exception
+	 * @throws SaleAdvertisementNotFoundException when no sale advertisement found
 	 */
-	SaleAdvertisementEntity update(DefaultSaleAdvertisementEntity saleAdd) throws SaleAdvertisementServiceException;
+	SaleAdvertisementEntity update(DefaultSaleAdvertisementEntity saleAdd) throws SaleAdvertisementNotFoundException;
 
 	/**
 	 * Gets the sale advertisements by date.
@@ -112,17 +111,6 @@ public interface SaleAdvertisementService {
 	 * @return the sale advertisements by date
 	 */
 	public Iterable<DefaultSaleAdvertisementEntity> getSaleAdvertisementsByDateDesc();
-
-	/**
-	 * Find by id default.
-	 *
-	 * @param identifier the identifier
-	 * @return the default sale advertisement entity
-	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
-	 *                                            exception
-	 */
-	public DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
-			throws SaleAdvertisementNotFoundException;
 
 	/**
 	 * Find sale advertisements by search criteria.

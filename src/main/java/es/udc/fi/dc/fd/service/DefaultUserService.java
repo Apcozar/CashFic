@@ -65,8 +65,8 @@ import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 @Service
 public class DefaultUserService implements UserService {
 
-	static final int MAX_RATING = 5;
-	static final int MIN_RATING = 1;
+	public static final int MAX_RATING = 5;
+	public static final int MIN_RATING = 1;
 
 	/**
 	 * Repository for the domain entities handled by the service.
@@ -105,14 +105,14 @@ public class DefaultUserService implements UserService {
 	@Override
 	public void signUp(DefaultUserEntity user)
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
-
+		checkNotNull(user, "Received a null pointer as user");
 		if ((userDao.existsByLogin(user.getLogin())) && (userDao.existsByEmail(user.getEmail()))) {
 			throw new UserLoginAndEmailExistsException(user.getLogin(), user.getEmail());
 		}
 		if (userDao.existsByLogin(user.getLogin())) {
 			throw new UserLoginExistsException(user.getLogin());
 		}
-		if (userDao.findByEmail(user.getEmail()) != null) {
+		if (userDao.existsByEmail(user.getEmail())) {
 			throw new UserEmailExistsException(user.getEmail());
 		}
 
@@ -148,7 +148,7 @@ public class DefaultUserService implements UserService {
 		Optional<DefaultUserEntity> user = userDao.findById(identifier);
 
 		if (!user.isPresent()) {
-			throw new UserNotFoundException(identifier.toString());
+			throw new UserNotFoundException(identifier);
 		}
 		return user.get();
 	}

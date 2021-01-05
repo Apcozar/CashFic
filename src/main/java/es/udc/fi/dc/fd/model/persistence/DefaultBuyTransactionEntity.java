@@ -160,7 +160,7 @@ public final class DefaultBuyTransactionEntity implements BuyTransactionEntity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(createdDate, id, saleAdvertisement, user);
+		return Objects.hash(id, saleAdvertisement, user);
 	}
 
 	@Override
@@ -170,8 +170,8 @@ public final class DefaultBuyTransactionEntity implements BuyTransactionEntity {
 		if (!(obj instanceof DefaultBuyTransactionEntity))
 			return false;
 		DefaultBuyTransactionEntity other = (DefaultBuyTransactionEntity) obj;
-		return Objects.equals(createdDate, other.createdDate) && Objects.equals(id, other.id)
-				&& Objects.equals(saleAdvertisement, other.saleAdvertisement) && Objects.equals(user, other.user);
+		return Objects.equals(id, other.id) && Objects.equals(saleAdvertisement, other.saleAdvertisement)
+				&& Objects.equals(user, other.user);
 	}
 
 }

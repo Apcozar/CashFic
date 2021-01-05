@@ -108,7 +108,8 @@ public class SaleAdvertisementListViewController {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity user = userService.findByLogin(username);
 
-			DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(id);
+			DefaultSaleAdvertisementEntity saleAdvertisement = (DefaultSaleAdvertisementEntity) saleAdvertisementService
+					.findById(id);
 
 			SaleAdvertisementWithLoggedUserInfoDTO saleAdvertisementDto = createSaleAdvertisementDTO(saleAdvertisement,
 					user);
@@ -407,7 +408,7 @@ public class SaleAdvertisementListViewController {
 		checkSearchCriteriaForm(form);
 
 		if (form.getMinDate() == null || form.getMinDate().isEmpty())
-			minimumDate = LocalDate.MIN;
+			minimumDate = LocalDate.of(1900, 1, 1);
 		else
 			minimumDate = LocalDate.parse(form.getMinDate(), DateTimeFormatter.ISO_LOCAL_DATE);
 
@@ -453,7 +454,7 @@ public class SaleAdvertisementListViewController {
 		checkSearchCriteriaForm(form);
 
 		if (form.getMinDate() == null || form.getMinDate().isEmpty())
-			minimumDate = LocalDate.MIN;
+			minimumDate = LocalDate.of(1900, 1, 1);
 		else
 			minimumDate = LocalDate.parse(form.getMinDate(), DateTimeFormatter.ISO_LOCAL_DATE);
 
