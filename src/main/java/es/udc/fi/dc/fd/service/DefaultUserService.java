@@ -67,6 +67,7 @@ public class DefaultUserService implements UserService {
 
 	public static final int MAX_RATING = 5;
 	public static final int MIN_RATING = 1;
+	private static final String NULL_USER_MESSAGE = "Received a null pointer as user";
 
 	/**
 	 * Repository for the domain entities handled by the service.
@@ -95,7 +96,6 @@ public class DefaultUserService implements UserService {
 			final SaleAdvertisementRepository saleAdvertisementRepository,
 			final RateUserRepository rateUserRepository) {
 		super();
-
 		userDao = checkNotNull(repository, "Received a null pointer as repository");
 		this.saleAdvertisementRepository = checkNotNull(saleAdvertisementRepository,
 				"Received a null pointer as saleAdvertisementRepository");
@@ -105,7 +105,7 @@ public class DefaultUserService implements UserService {
 	@Override
 	public void signUp(DefaultUserEntity user)
 			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException {
-		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(user, NULL_USER_MESSAGE);
 		if ((userDao.existsByLogin(user.getLogin())) && (userDao.existsByEmail(user.getEmail()))) {
 			throw new UserLoginAndEmailExistsException(user.getLogin(), user.getEmail());
 		}
@@ -115,11 +115,9 @@ public class DefaultUserService implements UserService {
 		if (userDao.existsByEmail(user.getEmail())) {
 			throw new UserEmailExistsException(user.getEmail());
 		}
-
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user.setRole(Role.ROLE_USER);
-
 		userDao.save(user);
 	}
 
@@ -131,15 +129,11 @@ public class DefaultUserService implements UserService {
 		if (!userDao.existsByLogin(login)) {
 			throw new UserNotFoundException(login);
 		}
-
 		DefaultUserEntity user = userDao.findByLogin(login);
-
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
 		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new UserIncorrectLoginException(login, password);
 		}
-
 		return user;
 	}
 
@@ -158,7 +152,6 @@ public class DefaultUserService implements UserService {
 		if (!userDao.existsByLogin(login)) {
 			throw new UserNotFoundException(login);
 		}
-
 		return userDao.findByLogin(login);
 	}
 
@@ -167,55 +160,43 @@ public class DefaultUserService implements UserService {
 		if (!userDao.existsByEmail(email)) {
 			throw new UserEmailNotFoundException(email);
 		}
-
 		return userDao.findByEmail(email);
 	}
 
 	@Override
 	public UserEntity like(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
 			throws UserNotFoundException, SaleAdvertisementNotFoundException {
-		checkNotNull(user, "Received a null pointer as user");
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
+		checkNotNull(user, NULL_USER_MESSAGE);
 		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+		checkUser(user.getId());
 		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
 			throw new SaleAdvertisementNotFoundException(saleAdvertisement.getId());
 		}
-
 		saleAdvertisement.addUsersLike((DefaultUserEntity) user);
 		saleAdvertisementRepository.save((DefaultSaleAdvertisementEntity) saleAdvertisement);
 		user.addLike(saleAdvertisement);
-
 		return userDao.save((DefaultUserEntity) user);
 	}
 
 	@Override
 	public UserEntity unlike(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
 			throws UserNotFoundException, SaleAdvertisementNotFoundException {
-		checkNotNull(user, "Received a null pointer as user");
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
+		checkNotNull(user, NULL_USER_MESSAGE);
 		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+		checkUser(user.getId());
 		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
 			throw new SaleAdvertisementNotFoundException(saleAdvertisement.getId());
 		}
 		saleAdvertisement.removeUsersLike((DefaultUserEntity) user);
 		saleAdvertisementRepository.save((DefaultSaleAdvertisementEntity) saleAdvertisement);
 		user.removeLike(saleAdvertisement);
-
 		return userDao.save((DefaultUserEntity) user);
 	}
 
 	public UserEntity followUser(UserEntity user, UserEntity userToFollow)
 			throws UserNotFoundException, UserToFollowExistsException {
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
-		if (!userDao.existsById(userToFollow.getId())) {
-			throw new UserNotFoundException(userToFollow.getId());
-		}
+		checkUser(user.getId());
+		checkUser(userToFollow.getId());
 		if (user.getFollowed().contains(userToFollow)) {
 			throw new UserToFollowExistsException(userToFollow);
 		}
@@ -228,12 +209,8 @@ public class DefaultUserService implements UserService {
 	@Override
 	public UserEntity unfollowUser(UserEntity user, UserEntity userToUnfollow)
 			throws UserNotFoundException, UserToUnfollowNotFoundException {
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
-		if (!userDao.existsById(userToUnfollow.getId())) {
-			throw new UserNotFoundException(userToUnfollow.getId());
-		}
+		checkUser(user.getId());
+		checkUser(userToUnfollow.getId());
 		if (!user.getFollowed().contains(userToUnfollow)) {
 			throw new UserToUnfollowNotFoundException(userToUnfollow);
 		}
@@ -255,32 +232,22 @@ public class DefaultUserService implements UserService {
 
 	@Override
 	public boolean existsRatingFromUserToRateUser(UserEntity user, UserEntity ratedUser) throws UserNotFoundException {
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
-		if (!userDao.existsById(ratedUser.getId())) {
-			throw new UserNotFoundException(ratedUser.getId());
-		}
+		checkUser(user.getId());
+		checkUser(ratedUser.getId());
 		return rateUserDao.existsRatingFromUserToRatedUser(user.getId(), ratedUser.getId());
 	}
 
 	@Override
 	public boolean existsRatingForUser(UserEntity user) throws UserNotFoundException {
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
+		checkUser(user.getId());
 		return rateUserDao.existsRatedUser(user.getId());
 	}
 
 	@Override
 	public void rateUser(UserEntity user, UserEntity userToRate, Integer rating)
 			throws UserNotFoundException, UserAlreadyGiveRatingToUserToRate, LowRatingException, HighRatingException {
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
-		if (!userDao.existsById(userToRate.getId())) {
-			throw new UserNotFoundException(userToRate.getId());
-		}
+		checkUser(user.getId());
+		checkUser(userToRate.getId());
 		if (rateUserDao.existsRatingFromUserToRatedUser(user.getId(), userToRate.getId())) {
 			throw new UserAlreadyGiveRatingToUserToRate(user.getId(), userToRate.getId());
 		}
@@ -292,48 +259,39 @@ public class DefaultUserService implements UserService {
 		}
 		DefaultRateUserEntity rateEntity = new DefaultRateUserEntity((DefaultUserEntity) user,
 				(DefaultUserEntity) userToRate, rating);
-
 		rateUserDao.save(rateEntity);
 	}
 
 	@Override
 	public Double averageRating(UserEntity user) throws UserNotFoundException, UserNoRatingException {
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
-		Double average = rateUserDao.findAverageRating(user.getId());
+		checkUser(user.getId());
 		if (!existsRatingForUser(user)) {
 			throw new UserNoRatingException(user.getId());
 		}
-		return average;
+		return rateUserDao.findAverageRating(user.getId());
 	}
 
 	@Override
 	public int givenRatingFromUserToRatedUser(UserEntity user, UserEntity ratedUser) throws UserNotFoundException {
-		if (!userDao.existsById(user.getId())) {
-			throw new UserNotFoundException(user.getId());
-		}
-		if (!userDao.existsById(ratedUser.getId())) {
-			throw new UserNotFoundException(ratedUser.getId());
-		}
+		checkUser(user.getId());
+		checkUser(ratedUser.getId());
 		return rateUserDao.givenRatingFromUserToRatedUser(user.getId(), ratedUser.getId());
 	}
 
 	public UserEntity premiumUser(UserEntity user) throws UserNotFoundException {
-
-		if (!userDao.existsById(user.getId())) {
-
-			throw new UserNotFoundException(user.getId());
-
-		} else if (user.getRole() != Role.ROLE_PREMIUM) {
-
+		checkUser(user.getId());
+		if (user.getRole() != Role.ROLE_PREMIUM) {
 			user.setRole(Role.ROLE_PREMIUM);
 			return userDao.save((DefaultUserEntity) user);
-
 		} else {
-
 			user.setRole(Role.ROLE_USER);
 			return userDao.save((DefaultUserEntity) user);
+		}
+	}
+
+	private void checkUser(Integer identifier) throws UserNotFoundException {
+		if (!userDao.existsById(identifier)) {
+			throw new UserNotFoundException(identifier);
 		}
 	}
 

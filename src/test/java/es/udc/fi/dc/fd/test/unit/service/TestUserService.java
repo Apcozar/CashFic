@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.runner.JUnitPlatform;
@@ -38,18 +40,28 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import es.udc.fi.dc.fd.model.Role;
+import es.udc.fi.dc.fd.model.persistence.DefaultRateUserEntity;
+import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;
 import es.udc.fi.dc.fd.repository.RateUserRepository;
 import es.udc.fi.dc.fd.repository.SaleAdvertisementRepository;
 import es.udc.fi.dc.fd.repository.UserRepository;
 import es.udc.fi.dc.fd.service.DefaultUserService;
+import es.udc.fi.dc.fd.service.HighRatingException;
 import es.udc.fi.dc.fd.service.SaleAdvertisementService;
+import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.LowRatingException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserAlreadyGiveRatingToUserToRate;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserEmailNotFoundException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserIncorrectLoginException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginAndEmailExistsException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserLoginExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserNoRatingException;
 import es.udc.fi.dc.fd.service.user.exceptions.UserNotFoundException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToFollowExistsException;
+import es.udc.fi.dc.fd.service.user.exceptions.UserToUnfollowNotFoundException;
 
 /**
  * Unit tests for the {@link SaleAdvertisementService}.
@@ -272,6 +284,627 @@ final class TestUserService {
 		try {
 			assertEquals(userService.findByEmail(userEmail), user);
 		} catch (UserEmailNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void findByIdUserNotFoundThrowException() {
+		int identifier = 1;
+		Optional<DefaultUserEntity> userOptional = Optional.empty();
+		Mockito.when(userRepository.findById(identifier)).thenReturn(userOptional);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.findById(identifier);
+		});
+	}
+
+	@Test
+	void findByIdUserFound() {
+		int identifier = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(identifier);
+		Optional<DefaultUserEntity> userOptional = Optional.of(user);
+		Mockito.when(userRepository.findById(identifier)).thenReturn(userOptional);
+		try {
+			assertEquals(userService.findById(identifier), user);
+		} catch (UserNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void likeNullUserThrowException() {
+		int saleAdvertisementId = 1;
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+
+		assertThrows(NullPointerException.class, () -> {
+			userService.like(null, saleAdvertisement);
+		});
+	}
+
+	@Test
+	void likeNullSaleAdvertisementThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+
+		assertThrows(NullPointerException.class, () -> {
+			userService.like(user, null);
+		});
+	}
+
+	@Test
+	void likeUserNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int saleAdvertisementId = 1;
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.like(user, saleAdvertisement);
+		});
+	}
+
+	@Test
+	void likeSaleAdvertisementNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int saleAdvertisementId = 1;
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(saleAdvertisementRepository.existsById(saleAdvertisementId)).thenReturn(false);
+
+		assertThrows(SaleAdvertisementNotFoundException.class, () -> {
+			userService.like(user, saleAdvertisement);
+		});
+	}
+
+	@Test
+	void likeUserSaleAdvertisement() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int saleAdvertisementId = 1;
+		DefaultUserEntity userNoLike = new DefaultUserEntity();
+		userNoLike.setId(userId);
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(saleAdvertisementRepository.existsById(saleAdvertisementId)).thenReturn(true);
+		user.addLike(saleAdvertisement);
+		saleAdvertisement.addUsersLike(user);
+		Mockito.when(userRepository.save(user)).thenReturn(user);
+		Mockito.when(saleAdvertisementRepository.save(saleAdvertisement)).thenReturn(saleAdvertisement);
+
+		try {
+			assertEquals(userService.like(userNoLike, saleAdvertisement), user);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void unlikeNullUserThrowException() {
+		int saleAdvertisementId = 1;
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+
+		assertThrows(NullPointerException.class, () -> {
+			userService.unlike(null, saleAdvertisement);
+		});
+	}
+
+	@Test
+	void unlikeNullSaleAdvertisementThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+
+		assertThrows(NullPointerException.class, () -> {
+			userService.unlike(user, null);
+		});
+	}
+
+	@Test
+	void unlikeUserNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int saleAdvertisementId = 1;
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.unlike(user, saleAdvertisement);
+		});
+	}
+
+	@Test
+	void unlikeSaleAdvertisementNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int saleAdvertisementId = 1;
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(saleAdvertisementRepository.existsById(saleAdvertisementId)).thenReturn(false);
+
+		assertThrows(SaleAdvertisementNotFoundException.class, () -> {
+			userService.unlike(user, saleAdvertisement);
+		});
+	}
+
+	@Test
+	void unlikeUserSaleAdvertisement() {
+		int userId = 1;
+		DefaultUserEntity userWithLike = new DefaultUserEntity();
+		userWithLike.setId(userId);
+		int saleAdvertisementId = 1;
+		DefaultSaleAdvertisementEntity saleAdvertisement = new DefaultSaleAdvertisementEntity();
+		saleAdvertisement.setId(saleAdvertisementId);
+		DefaultUserEntity userNoLike = new DefaultUserEntity();
+		userNoLike.setId(userId);
+
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(saleAdvertisementRepository.existsById(saleAdvertisementId)).thenReturn(true);
+		userWithLike.addLike(saleAdvertisement);
+		saleAdvertisement.addUsersLike(userWithLike);
+		Mockito.when(userRepository.save(userNoLike)).thenReturn(userNoLike);
+		Mockito.when(saleAdvertisementRepository.save(saleAdvertisement)).thenReturn(saleAdvertisement);
+
+		try {
+			assertEquals(userService.unlike(userWithLike, saleAdvertisement), userNoLike);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void followUserNotFoundThrowException() {
+		int userId = 1;
+		int userToFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToFollow.setId(userToFollowId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.followUser(user, userToFollow);
+		});
+	}
+
+	@Test
+	void followUserToFollowNotFoundThrowException() {
+		int userId = 1;
+		int userToFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToFollow.setId(userToFollowId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToFollowId)).thenReturn(false);
+
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.followUser(user, userToFollow);
+		});
+	}
+
+	@Test
+	void followUserAlreadyFollowsThrowException() {
+		int userId = 1;
+		int userToFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToFollow.setId(userToFollowId);
+		user.addFollowUser(userToFollow);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToFollowId)).thenReturn(true);
+
+		assertThrows(UserToFollowExistsException.class, () -> {
+			userService.followUser(user, userToFollow);
+		});
+	}
+
+	@Test
+	void followUser() {
+		int userId = 1;
+		int userToFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToFollow.setId(userToFollowId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToFollowId)).thenReturn(true);
+		DefaultUserEntity userHaveFollow = new DefaultUserEntity();
+		userHaveFollow.setId(userId);
+		userHaveFollow.addFollowserUser(userToFollow);
+
+		Mockito.when(userRepository.save(userToFollow)).thenReturn(userToFollow);
+		Mockito.when(userRepository.save(user)).thenReturn(userHaveFollow);
+		try {
+			assertEquals(userService.followUser(user, userToFollow), userHaveFollow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void unfollowUserUserNotFoundThrowException() {
+		int userId = 1;
+		int userToUnFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToUnFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToUnFollow.setId(userToUnFollowId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+		Mockito.when(userRepository.existsById(userToUnFollowId)).thenReturn(true);
+
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.unfollowUser(user, userToUnFollow);
+		});
+	}
+
+	@Test
+	void unfollowUserUserToUnfollowNotFoundThrowException() {
+		int userId = 1;
+		int userToUnFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToUnFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToUnFollow.setId(userToUnFollowId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToUnFollowId)).thenReturn(false);
+
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.unfollowUser(user, userToUnFollow);
+		});
+	}
+
+	@Test
+	void unfollowUserUserNotFollowUserToUnfollowThrowException() {
+		int userId = 1;
+		int userToUnFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToUnFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToUnFollow.setId(userToUnFollowId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToUnFollowId)).thenReturn(true);
+
+		assertThrows(UserToUnfollowNotFoundException.class, () -> {
+			userService.unfollowUser(user, userToUnFollow);
+		});
+	}
+
+	@Test
+	void unfollowUser() {
+		int userId = 1;
+		int userToUnFollowId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToUnFollow = new DefaultUserEntity();
+		user.setId(userId);
+		userToUnFollow.setId(userToUnFollowId);
+		user.addFollowUser(userToUnFollow);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToUnFollowId)).thenReturn(true);
+		Mockito.when(userRepository.save(userToUnFollow)).thenReturn(userToUnFollow);
+		Mockito.when(userRepository.save(user)).thenReturn(user);
+		try {
+			assertEquals(userService.unfollowUser(user, userToUnFollow), user);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void minRating() {
+		assertEquals(1, userService.getMinRating());
+	}
+
+	@Test
+	void maxRating() {
+		assertEquals(5, userService.getMaxRating());
+	}
+
+	@Test
+	void existsRatingFromUserToRateUserUserNotFoundThrowException() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(true);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.existsRatingFromUserToRateUser(user, userToRate);
+		});
+	}
+
+	@Test
+	void existsRatingFromUserToRateUserRateUserNotFoundThrowException() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(false);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.existsRatingFromUserToRateUser(user, userToRate);
+		});
+	}
+
+	@Test
+	void existsRatingFromUserToRateUserReturnBoolean() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(true);
+		Mockito.when(rateUserRepository.existsRatingFromUserToRatedUser(userId, userToRateId)).thenReturn(false);
+		try {
+			assertEquals(false, userService.existsRatingFromUserToRateUser(user, userToRate));
+		} catch (UserNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void existsRatingForUserUserNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.existsRatingForUser(user);
+		});
+
+	}
+
+	@Test
+	void rateUserUserNotFoundThrowException() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(true);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.rateUser(user, userToRate, userService.getMinRating());
+		});
+	}
+
+	@Test
+	void rateUserUserToRateNotFoundThrowException() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(false);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.rateUser(user, userToRate, userService.getMinRating());
+		});
+	}
+
+	@Test
+	void rateUserHaveRateThrowException() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(true);
+		Mockito.when(rateUserRepository.existsRatingFromUserToRatedUser(userId, userToRateId)).thenReturn(true);
+		assertThrows(UserAlreadyGiveRatingToUserToRate.class, () -> {
+			userService.rateUser(user, userToRate, userService.getMinRating());
+		});
+	}
+
+	@Test
+	void rateUserRateUnderMinRatingThrowException() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(true);
+		Mockito.when(rateUserRepository.existsRatingFromUserToRatedUser(userId, userToRateId)).thenReturn(false);
+		assertThrows(LowRatingException.class, () -> {
+			userService.rateUser(user, userToRate, userService.getMinRating() - 1);
+		});
+	}
+
+	@Test
+	void rateUserRateGreaterThanMaxRatingThrowException() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(true);
+		Mockito.when(rateUserRepository.existsRatingFromUserToRatedUser(userId, userToRateId)).thenReturn(false);
+		assertThrows(HighRatingException.class, () -> {
+			userService.rateUser(user, userToRate, userService.getMaxRating() + 1);
+		});
+	}
+
+	@Test
+	void rateUser() {
+		int userId = 1;
+		int userToRateId = 2;
+		DefaultUserEntity user = new DefaultUserEntity();
+		DefaultUserEntity userToRate = new DefaultUserEntity();
+		user.setId(userId);
+		userToRate.setId(userToRateId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(userToRateId)).thenReturn(true);
+		Mockito.when(rateUserRepository.existsRatingFromUserToRatedUser(userId, userToRateId)).thenReturn(false);
+		DefaultRateUserEntity rate = new DefaultRateUserEntity(user, userToRate, userService.getMaxRating());
+		Mockito.when(rateUserRepository.save(rate)).thenReturn(rate);
+
+		try {
+			userService.rateUser(user, userToRate, userService.getMaxRating());
+			assertTrue(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void averageRatingUserNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.averageRating(user);
+		});
+	}
+
+	@Test
+	void averageRatingUserWithoutRateThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(rateUserRepository.existsRatedUser(userId)).thenReturn(false);
+		assertThrows(UserNoRatingException.class, () -> {
+			userService.averageRating(user);
+		});
+	}
+
+	@Test
+	void averageRating() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(rateUserRepository.existsRatedUser(userId)).thenReturn(true);
+		Mockito.when(rateUserRepository.findAverageRating(userId)).thenReturn(Double.valueOf(5));
+		try {
+			assertEquals(userService.averageRating(user), Double.valueOf(5));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void givenRatingFromUserToRatedUserUserNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int ratedUserId = 2;
+		DefaultUserEntity ratedUser = new DefaultUserEntity();
+		ratedUser.setId(ratedUserId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.givenRatingFromUserToRatedUser(user, ratedUser);
+		});
+	}
+
+	@Test
+	void givenRatingFromUserToRatedUserRatedUserNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int ratedUserId = 2;
+		DefaultUserEntity ratedUser = new DefaultUserEntity();
+		ratedUser.setId(ratedUserId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(ratedUserId)).thenReturn(false);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.givenRatingFromUserToRatedUser(user, ratedUser);
+		});
+	}
+
+	@Test
+	void givenRatingFromUserToRatedUser() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		int ratedUserId = 2;
+		DefaultUserEntity ratedUser = new DefaultUserEntity();
+		ratedUser.setId(ratedUserId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.existsById(ratedUserId)).thenReturn(true);
+		Mockito.when(rateUserRepository.givenRatingFromUserToRatedUser(userId, ratedUserId))
+				.thenReturn(Integer.valueOf(4));
+		try {
+			assertEquals(userService.givenRatingFromUserToRatedUser(user, ratedUser), Integer.valueOf(4));
+		} catch (UserNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void premiumUserUserNotFoundThrowException() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+		assertThrows(UserNotFoundException.class, () -> {
+			userService.premiumUser(user);
+		});
+	}
+
+	@Test
+	void premiumUserNoPremiumToPremium() {
+		int userId = 1;
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		user.setRole(Role.ROLE_USER);
+		DefaultUserEntity premiumUser = new DefaultUserEntity();
+		premiumUser.setId(userId);
+		premiumUser.setRole(Role.ROLE_PREMIUM);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.save(user)).thenReturn(premiumUser);
+		try {
+			assertEquals(userService.premiumUser(user), premiumUser);
+		} catch (UserNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	void premiumUserPremiumToNoPremium() {
+		int userId = 1;
+		DefaultUserEntity premiumUser = new DefaultUserEntity();
+		premiumUser.setId(userId);
+		premiumUser.setRole(Role.ROLE_PREMIUM);
+		DefaultUserEntity user = new DefaultUserEntity();
+		user.setId(userId);
+		user.setRole(Role.ROLE_USER);
+		Mockito.when(userRepository.existsById(userId)).thenReturn(true);
+		Mockito.when(userRepository.save(premiumUser)).thenReturn(user);
+		try {
+			assertEquals(userService.premiumUser(premiumUser), user);
+		} catch (UserNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
