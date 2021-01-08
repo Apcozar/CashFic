@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.io.FilenameUtils;
@@ -117,10 +118,12 @@ public class SaleAdvertisementFormController {
 	@PostMapping(path = "/addSaleAdvertisement")
 	public String addSaleAdvertisement(
 			@Valid @ModelAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_FORM) SaleAdvertisementForm saleAdvertisementForm,
-			BindingResult bindingResult, Model model) throws SaleAdvertisementAlreadyExistsException {
+			BindingResult bindingResult, Model model, final HttpServletResponse response)
+			throws SaleAdvertisementAlreadyExistsException {
 
 		try {
 			if (bindingResult.hasErrors()) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_FORM;
 			}
 
