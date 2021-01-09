@@ -114,6 +114,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		if (saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
 			throw new SaleAdvertisementAlreadyExistsException(saleAdvertisement.getId());
 		}
+		saleAdvertisement.setDate(LocalDateTime.now());
 		return saleAdvertisementRepository.save(saleAdvertisement);
 	}
 
@@ -129,6 +130,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 			throws SaleAdvertisementNotFoundException {
 		checkNotNull(saleAdvertisement, "Received a null pointer as sale advertisement");
 		checkSaleAdvertisementExists(saleAdvertisement.getId());
+		saleAdvertisement.setDate(LocalDateTime.now());
 		return saleAdvertisementRepository.save(saleAdvertisement);
 	}
 

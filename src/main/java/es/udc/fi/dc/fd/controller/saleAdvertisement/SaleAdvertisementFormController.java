@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,16 +133,16 @@ public class SaleAdvertisementFormController {
 			double price = Double.parseDouble(saleAdvertisementForm.getPrice());
 
 			DefaultSaleAdvertisementEntity defaultSaleAdvertisement = new DefaultSaleAdvertisementEntity(
-					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user,
-					LocalDateTime.now());
+					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user);
 
 			defaultSaleAdvertisement.setPrice(BigDecimal.valueOf(price));
 
 			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.add(defaultSaleAdvertisement);
 
-			if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
-				uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
-
+			if (saleAdvertisementForm.getImageFile() != null) {
+				if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
+					uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
+			}
 			return "redirect:" + "/saleAdvertisement/" + saleAdvertisement.getId();
 
 		} catch (UserNotFoundException e) {
@@ -179,9 +178,8 @@ public class SaleAdvertisementFormController {
 
 			DefaultUserEntity user = userService.findByLogin(username);
 
-			saleAdvertisementService
-					.update(new DefaultSaleAdvertisementEntity(id, saleAdvertisementForm.getProductTitle(),
-							saleAdvertisementForm.getProductDescription(), user, LocalDateTime.now()));
+			saleAdvertisementService.update(new DefaultSaleAdvertisementEntity(id,
+					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user));
 
 			return ViewConstants.WELCOME;
 		} catch (SaleAdvertisementNotFoundException e) {

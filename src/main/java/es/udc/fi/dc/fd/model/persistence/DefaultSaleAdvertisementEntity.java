@@ -146,7 +146,7 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	}
 
 	public DefaultSaleAdvertisementEntity(Integer id, String productTitle, String productDescription,
-			DefaultUserEntity user, LocalDateTime date) {
+			DefaultUserEntity user) {
 		super();
 		this.id = id;
 		this.product_title = productTitle;
@@ -158,23 +158,20 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 	}
 
 	public DefaultSaleAdvertisementEntity(String product_title, String product_description,
-			Set<DefaultImageEntity> images, DefaultUserEntity user, LocalDateTime date) {
+			Set<DefaultImageEntity> images, DefaultUserEntity user) {
 		super();
 		this.product_title = product_title;
 		this.product_description = product_description;
 		this.images = images;
 		this.user = user;
-		this.date = date;
 		this.state = State.STATE_ON_SALE;
 	}
 
-	public DefaultSaleAdvertisementEntity(String productTitle, String productDescription, DefaultUserEntity user,
-			LocalDateTime date) {
+	public DefaultSaleAdvertisementEntity(String productTitle, String productDescription, DefaultUserEntity user) {
 		super();
 		this.product_title = productTitle;
 		this.product_description = productDescription;
 		this.user = user;
-		this.date = date;
 		this.state = State.STATE_ON_SALE;
 	}
 
