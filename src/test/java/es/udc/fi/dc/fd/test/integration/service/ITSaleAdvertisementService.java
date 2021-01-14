@@ -146,7 +146,6 @@ class ITSaleAdvertisementService {
 		saleAdvertisement = new DefaultSaleAdvertisementEntity();
 		saleAdvertisement.setProductTitle("ExampleProductTittle");
 		saleAdvertisement.setProductDescription("ExampleProductDescription");
-		saleAdvertisement.setDate(LocalDateTime.of(2020, 3, 2, 20, 50));
 		saleAdvertisement.setUser(user);
 		saleAdvertisement.setPrice(BigDecimal.valueOf(15));
 
@@ -159,7 +158,6 @@ class ITSaleAdvertisementService {
 		// Check saved data
 		Assert.assertEquals("ExampleProductTittle", savedSaleAdvertisement.getProductTitle());
 		Assert.assertEquals("ExampleProductDescription", savedSaleAdvertisement.getProductDescription());
-		Assert.assertEquals(savedSaleAdvertisement.getDate(), LocalDateTime.of(2020, 3, 2, 20, 50));
 
 		// Check if user have sale advertisement
 		DefaultUserEntity updatedUser = userService.findById(1);
@@ -191,7 +189,7 @@ class ITSaleAdvertisementService {
 	// NOT CHECKED WHAT HAPPEN IF UPDATE SET OF IMAGES OR USER
 	@Test
 	void testUpdate_Existing_Updated()
-			throws SaleAdvertisementServiceException, UserNotFoundException, SaleAdvertisementAlreadyExistsException {
+			throws SaleAdvertisementNotFoundException, UserNotFoundException, SaleAdvertisementAlreadyExistsException {
 		final DefaultSaleAdvertisementEntity saleAdvertisement; // Sale advertisement for update
 		final DefaultUserEntity user; // User for sale Advertisement
 
@@ -211,7 +209,6 @@ class ITSaleAdvertisementService {
 		// Update sale advertisement attributes
 		savedSaleAdvertisement.setProductTitle("updated test product title");
 		savedSaleAdvertisement.setProductDescription("updated test product description");
-		savedSaleAdvertisement.setDate(LocalDateTime.of(2020, 6, 2, 10, 50));
 		savedSaleAdvertisement.setUser(userService.findById(2));
 
 		// Update sale advertisement
@@ -221,7 +218,6 @@ class ITSaleAdvertisementService {
 		// Check updated attributes
 		Assert.assertEquals("updated test product title", updatedSaleAdvertisement.getProductTitle());
 		Assert.assertEquals("updated test product description", updatedSaleAdvertisement.getProductDescription());
-		Assert.assertEquals(updatedSaleAdvertisement.getDate(), LocalDateTime.of(2020, 6, 2, 10, 50));
 		Assert.assertEquals(updatedSaleAdvertisement.getUser(), userService.findById(2));
 
 		// Check if user old user not have sale advertisement
@@ -252,7 +248,7 @@ class ITSaleAdvertisementService {
 
 		saleAdvertisement.setId(100);
 		// Update not existing sale advertisement throw exception
-		Assertions.assertThrows(SaleAdvertisementServiceException.class,
+		Assertions.assertThrows(SaleAdvertisementNotFoundException.class,
 				() -> service.update((DefaultSaleAdvertisementEntity) saleAdvertisement));
 	}
 

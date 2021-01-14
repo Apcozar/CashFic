@@ -167,34 +167,10 @@ class ITChatMessageService {
 		Assertions.assertThrows(IncorrectChatMessageException.class, () -> {
 			chatMessageService.sendChatMessage(userOne.getId(), userTwo.getId(), "");
 		});
-	}
-
-	@Test
-	void sendChatMessageIncorrectChatMessage2Test()
-			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
-			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
-
-		DefaultUserEntity userOne = createUser(LOGIN, EMAIL);
-		DefaultUserEntity userTwo = createUser(LOGIN2, EMAIL2);
-
-		userService.signUp(userOne);
-		userService.signUp(userTwo);
 
 		Assertions.assertThrows(IncorrectChatMessageException.class, () -> {
 			chatMessageService.sendChatMessage(userOne.getId(), userTwo.getId(), "      ");
 		});
-	}
-
-	@Test
-	void sendChatMessageIncorrectChatMessage3Test()
-			throws UserLoginExistsException, UserEmailExistsException, UserLoginAndEmailExistsException,
-			UserNotFoundException, ChatRoomNotFoundException, IncorrectChatMessageException {
-
-		DefaultUserEntity userOne = createUser(LOGIN, EMAIL);
-		DefaultUserEntity userTwo = createUser(LOGIN2, EMAIL2);
-
-		userService.signUp(userOne);
-		userService.signUp(userTwo);
 
 		Assertions.assertThrows(IncorrectChatMessageException.class, () -> {
 			chatMessageService.sendChatMessage(userOne.getId(), userTwo.getId(), null);

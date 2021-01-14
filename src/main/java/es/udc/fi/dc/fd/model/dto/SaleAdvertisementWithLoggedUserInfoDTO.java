@@ -52,7 +52,8 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	/**
 	 * Sale advertisement's images
 	 */
-	private ArrayList<ImageDTO> images = new ArrayList<>();
+	private List<ImageDTO> images = new ArrayList<>();
+
 	/**
 	 * Sale advertisement's product title
 	 */
@@ -88,13 +89,15 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	private final LocalDateTime date;
 
+	/** The advertisement's price. */
 	private final BigDecimal price;
 
+	/** The sale advertisement ID. */
 	private final Integer saleAdvertisementID;
 	/**
 	 * Sale advertisement's likes count
 	 */
-	private final Integer saleAdvertisementLikesCount;
+	private Integer saleAdvertisementLikesCount;
 	/**
 	 * boolean true if logged user likes sale advertisement false if not
 	 */
@@ -102,10 +105,6 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 
 	/** The city of the user. */
 	private final String city;
-
-	public BigDecimal getPrice() {
-		return price;
-	}
 
 	/**
 	 * boolean true if logged user likes sale advertisement false if not
@@ -123,13 +122,25 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	private final boolean saleAdvertisementIsSold;
 
+	/** The is user logged. */
+	private final boolean isUserLogged;
+
 	/**
 	 * Constructs SaleAdvertisementWithLoggedUserInfoDTO DTO.
+	 *
+	 * @param saleAdvertisement                      the sale advertisement
+	 * @param userLikeSaleAdvertisement              the user like sale
+	 *                                               advertisement
+	 * @param loggedUserFollowsSaleAdvertisementUser the logged user follows sale
+	 *                                               advertisement user
+	 * @param areUserRated                           the are user rated
+	 * @param averageRating                          the average rating
+	 * @param saleAdvertisementIsSold                the sale advertisement is sold
+	 * @param isUserLogged                           the is user logged
 	 */
 	public SaleAdvertisementWithLoggedUserInfoDTO(SaleAdvertisementEntity saleAdvertisement,
-
 			boolean userLikeSaleAdvertisement, boolean loggedUserFollowsSaleAdvertisementUser, boolean areUserRated,
-			Double averageRating, boolean saleAdvertisementIsSold) {
+			Double averageRating, boolean saleAdvertisementIsSold, boolean isUserLogged) {
 
 		super();
 
@@ -150,7 +161,7 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		this.averageRating = averageRating;
 		saleAdvertisement.getImages().forEach(image -> images.add(new ImageDTO(image)));
 		this.saleAdvertisementIsSold = saleAdvertisementIsSold;
-
+		this.isUserLogged = isUserLogged;
 	}
 
 	/**
@@ -168,6 +179,13 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	}
 
 	/**
+	 * @param images the images to set
+	 */
+	public void setImages(List<ImageDTO> images) {
+		this.images = images;
+	}
+
+	/**
 	 * @return the productTitle
 	 */
 	public String getProductTitle() {
@@ -179,6 +197,10 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	public String getProductDescription() {
 		return productDescription;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
 	}
 
 	/**
@@ -207,6 +229,15 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	public Integer getSaleAdvertisementLikesCount() {
 		return saleAdvertisementLikesCount;
+	}
+
+	/**
+	 * Sets the sale advertisement likes count.
+	 *
+	 * @param saleAdvertisementLikesCount the sale advertisement likes count
+	 */
+	public void setSaleAdvertisementLikesCount(Integer saleAdvertisementLikesCount) {
+		this.saleAdvertisementLikesCount = saleAdvertisementLikesCount;
 	}
 
 	/**
@@ -243,11 +274,15 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 		return role;
 	}
 
+	public boolean isUserLogged() {
+		return isUserLogged;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(city, date, images, loggedUserFollowsSaleAdvertisementUser, ownerUserId, ownerUserLogin,
 				price, productDescription, productTitle, role, saleAdvertisementID, saleAdvertisementLikesCount, state,
-				userLikeSaleAdvertisement, areUserRated, averageRating);
+				userLikeSaleAdvertisement, areUserRated, averageRating, isUserLogged);
 	}
 
 	@Override
@@ -270,7 +305,8 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 				&& Objects.equals(saleAdvertisementLikesCount, other.saleAdvertisementLikesCount)
 				&& Objects.equals(state, other.state) && userLikeSaleAdvertisement == other.userLikeSaleAdvertisement
 				&& Objects.equals(areUserRated, other.areUserRated)
-				&& Objects.equals(averageRating, other.averageRating);
+				&& Objects.equals(averageRating, other.averageRating)
+				&& Objects.equals(isUserLogged, other.isUserLogged);
 	}
 
 	@Override
@@ -281,7 +317,7 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 				+ saleAdvertisementID + ", saleAdvertisementLikesCount=" + saleAdvertisementLikesCount
 				+ ", userLikeSaleAdvertisement=" + userLikeSaleAdvertisement
 				+ ", loggedUserFollowsSaleAdvertisementUser=" + loggedUserFollowsSaleAdvertisementUser + ", city="
-				+ city + "]";
+				+ city + ", isUserLogged=" + isUserLogged + "]";
 	}
 
 }

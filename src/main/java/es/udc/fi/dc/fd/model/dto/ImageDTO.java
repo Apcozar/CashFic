@@ -53,8 +53,15 @@ public final class ImageDTO implements Serializable {
 	 */
 	private String imagePath;
 
+	public ImageDTO(String imagePath) {
+		super();
+		this.imagePath = imagePath;
+	}
+
 	/**
-	 * Constructs a DTO for the image entity
+	 * Constructs a DTO for the image entity.
+	 *
+	 * @param image the image
 	 */
 	public ImageDTO(ImageEntity image) {
 		super();
@@ -90,8 +97,9 @@ public final class ImageDTO implements Serializable {
 		if (imagePath == null) {
 			if (other.imagePath != null)
 				return false;
-		} else if (!imagePath.equals(other.imagePath))
+		} else if (!imagePath.equals(other.imagePath)) {
 			return false;
+		}
 		return true;
 	}
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:include="fragments/header :: header">
+<title th:text="#{title.purchaseHistory}"></title>
+</head>
+
+<body>
+	<header class="header" th:include="fragments/menu :: menu"> </header>
+
+	<div class="container-fluid">
+		<div
+			th:replace="fragments/showProfile.html
+	      :: showProfile(user=${user})">
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="card bg-light">
+			<div class="card-header">
+				<h3>
+					<span th:text="#{title.purchaseHistory}" id="title"></span>
+				</h3>
+			</div>
+
+			<th:block th:each="buyTransaction : ${buyTransactions}" th:with="sdf = ${new java.text.SimpleDateFormat('dd/MM/yy HH:mm')}">
+			<span th:text="#{label.purchaseDate} + ' ' + ${#dates.format(sdf.parse(buyTransaction.createdDate), 'dd/MM/yy HH:mm')}"></span>
+				<div
+					th:replace="fragments/showSaleAdvertisement.html
+			      :: showSaleAdvertisement(saleAdvertisement=${buyTransaction.saleAdvertisementDTO})">
+				</div>
+			</th:block>
+
+
+		</div>
+	</div>
+
+	<footer>
+		<div th:include="fragments/scripts :: general"></div>
+	</footer>
+</body>
+
+</html>

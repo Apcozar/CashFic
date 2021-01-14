@@ -5,7 +5,7 @@
 	      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0" metadata-complete="true">
 
-	<display-name>FD Spring MVC Guapi Pop App</display-name>
+	<display-name>FD Spring MVC CashFIC App</display-name>
 	<description>Test project for FD 2020</description>
 
 	<context-param>
@@ -26,27 +26,23 @@
 	</listener>
 
 	<filter>
-        <filter-name>
-            OpenEntityManagerInViewFilter
-        </filter-name>
-            <filter-class>
-                org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter
-            </filter-class>
-            <init-param>
-                <param-name>singleSession</param-name>
-                <param-value>true</param-value>
-            </init-param>
-            <init-param>
-                <param-name>flushMode</param-name>
-                <param-value>AUTO</param-value>
-            </init-param>
-    </filter>
+		<filter-name>OpenEntityManagerInViewFilter</filter-name>
+		<filter-class>
+			org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>
+		<init-param>
+			<param-name>singleSession</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>flushMode</param-name>
+			<param-value>AUTO</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>OpenEntityManagerInViewFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-    <filter-mapping>
-        <filter-name>OpenEntityManagerInViewFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-	
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -55,7 +51,7 @@
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
 
 	<servlet>
 		<!-- Application servlet -->

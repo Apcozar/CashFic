@@ -1,8 +1,3 @@
-<!DOCTYPE html>
-
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-
 <header th:fragment="menu">
 	<nav id="navbar-main" class="navbar navbar-main navbar-default">
 		<div class="container-fluid">
@@ -15,7 +10,7 @@
 						class="icon-bar"></span>
 				</button>
 				<a class="navbar-brand" th:href="@{/}"
-					th:text="#{application.title}">Webapp title</a>
+					th:text="#{application.title}" id="home">Webapp title</a>
 
 			</div>
 
@@ -26,55 +21,57 @@
 
 					<li><a th:href="@{/saleAdvertisement/add}"
 						class="btn btn-default" role="button" aria-pressed="true"
-						th:text="#{label.addSaleAdvertisement}"></a></li>
+						th:text="#{label.addSaleAdvertisement}" id="add"></a></li>
 
 					<li><a th:href="@{/saleAdvertisement/list}"
 						class="btn btn-default" role="button" aria-pressed="true"
-						th:text="#{label.saleAdvertisementList}"></a></li>
+						th:text="#{label.saleAdvertisementList}" id="list"></a></li>
 
 					<li><a th:href="@{/saleAdvertisement/followedList}"
 						class="btn btn-default" role="button" aria-pressed="true"
-						th:text="#{label.saleAdvertisementFollowedList}"></a></li>
+						th:text="#{label.saleAdvertisementFollowedList}" id="followedList"></a></li>
 
 					<li sec:authorize="isAnonymous()" class="dropdown"><a href="#"
 						class="dropdown-toggle" data-toggle="dropdown" role="button"
-						aria-haspopup="true" aria-expanded="false"><span
+						aria-haspopup="true" aria-expanded="false" id="menuAnonymous"><span
 							th:remove="tag" th:text="#{title.account}"></span> <span
 							aria-hidden="true"></span> </a>
 
 						<ul class="dropdown-menu" role="menu">
-							<li><a th:href="@{/signIn}"> <span
+							<li><a th:href="@{/signIn}" id="signIn"> <span
 									class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign
 									In
 							</a></li>
 
-							<li><a th:href="@{/signUp}"> <span
+							<li><a th:href="@{/signUp}" id="signUp"> <span
 									class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign
 									Up
 							</a></li>
 						</ul></li>
-					</th:block>
-
 
 					<li sec:authorize="isAuthenticated()" class="dropdown"><a
 						href="#" class="dropdown-toggle" data-toggle="dropdown"
-						role="button" aria-haspopup="true" aria-expanded="false"><span
+						role="button" aria-haspopup="true" aria-expanded="false" id="menuLogged"><span
 							th:remove="tag" sec:authentication="name"></span> <span
 							aria-hidden="true"></span> </a>
 
 						<ul class="dropdown-menu" role="menu">
-							<li><a th:href="@{/profile}"> <span
+							<li><a th:href="@{/profile}" id="profile"> <span
 									class="glyphicon glyphicon-user" aria-hidden="true"
 									th:text="#{label.profile}"></span>
 							</a></li>
-							<li><a th:href="@{/chat/emptyChat}"> <span
+							<li><a th:href="@{/chat/emptyChat}" id="chat"> <span
 									class="glyphicon glyphicon-comment" aria-hidden="true"
 									th:text="#{label.chat}"></span>
+							</a></li>
+							<li><a th:href="@{/profile/history}" id="history"> <span
+									class="glyphicon glyphicon-list-alt" aria-hidden="true"
+									th:text="#{label.history}"></span>
 							</a></li>
 
 							<li><a href="@{/logout}"
 								onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-								th:text="#{label.logout}"><span
+								th:text="#{label.logout}" id="logOut"><span
 									class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Logout
 							</a></li>
 							<form id="logout-form" th:action="@{/logout}" method="GET" hidden></form>
@@ -84,5 +81,3 @@
 		</div>
 	</nav>
 </header>
-
-</html>
