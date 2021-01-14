@@ -24,9 +24,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -152,59 +150,7 @@ public class SaleAdvertisementFormController {
 		}
 	}
 
-	/**
-	 * Update sale add.
-	 *
-	 * @param id                    the sale id
-	 * @param saleAdvertisementForm the sale add form
-	 * @param bindingResult         the binding result
-	 * @param model                 the model
-	 * 
-	 * @return the welcome view
-	 * @throws SaleAdvertisementNotFoundException exception
-	 */
-	@PutMapping(path = "/{id}")
-	public String updateSaleAdvertisement(@PathVariable Integer id,
-			@Valid @ModelAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_FORM) SaleAdvertisementForm saleAdvertisementForm,
-			BindingResult bindingResult, Model model) throws SaleAdvertisementNotFoundException {
-
-		try {
-			if (bindingResult.hasErrors()) {
-				checkSaleAdvertisement(id, model);
-				return SaleAdvertisementViewConstants.UPDATE_SALE_ADVERTISEMENT;
-			}
-
-			String username = securityService.findLoggedInUsername();
-
-			DefaultUserEntity user = userService.findByLogin(username);
-
-			saleAdvertisementService.update(new DefaultSaleAdvertisementEntity(id,
-					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user));
-
-			return ViewConstants.WELCOME;
-		} catch (SaleAdvertisementNotFoundException e) {
-			model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
-					SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
-			return SaleAdvertisementViewConstants.UPDATE_SALE_ADVERTISEMENT;
-		} catch (UserNotFoundException e) {
-			return ViewConstants.VIEW_SIGNIN;
-		}
-	}
-
-	/**
-	 * Check if the sale exists or not.
-	 *
-	 * @param id    the sale id
-	 * @param model the model
-	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
-	 *                                            exception
-	 */
-
-	private void checkSaleAdvertisement(Integer id, Model model) throws SaleAdvertisementNotFoundException {
-		saleAdvertisementService.findById(id);
-		model.addAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST,
-				SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_NOT_EXIST);
-	}
+	
 
 	/**
 	 * Upload images into the sale.

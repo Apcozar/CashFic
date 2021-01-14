@@ -110,24 +110,7 @@ public class ChatController {
 	@GetMapping(path = "/{id}")
 	public String showChat(@PathVariable(value = "id") Integer id, Model model) {
 		try {
-			String username = this.securityService.findLoggedInUsername();
-			DefaultUserEntity user = userService.findByLogin(username);
-			DefaultUserEntity recipientUser = userService.findById(id);
-
-			model.addAttribute(ChatViewConstants.USER, user);
-			model.addAttribute(ChatViewConstants.RECIPIENT_USER_ID, recipientUser.getId());
-			model.addAttribute(ChatViewConstants.CHAT_FORM, new ChatForm());
-
-			Integer chatId = chatRoomService.getChatId(user.getId(), recipientUser.getId(), true);
-			model.addAttribute(ChatViewConstants.CHAT_ACTIVE, chatId);
-
-			Set<DefaultChatRoomEntity> chatList = chatRoomService.findByUserId(user.getId());
-			model.addAttribute(ChatViewConstants.CHAT_LIST, chatList);
-
-			List<DefaultChatMessageEntity> messages = chatMessageService.findChatMessages(user.getId(),
-					recipientUser.getId());
-			model.addAttribute(ChatViewConstants.MESSAGES, messages);
-			model.addAttribute(ChatViewConstants.MESSAGES_SIZE, messages.size());
+			loadMessagges(model, id);
 
 			return ChatViewConstants.CHAT_VIEW;
 
@@ -147,24 +130,7 @@ public class ChatController {
 	@GetMapping(path = "/messages/{id}")
 	public String showMessagges(@PathVariable(value = "id") Integer id, Model model) {
 		try {
-			String username = this.securityService.findLoggedInUsername();
-			DefaultUserEntity user = userService.findByLogin(username);
-			DefaultUserEntity recipientUser = userService.findById(id);
-
-			model.addAttribute(ChatViewConstants.USER, user);
-			model.addAttribute(ChatViewConstants.RECIPIENT_USER_ID, recipientUser.getId());
-			model.addAttribute(ChatViewConstants.CHAT_FORM, new ChatForm());
-
-			Integer chatId = chatRoomService.getChatId(user.getId(), recipientUser.getId(), true);
-			model.addAttribute(ChatViewConstants.CHAT_ACTIVE, chatId);
-
-			Set<DefaultChatRoomEntity> chatList = chatRoomService.findByUserId(user.getId());
-			model.addAttribute(ChatViewConstants.CHAT_LIST, chatList);
-
-			List<DefaultChatMessageEntity> messages = chatMessageService.findChatMessages(user.getId(),
-					recipientUser.getId());
-			model.addAttribute(ChatViewConstants.MESSAGES, messages);
-			model.addAttribute(ChatViewConstants.MESSAGES_SIZE, messages.size());
+			loadMessagges(model, id);
 
 			return ChatViewConstants.CHAT_VIEW + " :: #messages_history";
 
@@ -240,5 +206,27 @@ public class ChatController {
 		} catch (UserNotFoundException | ChatRoomNotFoundException | IncorrectChatMessageException e) {
 			return ViewConstants.VIEW_SIGNIN;
 		}
+	}
+
+	private void loadMessagges(Model model, Integer userToChatId)
+			throws UserNotFoundException, ChatRoomNotFoundException {
+		String username = this.securityService.findLoggedInUsername();
+		DefaultUserEntity user = userService.findByLogin(username);
+		DefaultUserEntity recipientUser = userService.findById(userToChatId);
+
+		model.addAttribute(ChatViewConstants.USER, user);
+		model.addAttribute(ChatViewConstants.RECIPIENT_USER_ID, recipientUser.getId());
+		model.addAttribute(ChatViewConstants.CHAT_FORM, new ChatForm());
+
+		Integer chatId = chatRoomService.getChatId(user.getId(), recipientUser.getId(), true);
+		model.addAttribute(ChatViewConstants.CHAT_ACTIVE, chatId);
+
+		Set<DefaultChatRoomEntity> chatList = chatRoomService.findByUserId(user.getId());
+		model.addAttribute(ChatViewConstants.CHAT_LIST, chatList);
+
+		List<DefaultChatMessageEntity> messages = chatMessageService.findChatMessages(user.getId(),
+				recipientUser.getId());
+		model.addAttribute(ChatViewConstants.MESSAGES, messages);
+		model.addAttribute(ChatViewConstants.MESSAGES_SIZE, messages.size());
 	}
 }
