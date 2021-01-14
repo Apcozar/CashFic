@@ -13,11 +13,11 @@
 							
 					<th:block th:if="${user.isUserLogged()} == true">
 						<a th:if="${user.isPremium()} == false" type="button"
-							data-toggle="modal" data-target="#premiumModalCenter" href=""> <em class="far fa-gem"
+							data-toggle="modal" data-target="#premiumModalCenter" href="" id="becamePremium"> <em class="far fa-gem"
 							style="color: rgb(222, 217, 12);" aria-hidden="true"></em>
 						</a>
 						<a th:unless="${user.isPremium()} == false" class="fa-stack fa-lg" type="button"
-							data-toggle="modal" data-target="#premiumModalCenter" href="">
+							data-toggle="modal" data-target="#premiumModalCenter" href="" id="becameUser">
 						  <em class="far fa-gem fa-stack-1x" style="color: rgb(222, 217, 12);"></em>
 						  <em class="fa fa-ban fa-stack-2x text-danger"></em>
 						</a>
@@ -44,10 +44,10 @@
 										<form method="post"
 											th:action="@{/premium}">
 											<button type="button" class="btn btn-secondary"
-												data-dismiss="modal" th:text="#{label.cancel}"></button>
+												data-dismiss="modal" th:text="#{label.cancel}" id="cancel"></button>
 		
 											<button type="submit" class="btn btn-primary"
-												th:text="#{label.accept}"></button>
+												th:text="#{label.accept}" id="submit"></button>
 										</form>
 									</div>
 								</div>
@@ -57,16 +57,16 @@
 					
 					<th:block th:if="${user.isUserLogged()} == false">
 						<a th:if="${user.isFollowedByUserLogged()} == false" type="button"
-							th:href="@{/follow/} + ${user.id}"> <i
+							th:href="@{/follow/} + ${user.id}" id="followUser"> <i
 							class="fa fa-user-plus fa-lg" aria-hidden="true"></i>
 						</a>
 
 						<a th:unless="${user.isFollowedByUserLogged()} == false"
-							type="button" th:href="@{/unfollow/} + ${user.id}"> <i
+							type="button" th:href="@{/unfollow/} + ${user.id}" id="unfollowUser"> <i
 							class="fa fa-user-times fa-lg" aria-hidden="true"></i>
 						</a>
 
-						<a th:href="@{/chat/} + ${user.id}"> <i class="fa fa-comment"
+						<a th:href="@{/chat/} + ${user.id}" id="chat"> <i class="fa fa-comment"
 							aria-hidden="true"></i>
 						</a>
 
@@ -75,7 +75,7 @@
 							<fieldset class="rating">
 								<legend></legend>
 								<button type="submit" class="btn btn-primary pull-right"
-									th:text="#{label.rate}"></button>
+									th:text="#{label.rate}" id="submitRate"></button>
 								<input type="radio" id="star5" name="rating" value="5"
 									th:field="*{ratingValue}" /><label for="star5" title="Rocks!">5
 									stars</label> <input type="radio" id="star4" name="rating" value="4"
@@ -92,7 +92,7 @@
 						</form>
 						<p th:unless="${user.isRatedByUserLogged()} == false"
 							class="small ratedUser">
-							<em th:text="#{label.rateWith} + ${user.rateByUserLogged}"></em>
+							<em th:text="#{label.rateWith} + ${user.rateByUserLogged}" id="ratedValue"></em>
 							<i class="fa fa-star-o" aria-hidden="true"></i>
 						</p>
 					</th:block>

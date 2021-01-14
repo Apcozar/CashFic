@@ -324,6 +324,7 @@ public class AccountController {
 			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, saleAdvertisementsDtoList);
 
 			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_ADVERTISEMENTS);
+			model.addAttribute(AccountViewConstants.RATE_FORM, new RateForm());
 
 			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
 
@@ -354,6 +355,7 @@ public class AccountController {
 			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_LIST, saleAdvertisementsDtoList);
 
 			model.addAttribute(AccountViewConstants.USER_ADVERTISEMENTS_VIEW, AccountViewConstants.USER_LIKES);
+			model.addAttribute(AccountViewConstants.RATE_FORM, new RateForm());
 
 			return ViewConstants.USER_ADVERTISEMENTS_LIKES_LIST;
 

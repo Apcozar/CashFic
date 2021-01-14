@@ -21,9 +21,9 @@
 						<input type="text" id="login" name="login"
 							th:placeholder="Login" class="form-control"
 							th:field="*{login}" autofocus /> <span class="text-danger"
-							th:if="${#fields.hasErrors('login')}" th:errors="*{login}"></span>
+							th:if="${#fields.hasErrors('login')}" th:errors="*{login}" id="loginError"></span>
 						<span class="text-danger" th:if="${user_exist != null}"
-							th:text="#{loginExists}"></span>
+							th:text="#{loginExists}" id="errorLoginExists"></span>
 					</div>
 
 					<div class="form-group"
@@ -31,7 +31,7 @@
 						<input type="password" th:placeholder="Password" id="password"
 							name="password" class="form-control" th:field="*{password}" /> <span
 							class="text-danger" th:if="${#fields.hasErrors('password')}"
-							th:errors="*{password}"></span>
+							th:errors="*{password}" id="passwordError"></span>
 					</div>
 					
 					<div class="form-group"
@@ -39,7 +39,7 @@
 						<input type="text" id="name" name="name"
 							th:placeholder="Name" class="form-control"
 							th:field="*{name}" autofocus /> <span class="text-danger"
-							th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+							th:if="${#fields.hasErrors('name')}" th:errors="*{name}" id="nameError"></span>
 					</div>
 					
 					<div class="form-group"
@@ -47,7 +47,7 @@
 						<input type="text" id="lastName" name="lastName"
 							th:placeholder="LastName" class="form-control"
 							th:field="*{lastName}" autofocus /> <span class="text-danger"
-							th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+							th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" id="lastNameError"></span>
 					</div>
 
 					<div class="form-group"
@@ -55,8 +55,8 @@
 						<input type="text" id="email" name="email" th:placeholder="Email"
 							class="form-control" th:field="*{email}" autofocus /> <span
 							class="text-danger" th:if="${#fields.hasErrors('email')}"
-							th:errors="*{email}"></span> <span class="text-danger"
-							th:if="${email_exist != null}" th:text="#{emailExist}"></span>
+							th:errors="*{email}" id="emailError"></span> <span class="text-danger"
+							th:if="${email_exist != null}" th:text="#{emailExist}" id="errorEmailExist"></span>
 					</div>
 
 					<div class="form-group"
@@ -64,11 +64,11 @@
 						<input type="text" id="city" name="city" th:placeholder="City"
 							class="form-control" th:field="*{city}" autofocus /> <span
 							class="text-danger" th:if="${#fields.hasErrors('city')}"
-							th:errors="*{city}"></span>
+							th:errors="*{city}" id="cityError"></span>
 					</div>
 					<div class="form-group">
 						<button class="btn btn-primary btn-block" name="Submit"
-							value="SignUp" type="Submit" th:text="SignUp"></button>
+							value="SignUp" type="Submit" th:text="#{label.signUp}" id="submit"></button>
 					</div>
 
 

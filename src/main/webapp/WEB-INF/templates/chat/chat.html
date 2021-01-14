@@ -15,7 +15,7 @@
 				<div class="inbox_people">
 					<div class="headind_srch">
 						<div class="recent_heading">
-							<h4 th:text="#{title.chat}"></h4>
+							<h4 th:text="#{title.chat}" id="titleChat"></h4>
 						</div>
 					</div>
 				
@@ -83,7 +83,7 @@
 								th:disabled="${chatActive} == null" autofocus /> <span class="text-danger"
 								th:if="${#fields.hasErrors('messageText')}" th:errors="*{message}"></span>
 
-							<button  class="msg_send_btn"
+							<button  class="msg_send_btn" id="submitMessage"
 								autofocus="autofocus" name="Submit" value="Send" type="Submit"
 								th:disabled="${chatActive} == null">
 								<i th:if="${chatActive} != null" class="fa fa-comment" aria-hidden="true"></i>

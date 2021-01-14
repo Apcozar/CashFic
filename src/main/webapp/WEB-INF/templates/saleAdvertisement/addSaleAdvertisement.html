@@ -35,7 +35,7 @@
 							th:placeholder="Title" class="form-control"
 							th:field="*{productTitle}" autofocus /> <span
 							class="text-danger" th:if="${#fields.hasErrors('productTitle')}"
-							th:errors="*{productTitle}"></span>
+							th:errors="*{productTitle}" id="errorProductTitle"></span>
 					</div>
 
 					<div class="form-group"
@@ -43,7 +43,7 @@
 						<input type="text" id="productDescription"
 							name="productDescription" th:placeholder="Description"
 							class="form-control" th:field="*{productDescription}" /> <span
-							class="text-danger"
+							class="text-danger" id="errorProductDescription"
 							th:if="${#fields.hasErrors('productDescription')}"
 							th:errors="*{productDescription}"></span>
 					</div>
@@ -53,7 +53,7 @@
 						<input type="number" id="price" step="any" min="0"
 							name="price" th:placeholder="Price"
 							class="form-control" th:field="*{price}" /> <span
-							class="text-danger"
+							class="text-danger" id="errorPrice"
 							th:if="${#fields.hasErrors('price')}"
 							th:errors="*{price}"></span>
 					</div>
@@ -73,7 +73,7 @@
 
 					<div class="form-group">
 						<button class="btn btn-primary btn-block" name="Submit"
-							value="Add" type="Submit" th:text="Add"></button>
+							value="Add" type="Submit" th:text="Add" id="submitSaleAdvertisement"></button>
 					</div>
 
 				</form>

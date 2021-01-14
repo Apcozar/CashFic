@@ -47,9 +47,9 @@
 							th:text="${saleAdvertisement.productTitle}"></del> <small
 						class="text-muted"
 						th:unless="${saleAdvertisement.state} == 'STATE_ON_SALE'"
-						th:text="#{label.onHoldInfo}"></small> <small class="text-muted"
+						th:text="#{label.onHoldInfo}" id="onHoldInfo"></small> <small class="text-muted"
 						th:if="${saleAdvertisement.saleAdvertisementIsSold} == true"
-						th:text="#{label.onSale}"></small>
+						th:text="#{label.onSale}" id="saleAdvertisementSoldInfo"></small>
 					</a>
 				</h1>
 				<h2>
@@ -97,7 +97,7 @@
 					<p>
 						<a th:if="${saleAdvertisement.userLikeSaleAdvertisement} == false"
 							type="button"
-							th:href="@{/saleAdvertisement/like/} + ${saleAdvertisement.saleAdvertisementID}">
+							th:href="@{/saleAdvertisement/like/} + ${saleAdvertisement.saleAdvertisementID}" id="likeSaleAdvertisement">
 							<i class="far fa-heart" style="color: #fb2c00;"
 							aria-hidden="true"></i>
 						</a>
@@ -106,7 +106,7 @@
 						<a
 							th:unless="${saleAdvertisement.userLikeSaleAdvertisement} == false"
 							type="button"
-							th:href="@{/saleAdvertisement/unlike/} + ${saleAdvertisement.saleAdvertisementID}">
+							th:href="@{/saleAdvertisement/unlike/} + ${saleAdvertisement.saleAdvertisementID}" id="unlikeSaleAdvertisement">
 							<i class="fas fa-heart" style="color: #fb2c00;"
 							aria-hidden="true"></i>
 						</a>
