@@ -86,18 +86,21 @@ public class DefaultBuyTransactionService implements BuyTransactionService {
 
 	@Override
 	public BuyTransactionEntity findById(BuyTransactionId identifier) throws BuyTransactionNotFoundException {
-		BuyTransactionEntity result = null;
+		BuyTransactionEntity result;
+		checkNotNull(identifier, "Received a null pointer as identifier");
 		if (!buyTransactionRepository.existsById(identifier)) {
 			throw new BuyTransactionNotFoundException(identifier);
-		} else {
-			result = buyTransactionRepository.getOne(identifier);
 		}
+		result = buyTransactionRepository.getOne(identifier);
 		return result;
 	}
 
 	@Override
 	public BuyTransactionEntity create(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
 			throws UserNotFoundException, SaleAdvertisementNotFoundException, BuyTransactionAlreadyExistsException {
+		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+
 		if (!userRepository.existsById(user.getId())) {
 			throw new UserNotFoundException(user.getId());
 		}
@@ -134,6 +137,10 @@ public class DefaultBuyTransactionService implements BuyTransactionService {
 	@Override
 	public boolean userHaveBoughtSaleAdvertisement(UserEntity user, SaleAdvertisementEntity saleAdvertisement)
 			throws UserNotFoundException, SaleAdvertisementNotFoundException {
+
+		checkNotNull(user, "Received a null pointer as user");
+		checkNotNull(saleAdvertisement, "Received a null pointer as saleAdvertisement");
+
 		if (!userRepository.existsById(user.getId())) {
 			throw new UserNotFoundException(user.getId());
 		}

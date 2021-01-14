@@ -108,7 +108,8 @@ public class SaleAdvertisementListViewController {
 			String username = this.securityService.findLoggedInUsername();
 			DefaultUserEntity user = userService.findByLogin(username);
 
-			DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(id);
+			DefaultSaleAdvertisementEntity saleAdvertisement = (DefaultSaleAdvertisementEntity) saleAdvertisementService
+					.findById(id);
 
 			SaleAdvertisementWithLoggedUserInfoDTO saleAdvertisementDto = createSaleAdvertisementDTO(saleAdvertisement,
 					user);

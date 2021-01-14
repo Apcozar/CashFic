@@ -39,8 +39,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.google.common.base.MoreObjects;
-
 import es.udc.fi.dc.fd.model.ImageEntity;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 
@@ -102,24 +100,6 @@ public class DefaultImageEntity implements ImageEntity {
 		this.sale_advertisement = saleAdvertisementEntity;
 	}
 
-	@Override
-	public final boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-
-		if (obj == null) {
-			return false;
-		}
-
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-
-		final DefaultImageEntity other = (DefaultImageEntity) obj;
-		return Objects.equals(id, other.id);
-	}
-
 	/**
 	 * Returns the identifier assigned to this image.
 	 * <p>
@@ -149,11 +129,6 @@ public class DefaultImageEntity implements ImageEntity {
 	}
 
 	@Override
-	public final int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
 	public void setId(final Integer value) {
 		id = checkNotNull(value, "Received a null pointer as identifier");
 	}
@@ -174,8 +149,25 @@ public class DefaultImageEntity implements ImageEntity {
 	}
 
 	@Override
-	public final String toString() {
-		return MoreObjects.toStringHelper(this).add("image_id", id).toString();
+	public int hashCode() {
+		return Objects.hash(id, image_path, sale_advertisement, title);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof DefaultImageEntity))
+			return false;
+		DefaultImageEntity other = (DefaultImageEntity) obj;
+		return Objects.equals(id, other.id) && Objects.equals(image_path, other.image_path)
+				&& Objects.equals(sale_advertisement, other.sale_advertisement) && Objects.equals(title, other.title);
+	}
+
+	@Override
+	public String toString() {
+		return "DefaultImageEntity [id=" + id + ", title=" + title + ", image_path=" + image_path
+				+ ", sale_advertisement=" + sale_advertisement + "]";
 	}
 
 }

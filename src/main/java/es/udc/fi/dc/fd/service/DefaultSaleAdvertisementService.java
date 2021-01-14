@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +42,6 @@ import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyExistsExceptio
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnHoldException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementAlreadyOnSaleException;
 import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementNotFoundException;
-import es.udc.fi.dc.fd.service.exceptions.SaleAdvertisementServiceException;
 
 /**
  * Default implementation of the saleAdd service.
@@ -94,12 +92,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	 */
 	@Override
 	public final SaleAdvertisementEntity findById(final Integer identifier) throws SaleAdvertisementNotFoundException {
-
-		checkNotNull(identifier, RECEIVED_A_NULL_POINTER_AS_IDENTIFIER);
-
-		if (!saleAdvertisementRepository.existsById(identifier)) {
-			throw new SaleAdvertisementNotFoundException(identifier);
-		}
+		checkSaleAdvertisementExists(identifier);
 		return saleAdvertisementRepository.getOne(identifier);
 	}
 
@@ -121,6 +114,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		if (saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
 			throw new SaleAdvertisementAlreadyExistsException(saleAdvertisement.getId());
 		}
+		saleAdvertisement.setDate(LocalDateTime.now());
 		return saleAdvertisementRepository.save(saleAdvertisement);
 	}
 
@@ -129,17 +123,14 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	 *
 	 * @param saleAdvertisement the sale advertisement entity with new parameters
 	 * @return the sale advertisement entity updated
-	 * @throws SaleAdvertisementServiceException the sale add service exception
+	 * @throws SaleAdvertisementNotFoundException when sale advertisement not found
 	 */
 	@Override
 	public final SaleAdvertisementEntity update(final DefaultSaleAdvertisementEntity saleAdvertisement)
-			throws SaleAdvertisementServiceException {
-		if (saleAdvertisement.getId() == null || saleAdvertisement.getId() == -1) {
-			throw new SaleAdvertisementServiceException("The sale add id cannot be null or -1");
-		}
-		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
-			throw new SaleAdvertisementServiceException("Sale advertisement not exists");
-		}
+			throws SaleAdvertisementNotFoundException {
+		checkNotNull(saleAdvertisement, "Received a null pointer as sale advertisement");
+		checkSaleAdvertisementExists(saleAdvertisement.getId());
+		saleAdvertisement.setDate(LocalDateTime.now());
 		return saleAdvertisementRepository.save(saleAdvertisement);
 	}
 
@@ -152,10 +143,7 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	@Override
 	public final void remove(final DefaultSaleAdvertisementEntity saleAdvertisement)
 			throws SaleAdvertisementNotFoundException {
-		checkNotNull(saleAdvertisement, RECEIVED_A_NULL_POINTER_AS_IDENTIFIER);
-		if (!saleAdvertisementRepository.existsById(saleAdvertisement.getId())) {
-			throw new SaleAdvertisementNotFoundException(saleAdvertisement.getId());
-		}
+		checkSaleAdvertisementExists(saleAdvertisement.getId());
 		saleAdvertisement.getImages().forEach(imageRepository::delete);
 		saleAdvertisementRepository.delete(saleAdvertisement);
 	}
@@ -192,30 +180,6 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 	}
 
 	/**
-	 * Find by id default.
-	 *
-	 * @param identifier the identifier
-	 * @return the implemented sale advertisement entity
-	 * @throws SaleAdvertisementNotFoundException the sale advertisement not found
-	 *                                            exception
-	 */
-	@Override
-	public final DefaultSaleAdvertisementEntity findByIdDefault(final Integer identifier)
-			throws SaleAdvertisementNotFoundException {
-
-		checkNotNull(identifier, RECEIVED_A_NULL_POINTER_AS_IDENTIFIER);
-
-		Optional<DefaultSaleAdvertisementEntity> defaultSaleAdvertisement = saleAdvertisementRepository
-				.findById(identifier);
-
-		if (!defaultSaleAdvertisement.isPresent()) {
-			throw new SaleAdvertisementNotFoundException(identifier);
-		}
-
-		return defaultSaleAdvertisement.get();
-	}
-
-	/**
 	 * Gets the sale advertisements by search criteria.
 	 *
 	 * @param city     the city
@@ -232,13 +196,10 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 		if (rating == null)
 			return saleAdvertisementRepository.findSaleAdvertisementsByCriteria(city, keywords, date1, date2, price1,
 					price2);
-
 		if (rating < DefaultUserService.MIN_RATING)
 			rating = Double.valueOf(DefaultUserService.MIN_RATING);
-
 		if (rating > DefaultUserService.MAX_RATING)
 			rating = Double.valueOf(DefaultUserService.MAX_RATING);
-
 		return saleAdvertisementRepository.findSaleAdvertisementsByCriteriaAndRating(city, keywords, date1, date2,
 				price1, price2, rating);
 	}
@@ -255,47 +216,44 @@ public class DefaultSaleAdvertisementService implements SaleAdvertisementService
 
 	@Override
 	public boolean areOnHoldAdvertisement(Integer identifier) throws SaleAdvertisementNotFoundException {
-		Optional<DefaultSaleAdvertisementEntity> saleAdvertisement = saleAdvertisementRepository.findById(identifier);
-
-		if (!saleAdvertisement.isPresent())
-			throw new SaleAdvertisementNotFoundException(identifier);
-
-		State state = saleAdvertisement.get().getState();
-
+		DefaultSaleAdvertisementEntity saleAdvertisement;
+		checkSaleAdvertisementExists(identifier);
+		saleAdvertisement = saleAdvertisementRepository.getOne(identifier);
+		State state = saleAdvertisement.getState();
 		return state.equals(State.STATE_ON_HOLD);
 	}
 
 	@Override
 	public void setOnHoldAdvertisement(Integer identifier)
 			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnHoldException {
-		Optional<DefaultSaleAdvertisementEntity> saleAdvertisement = saleAdvertisementRepository.findById(identifier);
-
-		if (!saleAdvertisement.isPresent())
-			throw new SaleAdvertisementNotFoundException(identifier);
-
-		State state = saleAdvertisement.get().getState();
-
+		DefaultSaleAdvertisementEntity saleAdvertisement;
+		checkSaleAdvertisementExists(identifier);
+		saleAdvertisement = saleAdvertisementRepository.getOne(identifier);
+		State state = saleAdvertisement.getState();
 		if (state.equals(State.STATE_ON_HOLD))
 			throw new SaleAdvertisementAlreadyOnHoldException(identifier);
-
-		saleAdvertisement.get().setState(State.STATE_ON_HOLD);
-		saleAdvertisementRepository.save(saleAdvertisement.get());
+		saleAdvertisement.setState(State.STATE_ON_HOLD);
+		saleAdvertisementRepository.save(saleAdvertisement);
 	}
 
 	@Override
 	public void setOnSaleAdvertisement(Integer identifier)
 			throws SaleAdvertisementNotFoundException, SaleAdvertisementAlreadyOnSaleException {
-		Optional<DefaultSaleAdvertisementEntity> saleAdvertisement = saleAdvertisementRepository.findById(identifier);
-
-		if (!saleAdvertisement.isPresent())
-			throw new SaleAdvertisementNotFoundException(identifier);
-
-		State state = saleAdvertisement.get().getState();
-
+		DefaultSaleAdvertisementEntity saleAdvertisement;
+		checkSaleAdvertisementExists(identifier);
+		saleAdvertisement = saleAdvertisementRepository.getOne(identifier);
+		State state = saleAdvertisement.getState();
 		if (state.equals(State.STATE_ON_SALE))
 			throw new SaleAdvertisementAlreadyOnSaleException(identifier);
-
-		saleAdvertisement.get().setState(State.STATE_ON_SALE);
-		saleAdvertisementRepository.save(saleAdvertisement.get());
+		saleAdvertisement.setState(State.STATE_ON_SALE);
+		saleAdvertisementRepository.save(saleAdvertisement);
 	}
+
+	private void checkSaleAdvertisementExists(Integer identifier) throws SaleAdvertisementNotFoundException {
+		checkNotNull(identifier, RECEIVED_A_NULL_POINTER_AS_IDENTIFIER);
+		if (!saleAdvertisementRepository.existsById(identifier)) {
+			throw new SaleAdvertisementNotFoundException(identifier);
+		}
+	}
+
 }

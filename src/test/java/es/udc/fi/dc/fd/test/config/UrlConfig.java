@@ -31,31 +31,36 @@ package es.udc.fi.dc.fd.test.config;
  */
 public final class UrlConfig {
 
-    /**
-     * Form view URL.
-     */
-    public static final String URL_FORM      = "/entity/edit";
+	/**
+	 * Form view URL.
+	 */
+	public static final String URL_FORM = "/entity/edit";
 
-    /**
-     * URL for posting the form data.
-     */
-    public static final String URL_FORM_POST = "/entity";
+	/**
+	 * URL for posting the form data.
+	 */
+	public static final String URL_FORM_POST = "/entity";
 
-    /**
-     * Entities list view URL.
-     */
-    public static final String URL_LIST      = "/entity/list";
+	/**
+	 * URL for posting the form data.
+	 */
+	public static final String ADD_SALE_ADVERTISEMENT = "/saleAdvertisement/addSaleAdvertisement";
 
-    /**
-     * Entities REST URL.
-     */
-    public static final String URL_REST      = "/rest/entity";
+	/**
+	 * Entities list view URL.
+	 */
+	public static final String URL_LIST = "/entity/list";
 
-    /**
-     * Default constructor to avoid initialization.
-     */
-    private UrlConfig() {
-        super();
-    }
+	/**
+	 * Entities REST URL.
+	 */
+	public static final String URL_REST = "/rest/entity";
+
+	/**
+	 * Default constructor to avoid initialization.
+	 */
+	private UrlConfig() {
+		super();
+	}
 
 }

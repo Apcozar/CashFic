@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.io.FilenameUtils;
@@ -115,10 +115,12 @@ public class SaleAdvertisementFormController {
 	@PostMapping(path = "/addSaleAdvertisement")
 	public String addSaleAdvertisement(
 			@Valid @ModelAttribute(SaleAdvertisementViewConstants.SALE_ADVERTISEMENT_FORM) SaleAdvertisementForm saleAdvertisementForm,
-			BindingResult bindingResult, Model model) throws SaleAdvertisementAlreadyExistsException {
+			BindingResult bindingResult, Model model, final HttpServletResponse response)
+			throws SaleAdvertisementAlreadyExistsException {
 
 		try {
 			if (bindingResult.hasErrors()) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_FORM;
 			}
 
@@ -129,16 +131,16 @@ public class SaleAdvertisementFormController {
 			double price = Double.parseDouble(saleAdvertisementForm.getPrice());
 
 			DefaultSaleAdvertisementEntity defaultSaleAdvertisement = new DefaultSaleAdvertisementEntity(
-					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user,
-					LocalDateTime.now());
+					saleAdvertisementForm.getProductTitle(), saleAdvertisementForm.getProductDescription(), user);
 
 			defaultSaleAdvertisement.setPrice(BigDecimal.valueOf(price));
 
 			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.add(defaultSaleAdvertisement);
 
-			if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
-				uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
-
+			if (saleAdvertisementForm.getImageFile() != null) {
+				if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
+					uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
+			}
 			return "redirect:" + "/saleAdvertisement/" + saleAdvertisement.getId();
 
 		} catch (UserNotFoundException e) {
@@ -147,6 +149,8 @@ public class SaleAdvertisementFormController {
 			return ViewConstants.WELCOME;
 		}
 	}
+
+	
 
 	/**
 	 * Upload images into the sale.
@@ -159,7 +163,8 @@ public class SaleAdvertisementFormController {
 	 */
 	private void uploadImages(Integer saleId, List<MultipartFile> files, Model model)
 			throws SaleAdvertisementNotFoundException {
-		DefaultSaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.findByIdDefault(saleId);
+		DefaultSaleAdvertisementEntity saleAdvertisement = (DefaultSaleAdvertisementEntity) saleAdvertisementService
+				.findById(saleId);
 		List<String> imageError = new ArrayList<>();
 
 		for (MultipartFile file : files) {
