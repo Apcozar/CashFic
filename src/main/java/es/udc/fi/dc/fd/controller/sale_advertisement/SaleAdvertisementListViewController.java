@@ -1,23 +1,26 @@
-package es.udc.fi.dc.fd.controller.saleAdvertisement;
+package es.udc.fi.dc.fd.controller.sale_advertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,9 +33,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
 import es.udc.fi.dc.fd.controller.account.AccountViewConstants;
+import es.udc.fi.dc.fd.controller.sale_advertisement.SaleAdvertisementViewConstants;
+import es.udc.fi.dc.fd.model.Role;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.State;
 import es.udc.fi.dc.fd.model.UserEntity;
+import es.udc.fi.dc.fd.model.dto.ImageDTO;
 import es.udc.fi.dc.fd.model.dto.SaleAdvertisementWithLoggedUserInfoDTO;
 import es.udc.fi.dc.fd.model.form.SearchCriteriaForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
@@ -130,12 +136,13 @@ public class SaleAdvertisementListViewController {
 	 * Show sale add list.
 	 *
 	 * @param model              the model
-	 * @param searchCriteriaFrom the search criteria from
+	 * @param searchCriteriaForm the search criteria form
+	 * @param request            the request
 	 * @return the string
 	 */
 	@GetMapping(path = "/list")
 	public String showSaleAdvertisementList(final ModelMap model,
-			@ModelAttribute("searchCriteriaForm") SearchCriteriaForm searchCriteriaFrom) {
+			@ModelAttribute("searchCriteriaForm") SearchCriteriaForm searchCriteriaForm, HttpServletRequest request) {
 		try {
 			String username;
 			DefaultUserEntity user;
@@ -149,18 +156,18 @@ public class SaleAdvertisementListViewController {
 			model.addAttribute(SaleAdvertisementViewConstants.VIEW_NAME, SaleAdvertisementViewConstants.VIEW_LIST);
 			model.addAttribute(AccountViewConstants.IS_RATED, isRated);
 
-			loadViewModel(model, searchCriteriaFrom, user);
+			loadViewModel(model, searchCriteriaForm, request, username);
 
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 
-		} catch (UserNotFoundException | UserNoRatingException e) {
+		} catch (UserNotFoundException | IOException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
 
 	@GetMapping(path = "/followedList")
 	public String showFollowedSaleAdvertisementList(final ModelMap model,
-			@ModelAttribute("searchCriteriaForm") SearchCriteriaForm searchCriteriaFrom) {
+			@ModelAttribute("searchCriteriaForm") SearchCriteriaForm searchCriteriaForm, HttpServletRequest request) {
 		try {
 			String username;
 			DefaultUserEntity user;
@@ -175,11 +182,11 @@ public class SaleAdvertisementListViewController {
 					SaleAdvertisementViewConstants.VIEW_FILTERED_LIST);
 			model.addAttribute(AccountViewConstants.IS_RATED, isRated);
 
-			loadViewModelFollow(model, searchCriteriaFrom, user);
+			loadViewModelFollow(model, searchCriteriaForm, request, user);
 
 			return SaleAdvertisementViewConstants.VIEW_SALE_ADVERTISEMENT_LIST;
 
-		} catch (UserNotFoundException | UserNoRatingException e) {
+		} catch (UserNotFoundException | IOException e) {
 			return ViewConstants.WELCOME;
 		}
 	}
@@ -396,44 +403,15 @@ public class SaleAdvertisementListViewController {
 	 * @param maxDate  the max date
 	 * @param minPrice the min price
 	 * @param maxPrice the max price
-	 * @throws UserNotFoundException
-	 * @throws UserNoRatingException
+	 * @throws IOException
 	 */
-	private final void loadViewModel(final ModelMap model, SearchCriteriaForm form, DefaultUserEntity user)
-			throws UserNotFoundException, UserNoRatingException {
 
-		LocalDate minimumDate;
-		LocalDate maximumDate;
+	private final void loadViewModel(final ModelMap model, SearchCriteriaForm form, HttpServletRequest request,
+			String username) throws IOException {
 
-		checkSearchCriteriaForm(form);
+		Set<SaleAdvertisementWithLoggedUserInfoDTO> saleAdvertisements = apiCall(form, request, username);
 
-		if (form.getMinDate() == null || form.getMinDate().isEmpty())
-			minimumDate = LocalDate.of(1900, 1, 1);
-		else
-			minimumDate = LocalDate.parse(form.getMinDate(), DateTimeFormatter.ISO_LOCAL_DATE);
-
-		if (form.getMaxDate() == null || form.getMaxDate().isEmpty())
-			maximumDate = LocalDate.now();
-		else
-			maximumDate = LocalDate.parse(form.getMaxDate(), DateTimeFormatter.ISO_LOCAL_DATE);
-
-		Iterable<DefaultSaleAdvertisementEntity> saleAdvertisementsList = saleAdvertisementService
-				.getSaleAdvertisementsBySearchCriteria(form.getCity(), form.getKeywords(),
-						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
-						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), form.getMinPrice(), form.getMaxPrice(),
-						form.getMinRating());
-		ArrayList<SaleAdvertisementWithLoggedUserInfoDTO> list = new ArrayList<>();
-
-		for (DefaultSaleAdvertisementEntity saleAdvertisement : saleAdvertisementsList) {
-
-			if ((saleAdvertisement.getBuyTransaction() == null) || !(saleAdvertisement.getBuyTransaction()
-					.getCreatedDate().isBefore(LocalDateTime.now().minusDays(1)))) {
-
-				list.add(createSaleAdvertisementDTO(saleAdvertisement, user));
-			}
-		}
-
-		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, list);
+		model.put(SaleAdvertisementViewConstants.PARAM_SALE_ADVERTISEMENTS, saleAdvertisements);
 
 	}
 
@@ -444,41 +422,21 @@ public class SaleAdvertisementListViewController {
 	 * @param form  the form
 	 * @throws UserNotFoundException the user not found exception
 	 * @throws UserNoRatingException the user no rating exception
+	 * @throws IOException
 	 */
-	private final void loadViewModelFollow(final ModelMap model, SearchCriteriaForm form, DefaultUserEntity user)
-			throws UserNotFoundException, UserNoRatingException {
+	private final void loadViewModelFollow(final ModelMap model, SearchCriteriaForm form, HttpServletRequest request,
+			UserEntity user) throws IOException {
 
-		LocalDate minimumDate;
-		LocalDate maximumDate;
-
-		checkSearchCriteriaForm(form);
-
-		if (form.getMinDate() == null || form.getMinDate().isEmpty())
-			minimumDate = LocalDate.of(1900, 1, 1);
-		else
-			minimumDate = LocalDate.parse(form.getMinDate(), DateTimeFormatter.ISO_LOCAL_DATE);
-
-		if (form.getMaxDate() == null || form.getMaxDate().isEmpty())
-			maximumDate = LocalDate.now();
-		else
-			maximumDate = LocalDate.parse(form.getMaxDate(), DateTimeFormatter.ISO_LOCAL_DATE);
-
-		Iterable<DefaultSaleAdvertisementEntity> unfiltered = saleAdvertisementService
-				.getSaleAdvertisementsBySearchCriteria(form.getCity(), form.getKeywords(),
-						LocalDateTime.of(minimumDate, LocalTime.of(0, 0, 0)),
-						LocalDateTime.of(maximumDate, LocalTime.of(23, 59, 59)), form.getMinPrice(), form.getMaxPrice(),
-						form.getMinRating());
+		Set<SaleAdvertisementWithLoggedUserInfoDTO> unfiltered = apiCall(form, request, user.getLogin());
 
 		List<SaleAdvertisementWithLoggedUserInfoDTO> filtered = new ArrayList<>();
 
-		for (DefaultSaleAdvertisementEntity saleAdvertisement : unfiltered) {
+		for (SaleAdvertisementWithLoggedUserInfoDTO saleAdvertisement : unfiltered) {
 
-			if (((saleAdvertisement.getBuyTransaction() == null) || !(saleAdvertisement.getBuyTransaction()
-					.getCreatedDate().isBefore(LocalDateTime.now().minusDays(1))))
-					&& (user.getFollowed().contains(saleAdvertisement.getUser()))) {
-
-				filtered.add(createSaleAdvertisementDTO(saleAdvertisement, user));
-			}
+			user.getFollowed().forEach(u -> {
+				if (u.getId().equals(saleAdvertisement.getOwnerUserId()))
+					filtered.add(saleAdvertisement);
+			});
 
 		}
 
@@ -532,29 +490,240 @@ public class SaleAdvertisementListViewController {
 		return result;
 	}
 
-	/**
-	 * Check search criteria form.
-	 *
-	 * @param form the form
-	 */
-	private void checkSearchCriteriaForm(SearchCriteriaForm form) {
+	private String getApiSearchPath(HttpServletRequest request, SearchCriteriaForm searchCriteriaFrom,
+			String username) {
+		String apiPath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+				+ context.getContextPath() + SaleAdvertisementViewConstants.FIND_API_REST;
 
-		if (form.getCity() == null || form.getCity().isEmpty())
-			form.setCity("%");
-		else if (form.getCity().contains("%"))
-			form.setCity("\\%");
+		apiPath += "?userName=" + username;
 
-		if (form.getKeywords() == null)
-			form.setKeywords("");
+		if ((searchCriteriaFrom.getCity() != null) && (StringUtils.isNotBlank(searchCriteriaFrom.getCity()))) {
+			apiPath += "&city=" + searchCriteriaFrom.getCity();
+		}
+		if ((searchCriteriaFrom.getKeywords() != null) && (StringUtils.isNotBlank(searchCriteriaFrom.getKeywords()))) {
+			apiPath += "&keywords=" + searchCriteriaFrom.getKeywords();
+		}
 
-		if (form.getKeywords().contains("%"))
-			form.setKeywords("\\%");
+		if ((searchCriteriaFrom.getMinPrice() != null)
+				&& (StringUtils.isNotBlank(searchCriteriaFrom.getMinPrice().toString()))) {
+			apiPath += "&minPrice=" + searchCriteriaFrom.getMinPrice().toString();
+		}
 
-		if (form.getMinPrice() == null)
-			form.setMinPrice(BigDecimal.valueOf(0));
+		if ((searchCriteriaFrom.getMaxPrice() != null)
+				&& (StringUtils.isNotBlank(searchCriteriaFrom.getMaxPrice().toString()))) {
+			apiPath += "&maxPrice=" + searchCriteriaFrom.getMaxPrice().toString();
+		}
 
-		if (form.getMaxPrice() == null)
-			form.setMaxPrice(saleAdvertisementService.getMaximumPrice());
+		if ((searchCriteriaFrom.getMinDate() != null) && (StringUtils.isNotBlank(searchCriteriaFrom.getMinDate()))) {
+			apiPath += "&minDate=" + searchCriteriaFrom.getMinDate();
+		}
+
+		if ((searchCriteriaFrom.getMaxDate() != null) && (StringUtils.isNotBlank(searchCriteriaFrom.getMaxDate()))) {
+			apiPath += "&maxDate=" + searchCriteriaFrom.getMaxDate();
+		}
+
+		if ((searchCriteriaFrom.getMinRating() != null)
+				&& (StringUtils.isNotBlank(searchCriteriaFrom.getMinRating().toString()))) {
+			apiPath += "&minRating=" + searchCriteriaFrom.getMinRating().toString();
+
+		}
+		return apiPath;
+	}
+
+	private void parseStringToDto(List<String> saleAdvertisementsString,
+			Set<SaleAdvertisementWithLoggedUserInfoDTO> saleAdvertisementsDto) {
+
+		int i;
+
+		List<ImageDTO> imagesDto;
+		DefaultUserEntity user;
+		SaleAdvertisementEntity saleAdvertisement;
+		SaleAdvertisementWithLoggedUserInfoDTO saleAdvertisementDto;
+
+		String images;
+		String imagePath;
+		String productTitle;
+		String productDescription;
+		String ownerUserLogin;
+		String state;
+		String ownerUserId;
+		String role;
+		String year;
+		String monthValue;
+		String dayOfMonth;
+		String hour;
+		String minute;
+		String second;
+		String price;
+		String saleAdvertisementID;
+		String saleAdvertisementLikesCount;
+		String userLikeSaleAdvertisement;
+		String city;
+		String loggedUserFollowsSaleAdvertisementUser;
+		String areUserRated;
+		String averageRating;
+		String saleAdvertisementIsSold;
+		String userLogged;
+
+		Double avgRating = null;
+
+		for (String x : saleAdvertisementsString) {
+			images = x.substring(x.indexOf('['), x.indexOf(']') + 1);
+			x = x.substring(x.indexOf(']') + 1);
+
+			x = x.substring(x.indexOf(":") + 1);
+			productTitle = x.substring(1, x.indexOf(',') - 1);
+
+			x = x.substring(x.indexOf(":") + 1);
+			productDescription = x.substring(1, x.indexOf(',') - 1);
+
+			x = x.substring(x.indexOf(":") + 1);
+			ownerUserLogin = x.substring(1, x.indexOf(',') - 1);
+
+			x = x.substring(x.indexOf(":") + 1);
+			state = x.substring(1, x.indexOf(',') - 1);
+
+			x = x.substring(x.indexOf(":") + 1);
+			ownerUserId = x.substring(0, x.indexOf(','));
+
+			x = x.substring(x.indexOf(":") + 1);
+			role = x.substring(0, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"year\":"));
+			year = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"monthValue\":"));
+			monthValue = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"dayOfMonth\":"));
+			dayOfMonth = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"hour\":"));
+			hour = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"minute\":"));
+			minute = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"second\":"));
+			second = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"price\":"));
+			price = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"saleAdvertisementID\":"));
+			saleAdvertisementID = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"saleAdvertisementLikesCount\":"));
+			saleAdvertisementLikesCount = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"userLikeSaleAdvertisement\":"));
+			userLikeSaleAdvertisement = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"city\":"));
+			city = x.substring(x.indexOf(":") + 2, x.indexOf(',') - 1);
+
+			x = x.substring(x.indexOf("\"loggedUserFollowsSaleAdvertisementUser\":"));
+			loggedUserFollowsSaleAdvertisementUser = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"areUserRated\":"));
+			areUserRated = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"averageRating\":"));
+			averageRating = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"saleAdvertisementIsSold\":"));
+			saleAdvertisementIsSold = x.substring(x.indexOf(":") + 1, x.indexOf(','));
+
+			x = x.substring(x.indexOf("\"userLogged\":"));
+			userLogged = x.substring(x.indexOf(":") + 1);
+
+			imagesDto = new ArrayList<>();
+
+			if (images.length() > 2) {
+
+				for (i = 0; i < images.length(); i++) {
+
+					if (images.charAt(i) == '}') {
+						imagePath = images.substring(images.indexOf(':') + 2, i - 1);
+						images = images.substring(i + 1);
+						imagesDto.add(new ImageDTO(imagePath));
+						i = 0;
+					}
+				}
+			}
+
+			user = new DefaultUserEntity();
+			user.setId(Integer.parseInt(ownerUserId));
+			user.setLogin(ownerUserLogin);
+			user.setCity(city);
+			user.setRole(Role.values()[Integer.parseInt(role)]);
+
+			saleAdvertisement = new DefaultSaleAdvertisementEntity(Integer.parseInt(saleAdvertisementID), productTitle,
+					productDescription, user);
+			saleAdvertisement.setPrice(BigDecimal.valueOf(Double.parseDouble(price)));
+			saleAdvertisement.setState(State.valueOf(state));
+			saleAdvertisement.setDate(
+					LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(monthValue), Integer.parseInt(dayOfMonth),
+							Integer.parseInt(hour), Integer.parseInt(minute), Integer.parseInt(second)));
+
+			if (!averageRating.equals("null")) {
+				avgRating = Double.parseDouble(averageRating);
+			}
+
+			saleAdvertisementDto = new SaleAdvertisementWithLoggedUserInfoDTO(saleAdvertisement,
+					Boolean.parseBoolean(userLikeSaleAdvertisement),
+					Boolean.parseBoolean(loggedUserFollowsSaleAdvertisementUser), Boolean.parseBoolean(areUserRated),
+					avgRating, Boolean.parseBoolean(saleAdvertisementIsSold), Boolean.parseBoolean(userLogged));
+			saleAdvertisementDto.setSaleAdvertisementLikesCount(Integer.parseInt(saleAdvertisementLikesCount));
+			saleAdvertisementDto.setImages(imagesDto);
+
+			saleAdvertisementsDto.add(saleAdvertisementDto);
+		}
+	}
+
+	private Set<SaleAdvertisementWithLoggedUserInfoDTO> apiCall(SearchCriteriaForm form, HttpServletRequest request,
+			String username) throws IOException {
+
+		int i;
+
+		Set<SaleAdvertisementWithLoggedUserInfoDTO> saleAdvertisements = new LinkedHashSet<>();
+		URL url;
+		HttpURLConnection connection;
+
+		String apiURL = getApiSearchPath(request, form, username);
+		url = new URL(apiURL);
+		connection = (HttpURLConnection) url.openConnection();
+		connection.setRequestMethod("GET");
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		String inputLine;
+		StringBuilder content = new StringBuilder();
+		while ((inputLine = in.readLine()) != null) {
+			content.append(inputLine);
+		}
+		in.close();
+
+		String responseString = content.toString().substring(1, content.length() - 1);
+		List<String> saleAdvertisementsString = new ArrayList<>();
+
+		int count = 0;
+		for (i = 0; i < responseString.length(); i++) {
+			if (responseString.charAt(i) == '{')
+				count += 1;
+			if (responseString.charAt(i) == '}')
+				count -= 1;
+
+			if (count == 0) {
+				saleAdvertisementsString.add(responseString.substring(responseString.indexOf('{') + 1, i));
+				responseString = responseString.substring(i + 1);
+				i = 0;
+			}
+
+		}
+
+		parseStringToDto(saleAdvertisementsString, saleAdvertisements);
+
+		return saleAdvertisements;
 	}
 
 }

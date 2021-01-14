@@ -5,7 +5,7 @@
 	      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0" metadata-complete="true">
 
-	<display-name>FD Spring MVC Guapi Pop App</display-name>
+	<display-name>FD Spring MVC CashFIC App</display-name>
 	<description>Test project for FD 2020</description>
 
 	<context-param>

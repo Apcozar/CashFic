@@ -53,6 +53,11 @@ public final class ImageDTO implements Serializable {
 	 */
 	private String imagePath;
 
+	public ImageDTO(String imagePath) {
+		super();
+		this.imagePath = imagePath;
+	}
+
 	/**
 	 * Constructs a DTO for the image entity.
 	 *
