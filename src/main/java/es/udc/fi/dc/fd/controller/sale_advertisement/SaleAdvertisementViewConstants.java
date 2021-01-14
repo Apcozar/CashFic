@@ -1,4 +1,4 @@
-package es.udc.fi.dc.fd.controller.saleAdvertisement;
+package es.udc.fi.dc.fd.controller.sale_advertisement;
 
 public class SaleAdvertisementViewConstants {
 
@@ -52,6 +52,9 @@ public class SaleAdvertisementViewConstants {
 
 	/** The Constant SEARCH_CRITERIA_FORM. */
 	public static final String SEARCH_CRITERIA_FORM = "searchCriteriaForm";
+
+	/** The Constant FIND_API_REST. */
+	public static final String FIND_API_REST = "/api/search";
 
 	/**
 	 * Private constructor to avoid initialization.

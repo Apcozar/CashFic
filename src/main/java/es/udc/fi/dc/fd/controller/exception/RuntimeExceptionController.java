@@ -28,7 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import es.udc.fi.dc.fd.controller.saleAdvertisement.exceptions.InternalServerErrorException;
+import es.udc.fi.dc.fd.controller.sale_advertisement.exceptions.InternalServerErrorException;
 
 /**
  * Controller which generates a runtime exception.

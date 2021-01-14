@@ -41,8 +41,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import es.udc.fi.dc.fd.controller.saleAdvertisement.SaleAdvertisementFormController;
-import es.udc.fi.dc.fd.controller.saleAdvertisement.SaleAdvertisementViewConstants;
+import es.udc.fi.dc.fd.controller.sale_advertisement.SaleAdvertisementFormController;
+import es.udc.fi.dc.fd.controller.sale_advertisement.SaleAdvertisementViewConstants;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultSaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.persistence.DefaultUserEntity;

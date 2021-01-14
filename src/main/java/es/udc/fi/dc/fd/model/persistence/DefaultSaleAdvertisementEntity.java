@@ -152,7 +152,6 @@ public class DefaultSaleAdvertisementEntity implements SaleAdvertisementEntity {
 		this.product_title = productTitle;
 		this.product_description = productDescription;
 		this.user = user;
-		this.date = date;
 		this.images = new HashSet<>();
 		this.state = State.STATE_ON_SALE;
 	}

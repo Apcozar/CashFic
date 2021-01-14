@@ -1,4 +1,4 @@
-package es.udc.fi.dc.fd.controller.saleAdvertisement.exceptions;
+package es.udc.fi.dc.fd.controller.sale_advertisement.exceptions;
 
 public class InternalServerErrorException extends Exception {
 

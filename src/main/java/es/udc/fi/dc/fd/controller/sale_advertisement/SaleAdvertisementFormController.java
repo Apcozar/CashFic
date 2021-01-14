@@ -1,4 +1,4 @@
-package es.udc.fi.dc.fd.controller.saleAdvertisement;
+package es.udc.fi.dc.fd.controller.sale_advertisement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
-import es.udc.fi.dc.fd.controller.saleAdvertisement.exceptions.InternalServerErrorException;
+import es.udc.fi.dc.fd.controller.sale_advertisement.exceptions.InternalServerErrorException;
 import es.udc.fi.dc.fd.model.SaleAdvertisementEntity;
 import es.udc.fi.dc.fd.model.form.SaleAdvertisementForm;
 import es.udc.fi.dc.fd.model.persistence.DefaultImageEntity;
@@ -137,9 +137,9 @@ public class SaleAdvertisementFormController {
 
 			SaleAdvertisementEntity saleAdvertisement = saleAdvertisementService.add(defaultSaleAdvertisement);
 
-			if (saleAdvertisementForm.getImageFile() != null) {
-				if (!saleAdvertisementForm.getImageFile().get(0).isEmpty())
-					uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
+			if ((saleAdvertisementForm.getImageFile() != null)
+					&& (!saleAdvertisementForm.getImageFile().get(0).isEmpty())) {
+				uploadImages(saleAdvertisement.getId(), saleAdvertisementForm.getImageFile(), model);
 			}
 			return "redirect:" + "/saleAdvertisement/" + saleAdvertisement.getId();
 
@@ -149,8 +149,6 @@ public class SaleAdvertisementFormController {
 			return ViewConstants.WELCOME;
 		}
 	}
-
-	
 
 	/**
 	 * Upload images into the sale.
@@ -310,7 +308,7 @@ public class SaleAdvertisementFormController {
 	private String getUserFolderRelativePath() {
 		String login = this.securityService.findLoggedInUsername();
 
-		return ViewConstants.UPLOADS_FOLDER_NAME + "/" + login;
+		return context.getContextPath() + ViewConstants.UPLOADS_FOLDER_NAME + "/" + login;
 	}
 
 }

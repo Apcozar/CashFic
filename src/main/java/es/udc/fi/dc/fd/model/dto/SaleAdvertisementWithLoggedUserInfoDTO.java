@@ -52,7 +52,8 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	/**
 	 * Sale advertisement's images
 	 */
-	private ArrayList<ImageDTO> images = new ArrayList<>();
+	private List<ImageDTO> images = new ArrayList<>();
+
 	/**
 	 * Sale advertisement's product title
 	 */
@@ -96,7 +97,7 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	/**
 	 * Sale advertisement's likes count
 	 */
-	private final Integer saleAdvertisementLikesCount;
+	private Integer saleAdvertisementLikesCount;
 	/**
 	 * boolean true if logged user likes sale advertisement false if not
 	 */
@@ -178,6 +179,13 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	}
 
 	/**
+	 * @param images the images to set
+	 */
+	public void setImages(List<ImageDTO> images) {
+		this.images = images;
+	}
+
+	/**
 	 * @return the productTitle
 	 */
 	public String getProductTitle() {
@@ -221,6 +229,15 @@ public final class SaleAdvertisementWithLoggedUserInfoDTO implements Serializabl
 	 */
 	public Integer getSaleAdvertisementLikesCount() {
 		return saleAdvertisementLikesCount;
+	}
+
+	/**
+	 * Sets the sale advertisement likes count.
+	 *
+	 * @param saleAdvertisementLikesCount the sale advertisement likes count
+	 */
+	public void setSaleAdvertisementLikesCount(Integer saleAdvertisementLikesCount) {
+		this.saleAdvertisementLikesCount = saleAdvertisementLikesCount;
 	}
 
 	/**

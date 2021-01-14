@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 
 import es.udc.fi.dc.fd.controller.ViewConstants;
-import es.udc.fi.dc.fd.controller.saleAdvertisement.SaleAdvertisementViewConstants;
+import es.udc.fi.dc.fd.controller.sale_advertisement.SaleAdvertisementViewConstants;
 import es.udc.fi.dc.fd.model.form.SaleAdvertisementForm;
 
 /**
