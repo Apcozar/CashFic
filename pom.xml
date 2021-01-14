@@ -413,11 +413,63 @@
 
 	<developers>
 		<developer>
-			<id>irlab</id>
-			<name>Information Retrieval Lab</name>
-			<email>irlab@udc.es</email>
+			<id>adrian.rubinos</id>
+			<name>Adrian Ulla Rubinos</name>
+			<email>adrian.rubinos@udc.es</email>
 			<url>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</url>
-			<organization>Information Retrieval Lab</organization>
+			<organization>CashFIC</organization>
+			<organizationUrl>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+			<properties />
+		</developer>
+		<developer>
+			<id>juan.lopez</id>
+			<name>Juan Lopez Rodriguez</name>
+			<email>juan.lopez@udc.es</email>
+			<url>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</url>
+			<organization>CashFIC</organization>
+			<organizationUrl>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+			<properties />
+		</developer>
+		<developer>
+			<id>a.pcozar</id>
+			<name>Angel Paderne Cozar</name>
+			<email>a.pcozar@udc.es</email>
+			<url>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</url>
+			<organization>CashFIC</organization>
+			<organizationUrl>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+			<properties />
+		</developer>
+		<developer>
+			<id>santiago.paz1</id>
+			<name>Santiago Paz Perez</name>
+			<email>santiago.paz1@udc.es</email>
+			<url>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</url>
+			<organization>CashFIC</organization>
+			<organizationUrl>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+			<properties />
+		</developer>
+		<developer>
+			<id>martin.rama.castro</id>
+			<name>Martin Rama Castro</name>
+			<email>martin.rama.castro@udc.es</email>
+			<url>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</url>
+			<organization>CashFIC</organization>
 			<organizationUrl>https://gitlab.fic.udc.es/ferramentas.2020/CashFIC</organizationUrl>
 			<roles>
 				<role>Developer</role>
